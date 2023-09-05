@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>osu_progressCLI</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="OsuMemoryDataProvider" Version="0.10.0" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
+	  <None Update="Credentials\*.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		  <Pack>True</Pack>
+		  <PackagePath>views</PackagePath>
+	  </None>
+  </ItemGroup>
+
+</Project>
