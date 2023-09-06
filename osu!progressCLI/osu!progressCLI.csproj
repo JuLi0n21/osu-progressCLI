@@ -15,7 +15,12 @@
 	  <None Update="Credentials\*.json">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		  <Pack>True</Pack>
-		  <PackagePath>views</PackagePath>
+		  <PackagePath>Credentials</PackagePath>
+	  </None>
+	  <None Update="server\**\*">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		  <Pack>True</Pack>
+		  <PackagePath>server</PackagePath>
 	  </None>
   </ItemGroup>
 

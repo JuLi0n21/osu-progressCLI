@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using osu_progressCLI.server;
 using osu1progressbar.Game.MemoryProvider;
 using System;
 using System.Net.Http;
@@ -21,7 +22,10 @@ class Program
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
 
-        while (true) ;
+        Webserver webserver = new Webserver();
+        while (true) {
+             webserver.listen();
+        };
     }
 
 }

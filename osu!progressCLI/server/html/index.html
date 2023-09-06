@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Chart Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <button id="loadDataButton">Load Data</button>
+    <canvas id="myChart"></canvas>
+
+    <script>
+        function renderChart(data) {
+            const labels = [];
+            const values = [];
+
+            // Extract the relevant data from the JSON
+            data.forEach(entry => {
+                console.log(entry);
+                labels.push(entry[3].Osufilename);
+                    values.push(entry[14].Accuracy);
+            });
+
+            console.log(values)
+
+            console.log(labels)
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Accuracy',
+                        data: values,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100 // Set the maximum value for the y-axis
+                        }
+                    }
+                }
+            });
+        }
+
+        document.getElementById('loadDataButton').addEventListener('click', function () {
+            fetch('/api/beatmaps.json')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    renderChart(data);
+                })
+                .catch(error => {
+                    console.error('Error loading data:', error);
+                });
+        });
+
+        // Trigger the initial data load when the page loads (optional)
+        window.addEventListener('DOMContentLoaded', function () {
+            // You can choose to load data immediately or wait for the button click
+            // For example, you can uncomment the line below to load data on page load:
+            // document.getElementById('loadDataButton').click();
+        });
+    </script>
+</body>
+</html>

@@ -79,7 +79,7 @@ namespace osu_progressCLI
 
         public async Task<JObject> getExpandedBeatmapinfo(string id)
         {
-            JObject beatmap;
+            JObject beatmap = null;
             //Console.WriteLine($"{DateTime.Now:T} Error reading {e.propPath}{Environment.NewLine}");
             string beatmapEndpoint = $"https://osu.ppy.sh/api/v2/beatmaps/lookup?id={id}";
 
@@ -103,10 +103,10 @@ namespace osu_progressCLI
             else
             {
                 Console.WriteLine($"Request failed with status code {reponse.StatusCode}");
-                return null;
+                return beatmap;
             }
 
-
+            client.Dispose();
             return beatmap;
         }
         

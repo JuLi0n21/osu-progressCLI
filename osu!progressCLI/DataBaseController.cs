@@ -101,8 +101,6 @@ namespace osu1progressbar.Game.Database
 
             Console.WriteLine("Database Created: " + dbname);
 
-            //think should be the times be based hourly or dayli?
-            //how many rows of data is accpetable for this? needs test data 
             string timeSpendTableQuery = @"
                 CREATE TABLE IF NOT EXISTS TimeWasted (Date TEXT ,RawStatus INTEGER, Time REAL)";
 
@@ -256,7 +254,6 @@ namespace osu1progressbar.Game.Database
 
             string starrating = "null", bpm = "null", creator = "null", artist = "null";
 
-            // Check if score exists based on id and has info
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
@@ -390,7 +387,7 @@ namespace osu1progressbar.Game.Database
                         urcount++;
                     });
 
-                    Console.WriteLine(((ur / urcount) * 100).ToString());
+                    //Console.WriteLine(((ur / urcount) * 100).ToString());
 
                     //YYYY-MM-DD HH:MM THIS FORMAT IS SUPPOSED TO BE USED 
                     using (var command = new SQLiteCommand(insertQuery, connection))
@@ -416,7 +413,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Hit50", baseAddresses.Player.Hit50);
                         command.Parameters.AddWithValue("@Hit100", baseAddresses.Player.Hit100);
                         command.Parameters.AddWithValue("@Hit300", baseAddresses.Player.Hit300);
-                        command.Parameters.AddWithValue("@Ur", ur.ToString());
+                        command.Parameters.AddWithValue("@Ur", ur.ToString()); //this is a lie 
                         command.Parameters.AddWithValue("@HitMiss", baseAddresses.Player.HitMiss);
                         command.Parameters.AddWithValue("@Mode", baseAddresses.Player.Mode);
                         command.Parameters.AddWithValue("@Mods", baseAddresses.Player.Mods.Value);
@@ -425,7 +422,7 @@ namespace osu1progressbar.Game.Database
                         command.ExecuteNonQuery();
                     }
 
-                    Console.WriteLine("Saved Score: ");
+                    Console.WriteLine($"Saved Score: {baseAddresses.Beatmap.OsuFileName}" );
 
                 }
                 catch (Exception e)
@@ -441,11 +438,11 @@ namespace osu1progressbar.Game.Database
 
         }
 
-        public List<string> GetScores(DateTime from, DateTime to)
+        public List<List<Dictionary<string, object>>> GetScoresInTimeSpan(DateTime from, DateTime to)
         {
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
             string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
-            List<string> scores = new List<string>();
+            List<List<Dictionary<string, object>>> scores = new List<List<Dictionary<string, object>>>();
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -473,20 +470,27 @@ namespace osu1progressbar.Game.Database
                     {
 
 
-                        //Console.WriteLine(reader.HasRows.ToString());
-
-                        //change to datatype maybe?
-
-                        string score = "";
+                        //Console.WriteLine(reader.HasRows.ToString
 
                         while (reader.Read())
                         {
-                            //Console.WriteLine(reader.GetDateTime(0).ToString());
+                            List<Dictionary<string, object>> row = new List<Dictionary<string, object>>();
+                            //Turn it back into a beatmap
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
-                                score = score + " " + reader[i].ToString();
+                                string columnName = reader.GetName(i);
+                                object columnValue = reader.GetValue(i);
+
+                                // Create a dictionary entry for each column
+                                Dictionary<string, object> columnEntry = new Dictionary<string, object>
+                                {
+                                    { columnName, columnValue }
+                                };
+
+                                row.Add(columnEntry);
+
                             }
-                            scores.Add(score);
+                            scores.Add(row);
                         }
 
                     }
@@ -501,7 +505,7 @@ namespace osu1progressbar.Game.Database
 
         public int GetScoreAmounts(DateTime from, DateTime to)
         {
-
+            //change or not use it, waste ...
             int rows = -1;
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
             string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
@@ -523,9 +527,6 @@ namespace osu1progressbar.Game.Database
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
 
-
-                        Console.WriteLine(reader.HasRows.ToString());
-
                         //change to datatype maybe?
 
                         while (reader.Read())
@@ -541,12 +542,6 @@ namespace osu1progressbar.Game.Database
 
             }
             return rows;
-        }
-
-        private List<string> getBeatmapinfo(string access_token, string beatmapid, string beatmapsetid) { 
-            List<string> Beatmap = new List<string>();
-
-            return Beatmap;
         }
 
     }

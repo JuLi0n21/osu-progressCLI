@@ -91,19 +91,6 @@ namespace osu1progressbar.Game.Logicstuff
                 oldRawStatus = NewValues.GeneralData.RawStatus;
                 Audiotime = NewValues.GeneralData.AudioTime;
 
-                if (stopwatch.ElapsedMilliseconds > 10000)
-                {
-                    DateTime from = DateTime.Now;
-                    from = from.Subtract(TimeSpan.FromDays(2));
-                    DateTime to = DateTime.Now;
-                    db.GetScores(from, to).ForEach(score =>
-                    {
-                       // Console.WriteLine(score.ToString());
-                    });
-
-                    //Console.Write(db.GetScores(from, to).Count());
-                    stopwatch.Restart();
-                }
 
                 return true;
             }
