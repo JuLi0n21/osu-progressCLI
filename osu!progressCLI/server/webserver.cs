@@ -21,15 +21,19 @@ namespace osu_progressCLI.server
 
         private DatabaseController databaseController;
 
+        private reqreshelper helper;
+
         private string ip = "127.0.0.1";
         private string port = "42069";
         public Webserver()
         {
             listener = new HttpListener();
             listener.Prefixes.Add($"http://{ip}:{port}/");
+            listener.IgnoreWriteExceptions = true;
             listener.Start();
             Console.WriteLine($"you can view ur Stats on localhost:{port}/");
             databaseController = new DatabaseController();
+            helper = new reqreshelper();
         }
         public Webserver Instance()
         {
@@ -54,31 +58,32 @@ namespace osu_progressCLI.server
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
 
-            Console.WriteLine(request.Url.Query);
+
+            Console.WriteLine($"queryparams: {request.Url.Query}");
 
             string path = request.Url.AbsolutePath;
             NameValueCollection queryparams = HttpUtility.ParseQueryString(request.Url.Query);
 
 
+            //default page
             if (path == "/")
             {
-                ServeStaticFile(response, "server/html/index.html", "text/html");
-            }
-            else if (path == "/api/beatmaps.json" && request.HttpMethod == "GET")
+                helper.defaultpage(request, response);
+            } //get all beatmaps
+            else if (path == "/api/beatmaps" && request.HttpMethod == "GET")
             {
+                helper.getAllBeatmapScroes(request, response);
+            }
+            else if (path == "/api/beatmapsintimespan" && queryparams["timespan"] != null && request.HttpMethod == "GET")
+            {
+                //convert timespan 
+                DateTime from = DateTime.Now;
                 DateTime to = DateTime.Now;
-                DateTime from = to.Subtract(TimeSpan.FromDays(30000));
+                helper.getBeatmapsinTimeSpan(request, response, from, to);
+            }
+            else if (path == "/api/beatmaps/search" && queryparams["searchquery"] != null) {
 
-                string beatmapstring = GetBeatmapData(from, to);
-
-                byte[] buffer = Encoding.UTF8.GetBytes(beatmapstring);
-
-                response.ContentType = "application/json";
-                response.ContentLength64 = buffer.Length;
-
-                response.OutputStream.Write(buffer, 0, buffer.Length);
-                response.OutputStream.Close();
-                Console.WriteLine("beatmaps send?");
+                helper.search(request, response, queryparams);
             }
             else
             {
@@ -89,42 +94,6 @@ namespace osu_progressCLI.server
                 response.OutputStream.Close();
             }
 
-        }
-
-        static void ServeStaticFile(HttpListenerResponse response, string filePath, string contentType)
-        {
-            if (File.Exists(filePath))
-            { 
-                string content = File.ReadAllText(filePath);
-                WriteResponse(response, content, contentType);
-            }
-            else
-            {
-                response.StatusCode = 404;
-                string responseString = $"404 - Not Found: File not found at {filePath}";
-                WriteResponse(response, responseString, "text/plain");
-            }
-        }
-
-        static void WriteResponse(HttpListenerResponse response, string responseString, string contentType)
-        {
-            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-
-            response.ContentType = contentType;
-            response.ContentLength64 = buffer.Length;
-
-            Stream output = response.OutputStream;
-            output.Write(buffer, 0, buffer.Length);
-            output.Close();
-        }
-
-        private string GetBeatmapData(DateTime from, DateTime to) {
-
-            //make database maybe single ton aswell or save accestoken somewhere instead of inside the object.
-            // databaseController.GetScoresInTimeSpan(from, to);
-            string jsondata = System.Text.Json.JsonSerializer.Serialize(databaseController.GetScoresInTimeSpan(from, to));
-            return jsondata;
-         
         }
 
         ~Webserver()

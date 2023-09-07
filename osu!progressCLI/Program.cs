@@ -24,6 +24,7 @@ class Program
 
         Webserver webserver = new Webserver();
         while (true) {
+            //can be called to fast
              webserver.listen();
         };
     }

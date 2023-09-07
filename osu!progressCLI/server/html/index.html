@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Chart Example</title>
+    <title>osu!progress</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -10,45 +10,163 @@
 
     <script>
         function renderChart(data) {
-            const labels = [];
-            const values = [];
+            const date = [];
+            const BeatmapSetid = [];
+            const Beatmapid = [];
+            const Osufilename = [];
+            const Ar = [];
+            const Cs = [];
+            const Hp = [];
+            const Od = [];
+            const Status = [];
+            const StarRating = [];
+            const Bpm = [];
+            const Artist = [];
+            const Creator = [];
+            const Username = [];
+            const Accuracy = [];
+            const MaxCombo = [];
+            const Score = [];
+            const Combo = [];
+            const Hit50 = [];
+            const Hit100 = [];
+            const Hit300 = [];
+            const Ur = [];
+            const HitMiss = [];
+            const Mode = [];
+            const Mods = [];
 
             // Extract the relevant data from the JSON
             data.forEach(entry => {
                 console.log(entry);
-                labels.push(entry[3].Osufilename);
-                    values.push(entry[14].Accuracy);
+                date.push(entry[0].Date);
+                BeatmapSetid.push(entry[1].BeatmapSetid);
+                Beatmapid.push(entry[2].Beatmapid);
+                Osufilename.push(entry[3].Osufilename);
+                Ar.push(entry[4].Ar);
+                Cs.push(entry[5].Cs);
+                Hp.push(entry[6].Hp);
+                Od.push(entry[7].Od);
+                Status.push(entry[8].Status);
+                StarRating.push(parseFloat(entry[9].StarRating));
+                Bpm.push(entry[10].Bpm); 
+                Artist.push(entry[11].Artist);
+                Creator.push(entry[12].Creator);
+                Username.push(entry[13].Username);
+                Accuracy.push(parseFloat(entry[14].Accuracy));
+                MaxCombo.push(entry[15].MaxCombo);
+                Score.push(entry[16].Score);
+                Combo.push(entry[17].Combo);
+                Hit50.push(entry[18].Hit50);
+                Hit100.push(entry[19].Hit100);
+                Hit300.push(entry[20].Hit300);
+                Ur.push(entry[21].Ur);
+                HitMiss.push(entry[22].HitMiss);
+                Mode.push(entry[23].Mode);
+                Mods.push(entry[24].Mods);
             });
 
-            console.log(values)
-
-            console.log(labels)
+             
             const ctx = document.getElementById('myChart').getContext('2d');
             const myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Accuracy',
-                        data: values,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
+                    labels: Osufilename,
+                    datasets: [
+                        {
+                            label: '50',
+                            data: Hit50, 
+                            backgroundColor: 'rgba(220, 135, 39, 0.8)',
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                            order: 1,
+                        },
+                        {
+                            label: '100',
+                            data: Hit100, 
+                            backgroundColor: 'rgba(63, 220, 39, 0.8)',
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                            order: 1,
+                        },
+                        {
+                            label: 'X',
+                            data: HitMiss,
+                            backgroundColor: 'rgba(204, 19, 19, 0.8)',
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                            order: 1,
+                        },
+                        {
+                            label: 'Stars',
+                            data: StarRating,
+                            backgroundColor: 'rgba(204, 19, 19, 0.8)',
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            borderWidth: 1,
+                            type: 'line',
+                            yAxisID: 'y2',
+                            order: 0,
+                        },
+                        {
+                            label: 'Bpm',
+                            data: Bpm,
+                            backgroundColor: 'rgba(204, 19, 19, 0.8)',
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            borderWidth: 1,
+                            type: 'line',
+                            yAxisID: 'y3',
+                            order: 0,
+                        },
+                    ]
                 },
                 options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100 // Set the maximum value for the y-axis
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'ScoreExample'
+                        },
+                        legend: {
+
                         }
+                    },
+                    responsive: true,
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true
+                        },
+                        y2: {
+                            position: 'right',
+
+                            ticks: {
+                                color: 'rgba(204, 19, 19, 0.8)'
+                            },
+                            grid: {
+                                drawOnChartArea: false // only want the grid lines for one axis to show up
+                            }
+                        },
+                        y3: {
+                            position: 'right',
+
+                            ticks: {
+                                color: 'rgba(243, 19, 19, 0.8)'
+                            },
+                            grid: {
+                                drawOnChartArea: false // only want the grid lines for one axis to show up
+                            }
+                        },
                     }
                 }
             });
         }
 
         document.getElementById('loadDataButton').addEventListener('click', function () {
-            fetch('/api/beatmaps.json')
+            fetch('/api/beatmaps')
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);

@@ -12,6 +12,7 @@ namespace osu_progressCLI
     {
         private static Crendtials instance;
 
+        //add access_token to shasre across the programm
         private string access_token { get; set; }
         private JsonDataHelper dataHelper { get; set; }
 
