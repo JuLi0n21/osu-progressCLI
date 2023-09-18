@@ -23,10 +23,15 @@ class Program
         memoryProvider.ReadDelay = 1;
 
         Webserver webserver = new Webserver();
-        while (true) {
-            //can be called to fast
-             webserver.listen();
-        };
+        Task listenTask = Task.Run(async () =>
+        {
+            while (true)
+            {
+                await webserver.listen(); 
+            }
+        });
+
+        await listenTask;
     }
 
 }

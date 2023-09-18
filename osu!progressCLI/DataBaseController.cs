@@ -11,6 +11,8 @@ using Newtonsoft.Json.Linq;
 using System.Runtime.CompilerServices;
 using System.Net.Http.Headers;
 using osu_progressCLI;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using System.Text.RegularExpressions;
 
 
 //Add proper debug messages and levels...
@@ -308,13 +310,13 @@ namespace osu1progressbar.Game.Database
                                 }
 
                             }
-                           
+
                         }
                     }
                 }
                 connection.Close();
-            }            
-            
+            }
+
             using (var connection = new SQLiteConnection(connectionString))
             {
                 try
@@ -422,7 +424,7 @@ namespace osu1progressbar.Game.Database
                         command.ExecuteNonQuery();
                     }
 
-                    Console.WriteLine($"Saved Score: {baseAddresses.Beatmap.OsuFileName}" );
+                    Console.WriteLine($"Saved Score: {baseAddresses.Beatmap.OsuFileName}");
 
                 }
                 catch (Exception e)
@@ -543,6 +545,94 @@ namespace osu1progressbar.Game.Database
             }
             return rows;
         }
+        public List<KeyValuePair<string, double>> GetBanchoTime(DateTime from, DateTime to)
+        {
+            List<KeyValuePair<string, double>> BanchoTime = new List<KeyValuePair<string, double>>();
+            int rows = 0;
 
+            string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
+            string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+
+                connection.Open();
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    //SELECT BanchoStatus, SUM(Time) FROM Group by BanchoStatus
+                    command.CommandText = "SELECT BanchoStatus, SUM(Time) as Time FROM BanchoTime WHERE datetime(Date) BETWEEN @from AND @to Group by BanchoStatus";
+
+                    command.Parameters.AddWithValue("@from", fromFormatted);
+                    command.Parameters.AddWithValue("@to", toFormatted);
+
+                    //rows = command.ExecuteNonQuery();
+
+                    Console.WriteLine(rows.ToString());
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+
+                        //change to datatype maybe?
+
+
+
+
+                        while (reader.Read())
+                        { 
+                            //Console.WriteLine(reader["BanchoStatus"].ToString(), Convert.ToString(reader["Time"]));
+                            BanchoTime.Add(new KeyValuePair<string, double>(reader["BanchoStatus"].ToString(), Convert.ToDouble(reader["Time"])));
+                        }
+                    }
+                }
+            }
+            return BanchoTime;
+        }
+
+        public List<KeyValuePair<string, double>> GetTimeWasted(DateTime from, DateTime to)
+        {
+            List<KeyValuePair<string, double>> BanchoTime = new List<KeyValuePair<string, double>>();
+            int rows = 0;
+
+            string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
+            string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+
+                connection.Open();
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    //SELECT BanchoStatus, SUM(Time) FROM Group by BanchoStatus
+                    command.CommandText = "SELECT RawStatus, SUM(Time) as Time FROM TimeWasted WHERE datetime(Date) BETWEEN @from AND @to Group by RawStatus";
+
+                    command.Parameters.AddWithValue("@from", fromFormatted);
+                    command.Parameters.AddWithValue("@to", toFormatted);
+
+                    //rows = command.ExecuteNonQuery();
+
+                    Console.WriteLine(rows.ToString());
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+
+                        //change to datatype maybe?
+
+
+
+
+                        while (reader.Read())
+                        {
+                            //Console.WriteLine(reader["BanchoStatus"].ToString(), Convert.ToString(reader["Time"]));
+                            BanchoTime.Add(new KeyValuePair<string, double>(reader["RawStatus"].ToString(), Convert.ToDouble(reader["Time"])));
+                        }
+                    }
+                }
+            }
+            return BanchoTime;
+        }
     }
 }
+
+

@@ -51,7 +51,13 @@ namespace osu_progressCLI.server
 
         public void getAllTimeWasted(HttpListenerRequest request, HttpListenerResponse response)
         {
-            //create db query firts
+            DateTime to = DateTime.Now;
+            DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
+
+            string beatmapstring = GetTimeWasted(from, to);
+
+            WriteResponse(response, beatmapstring, "application/json");
+
         }
 
         public void getTimeWastedinTimeSpan(HttpListenerRequest request, HttpListenerResponse response,DateTime from, DateTime to) {
@@ -60,7 +66,12 @@ namespace osu_progressCLI.server
 
         public void getAllBanchoTime(HttpListenerRequest request, HttpListenerResponse response)
         {
-            //create db query firts
+            DateTime to = DateTime.Now;
+            DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
+
+            string beatmapstring = GetBanchoTime(from, to);
+
+            WriteResponse(response, beatmapstring, "application/json");
         }
         public void getBanchoTimeinTineSpan(HttpListenerRequest request, HttpListenerResponse response, DateTime from, DateTime to)
         {
@@ -112,6 +123,19 @@ namespace osu_progressCLI.server
             //make database maybe single ton aswell or save accestoken somewhere instead of inside the object.
             // databaseController.GetScoresInTimeSpan(from, to);
             string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetScoresInTimeSpan(from, to));
+            return jsondata;
+
+        }
+
+        private string GetBanchoTime(DateTime from, DateTime to)
+        {
+            string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTime(from, to));
+            return jsondata;
+        }
+
+        private string GetTimeWasted(DateTime from, DateTime to) {
+
+            string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWasted(from, to));
             return jsondata;
 
         }

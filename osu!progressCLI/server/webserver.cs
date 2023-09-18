@@ -24,7 +24,7 @@ namespace osu_progressCLI.server
         private reqreshelper helper;
 
         private string ip = "127.0.0.1";
-        private string port = "42069";
+        private string port = "4200";
         public Webserver()
         {
             listener = new HttpListener();
@@ -46,13 +46,14 @@ namespace osu_progressCLI.server
             return instance;
         }
 
-        public async void listen()
+        public async Task listen()
         {
             HttpListenerContext context = await listener.GetContextAsync();
-            HandleRequest(context);
+            await HandleRequest(context);
         }
 
-        private void HandleRequest(HttpListenerContext context)
+
+        private async Task HandleRequest(HttpListenerContext context)
         {
 
             HttpListenerRequest request = context.Request;
@@ -85,15 +86,35 @@ namespace osu_progressCLI.server
 
                 helper.search(request, response, queryparams);
             }
+            else if (path == "/api/beatmaps/search" && queryparams["searchquery"] != null)
+            {
+                //convert timespan 
+                DateTime from = DateTime.Now;
+                DateTime to = DateTime.Now;
+                helper.getBanchoTimeinTineSpan(request, response, from, to);
+            }
+            else if (path == "/api/banchotime" && request.HttpMethod == "GET")
+            {
+                helper.getAllBanchoTime(request, response);
+            }
+            else if (path == "/api/timewasted" && request.HttpMethod == "GET")
+            {
+                helper.getAllTimeWasted(request, response);
+            }
             else
             {
                 Console.WriteLine("Invalid request");
                 // Handle a 404 - Not Found response for unknown routes
-                response.StatusCode = 302; // 302 Found (Temporary Redirect)
-                response.AddHeader("Location", "/");
+                response.StatusCode = 404; // 302 Found (Temporary Redirect)
+                //response.AddHeader("Location", "/");
                 response.OutputStream.Close();
             }
 
+        }
+
+        public void stop()
+        {
+            listener.Stop();
         }
 
         ~Webserver()
