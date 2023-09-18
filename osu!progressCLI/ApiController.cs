@@ -20,7 +20,7 @@ namespace osu_progressCLI
             clientid = Crendtials.Instance.GetClientId();
             clientsecret = Crendtials.Instance.GetClientSecret();
 
-            if (Crendtials.Instance.GetAccessToken() == null)
+            if(Crendtials.Instance.GetAccessToken() == null)
             {
                 getAccessToken();
             }
@@ -109,7 +109,78 @@ namespace osu_progressCLI
             client.Dispose();
             return beatmap;
         }
-        
+
+        public async Task<JObject> getSearch(string mode, string query) {
+
+            JObject search = null;
+
+            string searchEndpoint = $"https://osu.ppy.sh/api/v2/search?mode={mode}&query={query}";
+
+            var client = new HttpClient();
+
+            client.BaseAddress = new Uri(searchEndpoint);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Crendtials.Instance.GetAccessToken());
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+
+            HttpResponseMessage reponse = await client.GetAsync(searchEndpoint);
+
+            if (reponse.IsSuccessStatusCode)
+            {
+                string responseBody = await reponse.Content.ReadAsStringAsync();
+                Console.WriteLine("search Recieved.");
+                Console.WriteLine(responseBody);
+
+                search = JObject.Parse(responseBody);
+            }
+            else
+            {
+                Console.WriteLine($"Request failed with status code {reponse.StatusCode}");
+                return search;
+            }
+
+            client.Dispose();
+
+            return search;
+        }
+
+        public async Task<JObject> getuser(string user, string mode)
+        {
+
+            JObject search = null;
+
+            string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{user}/{mode}";
+
+            var client = new HttpClient();
+
+            client.BaseAddress = new Uri(searchEndpoint);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Crendtials.Instance.GetAccessToken());
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+
+            HttpResponseMessage reponse = await client.GetAsync(searchEndpoint);
+
+            if (reponse.IsSuccessStatusCode)
+            {
+                string responseBody = await reponse.Content.ReadAsStringAsync();
+                Console.WriteLine("search Recieved.");
+                Console.WriteLine(responseBody);
+
+                search = JObject.Parse(responseBody);
+            }
+            else
+            {
+                Console.WriteLine($"Request failed with status code {reponse.StatusCode}");
+                return search;
+            }
+
+            client.Dispose();
+
+            return search;
+        }
+
     }
 
     public class TokenResponse

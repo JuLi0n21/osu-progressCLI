@@ -253,6 +253,7 @@ namespace osu1progressbar.Game.Database
         //maybe consider passed or failed/canceld retires// more beatmap attributes
         public async void InsertScore(OsuBaseAddresses baseAddresses)
         {
+            apiController.getuser("11705938", "osu");
 
             string starrating = "null", bpm = "null", creator = "null", artist = "null";
 

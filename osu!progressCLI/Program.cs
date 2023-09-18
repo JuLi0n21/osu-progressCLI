@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using osu_progressCLI;
 using osu_progressCLI.server;
 using osu1progressbar.Game.MemoryProvider;
 using System;
