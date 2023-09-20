@@ -103,6 +103,10 @@ namespace osu_progressCLI.server
             {
                 helper.getAllTimeWasted(request, response);
             }
+            else if (path == "/api/save" && request.HttpMethod == "POST")
+            {
+                helper.save(request, response);
+            }
             else
             {
                 Console.WriteLine("Invalid request");

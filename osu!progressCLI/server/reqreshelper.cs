@@ -1,12 +1,15 @@
 ﻿using Newtonsoft.Json.Bson;
+using Newtonsoft.Json.Linq;
 using osu1progressbar.Game.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace osu_progressCLI.server
 {
@@ -24,7 +27,7 @@ namespace osu_progressCLI.server
         //defautl page
         public void defaultpage(HttpListenerRequest request, HttpListenerResponse response) {
 
-            WriteResponse(response, PageGenerator.Instance.generatepage("18767550", "osu"), "text/html");
+            WriteResponse(response, PageGenerator.Instance.generatepage(Credentials.Instance.GetConfig().userid, "osu"), "text/html");
             //ServeStaticFile(response, "server/html/index.html", "text/html");
         }
 
@@ -86,6 +89,22 @@ namespace osu_progressCLI.server
             //create db query frisrt
         }
 
+        public void save(HttpListenerRequest request, HttpListenerResponse response) {
+
+            string requestData = null;
+            using (Stream body = request.InputStream)
+            {
+                StreamReader reader = new StreamReader(body);
+                requestData = reader.ReadToEnd();
+            }
+
+            JObject parameters = JObject.Parse(requestData);
+
+            Credentials.Instance.UpdateApiCredentials(parameters["clientId"].ToString(), parameters["clientSecret"].ToString());
+
+            Credentials.Instance.UpdateConfig(parameters["localsettings"].ToString(), parameters["username"].ToString(), parameters["rank"].ToString(), parameters["country"].ToString(), parameters["coverUrl"].ToString(), parameters["avatarUrl"].ToString(), parameters["port"].ToString(), parameters["userid"].ToString());
+        }
+
         static void ServeStaticFile(HttpListenerResponse response, string filePath, string contentType)
         {
             if (File.Exists(filePath))
@@ -100,7 +119,6 @@ namespace osu_progressCLI.server
                 WriteResponse(response, responseString, "text/plain");
             }
         }
-
 
         static void WriteResponse(HttpListenerResponse response, string responseString, string contentType)
         {

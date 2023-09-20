@@ -19,10 +19,10 @@ namespace osu_progressCLI
         private string clientsecret;
         private ApiController() {
 
-            clientid = Crendtials.Instance.GetClientId();
-            clientsecret = Crendtials.Instance.GetClientSecret();
+            clientid = Credentials.Instance.GetClientId();
+            clientsecret = Credentials.Instance.GetClientSecret();
 
-            if(Crendtials.Instance.GetAccessToken() == null)
+            if(Credentials.Instance.GetAccessToken() == null)
             {
                 getAccessToken();
             }
@@ -67,7 +67,7 @@ namespace osu_progressCLI
 
                 TokenResponse tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
 
-                Crendtials.Instance.SetAccessToken(tokenResponse.access_token);
+                Credentials.Instance.SetAccessToken(tokenResponse.access_token);
 
             }
             else
@@ -80,6 +80,12 @@ namespace osu_progressCLI
 
         }
 
+        public async void updateapitokken(string clientid, string clientsecret) {
+            this.clientid = clientid;
+            this.clientsecret = clientsecret;
+            getAccessToken();
+        }
+
         public async Task<JObject> getExpandedBeatmapinfo(string id)
         {
             JObject beatmap = null;
@@ -89,7 +95,7 @@ namespace osu_progressCLI
             var client = new HttpClient();
 
             client.BaseAddress = new Uri(beatmapEndpoint);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Crendtials.Instance.GetAccessToken());
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Credentials.Instance.GetAccessToken());
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -122,7 +128,7 @@ namespace osu_progressCLI
             var client = new HttpClient();
 
             client.BaseAddress = new Uri(searchEndpoint);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Crendtials.Instance.GetAccessToken());
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Credentials.Instance.GetAccessToken());
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -148,17 +154,17 @@ namespace osu_progressCLI
             return search;
         }
 
-        public async Task<JObject> getuser(string user, string mode)
+        public async Task<JObject> getuser(string userid, string mode)
         {
 
             JObject userJson = null;
 
-            string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{user}/{mode}";
+            string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{userid}/{mode}";
 
             var client = new HttpClient();
 
             client.BaseAddress = new Uri(searchEndpoint);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Crendtials.Instance.GetAccessToken());
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Credentials.Instance.GetAccessToken());
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 

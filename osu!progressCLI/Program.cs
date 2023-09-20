@@ -20,8 +20,8 @@ class Program
         Console.WriteLine("If this is ur first time running read the README.txt");
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");
 
+        Credentials crendtials = Credentials.Instance; //instanceted it to load in data already
         ApiController apiController = ApiController.Instance; //to already get a access_token...
-        Crendtials crendtials = Crendtials.Instance; //instanceted it to load in data already
         
         //Configmanager congif = Configmanager.Instance; //incase user wants to customize anything could be done here maybe
 

@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu_progressCLI.server
 {
@@ -25,9 +20,10 @@ namespace osu_progressCLI.server
             }
         }
 
-        public string generatepage(string userid, string mode) {
-
-            JObject user = ApiController.Instance.getuser(userid, mode).Result;
+        public string generatepage(string userid, string mode)
+        {
+            JObject user = null;
+            var config = Credentials.Instance.GetConfig();
 
             string username = "Guest";
             string avatar_url = "https://osu.ppy.sh/images/layout/avatar-guest.png";
@@ -35,16 +31,47 @@ namespace osu_progressCLI.server
             string country = "Unknown";
             string rank = "-";
 
-            if (user != null)
-            {
-                username = user["username"]?.ToString();
-                avatar_url = user["avatar_url"]?.ToString();
-                cover_url = user["cover_url"]?.ToString();
-                country = user["country"]["name"]?.ToString();
-                rank = user["statistics"]["global_rank"]?.ToString();
-            }
+            if (config.Localconfig == "false") {
+                user = ApiController.Instance.getuser(userid, mode).Result;
 
-          
+                if (user != null)
+                {
+                    username = user["username"]?.ToString();
+                    avatar_url = user["avatar_url"]?.ToString();
+                    cover_url = user["cover_url"]?.ToString();
+                    country = user["country"]["name"]?.ToString();
+                    rank = user["statistics"]["global_rank"]?.ToString();
+                }
+            }
+            else {
+
+                if (!string.IsNullOrEmpty(config.username))
+                {
+                    username = config.username;
+                }
+
+                if (!string.IsNullOrEmpty(config.avatar_url))
+                {
+                    avatar_url = config.avatar_url;
+                }
+
+                if (!string.IsNullOrEmpty(config.cover_url))
+                {
+                    cover_url = config.cover_url;
+                }
+
+                if (!string.IsNullOrEmpty(config.country))
+                {
+                    country = config.country;
+                }
+
+                if (!string.IsNullOrEmpty(config.rank))
+                {
+                    rank = config.rank;
+                }
+            }
+        
+
 
 
             string html = $@"
@@ -142,65 +169,99 @@ namespace osu_progressCLI.server
         </button>
     </div>
 
-    <!-- Settings panel (initially hidden) -->
-    <div id=""settingsPanel"" class=""fixed top-20 right-5 transform rounded-lg scale-0 transition-transform duration-300 ease-in-out text-white text backdrop--dark"">
-        <i class=""fas fa-info-circle ml-2 text-blue-500 cursor-pointer hover:text-blue-700 top-0 right-0"" title=""Add informative text!""></i>
+<!-- Settings panel (initially hidden) -->
+<div id=""settingsPanel"" class=""fixed top-20 right-5 transform rounded-lg scale-0 transition-transform duration-300 ease-in-out text-white text backdrop--dark"">
+    <i class=""fas fa-info-circle ml-2 text-blue-500 cursor-pointer hover:text-blue-700 top-0 right-0"" title=""Add informative text!""></i>
 
-        <h2 class=""text-xl text-center font-semibold mb-4"">Settings</h2>
+    <h2 class=""text-xl text-center font-semibold mb-4"">Settings</h2>
 
-        <!-- ClientId -->
-        <div class=""mb-3 flex items-center"">
-            <label for=""ClientId"" class=""flex items-center m-0"" title=""This is your Client ID, which is used for authentication. Hover for more info."">
-                ClientId
-            </label>
-            <a href=""https://osu.ppy.sh/home/account/edit#oauth"" target=""_blank"" rel=""noopener noreferrer"">
-                <i class=""fas fa-external-link-alt ml-2 text-blue-500 cursor-pointer hover:text-blue-700"" title=""You can get your OAuth credentials here!""></i>
-            </a>
-        </div>
-            <input type=""text"" id=""ClientId"" class=""w-full border rounded px-2 py-1 backdrop--light"">
-           
-      
-
-        <!-- ClientSecret -->
-        <div class=""mb-3 flex items-center"">
-            <label for=""ClientSecret"" class=""flex items-center m-0"" title=""This is your Client Secret."">
-                ClientSecret
-                <i class=""fas fa-info-circle ml-2 text-blue-500 cursor-pointer hover:text-blue-700"" title=""Never Share your Credentials with anyone, these are stored locally!""></i>
-            </label>
-        </div>
-        <input type=""password"" id=""ClientSecret"" class=""w-full border rounded px-2 py-1 backdrop--light"">
-
-        <!-- Toggle 1 -->
-        <div class=""flex items-center justify-between mb-3"">
-            <span title=""Use Local config to set custom: Name, Rank, Banner, Avatar... (incause ur banned for example)"">Local config:</span>
-            <label class=""switch"">
-                <input type=""checkbox"" id=""toggle1"">
-                <span class=""slider round""></span>
-            </label>
-        </div>
-
-        <!-- Toggle 2 -->
-        <div class=""flex items-center justify-between mb-3"">
-            <span>Toggle 2:</span>
-            <label class=""switch"">
-                <input type=""checkbox"" id=""toggle2"">
-                <span class=""slider round""></span>
-            </label>
-        </div>
-
-        <!-- Text Input 3 -->
-        <div class=""mb-3"">
-            <label for=""textInput3"">Text Input 3:</label>
-            <input type=""text"" id=""textInput3"" class=""w-full border rounded px-2 py-1 backdrop--light"">
-        </div>
-
-        <!-- Save button -->
-        <div class=""flex justify-center"">
-        <button id=""saveButton"" class=""bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full"">
-            Save
-        </button>
-            </div>
+    <!-- ClientId -->
+    <div class=""mb-3 flex items-center"">
+        <label for=""ClientId"" class=""flex items-center m-0"" title=""This is your Client ID, which is used for authentication. Hover for more info."">
+            ClientId
+        </label>
+        <a href=""https://osu.ppy.sh/home/account/edit#oauth"" target=""_blank"" rel=""noopener noreferrer"">
+            <i class=""fas fa-external-link-alt ml-2 text-blue-500 cursor-pointer hover:text-blue-700"" title=""You can get your OAuth credentials here!""></i>
+        </a>
     </div>
+    <input type=""text"" id=""ClientId"" placeholder:{Credentials.Instance.GetClientId} class=""w-full border rounded px-2 py-1 backdrop--light"">
+
+    <!-- ClientSecret -->
+    <div class=""mb-3 flex items-center"">
+        <label for=""ClientSecret"" class=""flex items-center m-0"" title=""This is your Client Secret."">
+            ClientSecret
+            <i class=""fas fa-info-circle ml-2 text-blue-500 cursor-pointer hover:text-blue-700"" title=""Never Share your Credentials with anyone, these are stored locally!""></i>
+        </label>
+    </div>
+    <input type=""password"" id=""ClientSecret""  placeholder:{Credentials.Instance.GetClientSecret} class=""w-full border rounded px-2 py-1 backdrop--light"">
+
+    <!-- Toggle 1 -->
+    <div class=""flex items-center justify-between mb-3"">
+        <span title=""Use Local config to set custom: Name, Rank, Banner, Avatar... (in case you're banned, for example)"">Local config:</span>
+        <label class=""switch"">
+            <input type=""checkbox"" id=""localsettingstoggle"" onchange=""toggleLocalConfigMenu()"">
+            <span class=""slider round""></span>
+        </label>
+    </div>
+
+    <!-- Menu to open -->
+    <div class=""local-config-menu hidden"">
+        <!-- Add your menu content here -->
+        <p title=""Reload the Page after Saving"">Customize this Page.</p>
+        
+ <div class=""mb-3"">
+        <label for=""textInput3"">Username:</label>
+        <input type=""text"" id=""username_input""  placeholder:{username} class=""w-full border rounded px-2 py-1 backdrop--light"">
+    </div>
+
+ <div class=""mb-3"">
+        <label for=""textInput3"">Rank:</label>
+        <input type=""text"" id=""rank_input"" placeholder:{rank} class=""w-full border rounded px-2 py-1 backdrop--light"">
+    </div>
+
+ <div class=""mb-3"">
+        <label for=""textInput3"">Country:</label>
+        <input type=""text"" id=""country_input"" placeholder:{country} class=""w-full border rounded px-2 py-1 backdrop--light"">
+    </div>
+
+ <div class=""mb-3"">
+        <label for=""textInput3"">Avatarurl:</label>
+        <input type=""text"" id=""avatarurl_input"" placeholder:{avatar_url} class=""w-full border rounded px-2 py-1 backdrop--light"">
+    </div>
+
+ <div class=""mb-3"">
+        <label for=""textInput3"">coverurl:</label>
+        <input type=""text"" id=""coverurl_input"" placeholder:{cover_url} class=""w-full border rounded px-2 py-1 backdrop--light"">
+    </div>
+
+ <div class=""mb-3"">
+        <label for=""textInput3"">Port</label>
+        <input type=""text"" id=""port_input"" placeholder:{config.port} class=""w-full border rounded px-2 py-1 backdrop--light"">
+    </div>
+    </div>
+
+    <!-- Toggle 2 -->
+    <div class=""flex items-center justify-between mb-3"">
+        <span>Toggle 2:</span>
+        <label class=""switch"">
+            <input type=""checkbox"" id=""toggle2"">
+            <span class=""slider round""></span>
+        </label>
+    </div>
+
+    <!-- Text Input 3 -->
+    <div class=""mb-3"">
+        <label for=""userid"">Userid:</label>
+        <input type=""text"" id=""userid"" palceholder:{userid} class=""w-full border rounded px-2 py-1 backdrop--light"">
+    </div>
+
+    <!-- Save button -->
+   <div class=""flex justify-center"">
+    <button id=""saveButton"" class=""bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full"" onclick=""saveSettings()"">
+        Save
+    </button>
+    </div>
+</div>
 
 
     <div class=""flex justify-center items-center"">
@@ -722,18 +783,65 @@ namespace osu_progressCLI.server
             }}
         }});
 
-        saveButton.addEventListener(""click"", () => {{
-            // Handle saving settings here
-            const settings = {{
-                toggle1: toggle1.checked,
-                toggle2: toggle2.checked,
-                textInput1: textInput1.value,
-                textInput2: textInput2.value,
-                textInput3: textInput3.value,
-            }};
-            console.log(""Saved settings:"", settings);
-            // You can send the settings to your server or perform other actions as needed.
+         function toggleLocalConfigMenu() {{
+                const menu = document.querySelector('.local-config-menu');
+                const toggleCheckbox = document.getElementById('localsettingstoggle');
+        
+                if (toggleCheckbox.checked) {{
+                    menu.classList.remove('hidden');
+                }} else {{
+                    menu.classList.add('hidden');
+                }}
+            }}
+
+            //save configsettings
+        
+            function saveSettings() {{
+        const clientId = document.getElementById('ClientId').value;
+        const clientSecret = document.getElementById('ClientSecret').value;
+        const username = document.getElementById('username_input').value;
+        const rank = document.getElementById('rank_input').value;
+        const country = document.getElementById('country_input').value;
+        const avatarUrl = document.getElementById('avatarurl_input').value;
+        const coverUrl = document.getElementById('coverurl_input').value;
+        const port = document.getElementById('port_input').value;
+        const userid = document.getElementById('userid').value; 
+        const localConfigEnabled = document.getElementById('localsettingstoggle').checked;
+        
+        const data = {{
+            clientId: clientId,
+            clientSecret: clientSecret,
+            username: username,
+            rank: rank,
+            country: country,
+            avatarUrl: avatarUrl,
+            coverUrl: coverUrl,
+            port: port,
+            localsettings: localConfigEnabled,
+            userid: userid
+        }};
+               
+        //console.log(data);
+
+        // Send a POST request to the api/save endpoint
+        fetch('api/save', {{
+            method: 'POST',
+            headers: {{
+                'Content-Type': 'application/json'
+            }},
+            body: JSON.stringify(data)
+        }})
+        .then(response => {{
+            if (response.ok) {{
+                alarm('Settings saved successfully');
+            }} else {{
+                console.error('Failed to save settings');
+            }}
+        }})
+        .catch(error => {{
+            alarm('An error occurred:', error);
         }});
+    }}
 
 
         // Trigger the initial data load when the page loads (optional)
