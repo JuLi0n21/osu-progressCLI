@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             margin: 0;
@@ -66,6 +67,10 @@
         }
 
         .backdrop--medium {
+            background-color: rgba(56,46,50,255)
+        }
+
+        .backdrop--dark {
             background-color: rgba(42,34,38,255);
         }
     </style>
@@ -73,31 +78,106 @@
 <body>
 
 
-
-    <div class="fixed bottom-0 w-full">
-        <button id="loadDataButton" class="text-white rounded-full p-3 shadow-lg ml-4 mb-4 backdrop--medium">
+    <!-- Reload button -->
+    <div class="fixed top-0 right-20">
+        <button id="loadDataButton" class="text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 backdrop--medium">
             <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Refresh_font_awesome.svg" alt="Refresh" style="width: 24px; height: 24px; filter: invert(100%);" />
         </button>
     </div>
 
+    <!-- Settings button -->
+    <div class="fixed top-0 right-0">
+        <button id="settingsButton" class="text-white rounded-full p-3 shadow-lg mr-4 mt-4 backdrop--medium">
+            <i class="fa-solid fa-pen" style="color: #ffffff;"></i>
+        </button>
+    </div>
+
+    <!-- Settings panel (initially hidden) -->
+    <div id="settingsPanel" class="fixed top-20 right-5 transform rounded-lg scale-0 transition-transform duration-300 ease-in-out text-white text backdrop--dark">
+        <i class="fas fa-info-circle ml-2 text-blue-500 cursor-pointer hover:text-blue-700 top-0 right-0" title="Add informative text!"></i>
+
+        <h2 class="text-xl text-center font-semibold mb-4">Settings</h2>
+
+        <!-- ClientId -->
+        <div class="mb-3 flex items-center">
+            <label for="ClientId" class="flex items-center m-0" title="This is your Client ID, which is used for authentication. Hover for more info.">
+                ClientId
+            </label>
+            <a href="https://osu.ppy.sh/home/account/edit#oauth" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-external-link-alt ml-2 text-blue-500 cursor-pointer hover:text-blue-700" title="You can get your OAuth credentials here!"></i>
+            </a>
+        </div>
+            <input type="text" id="ClientId" class="w-full border rounded px-2 py-1 backdrop--light">
+           
+      
+
+        <!-- ClientSecret -->
+        <div class="mb-3 flex items-center">
+            <label for="ClientSecret" class="flex items-center m-0" title="This is your Client Secret.">
+                ClientSecret
+                <i class="fas fa-info-circle ml-2 text-blue-500 cursor-pointer hover:text-blue-700" title="Never Share your Credentials with anyone, these are stored locally!"></i>
+            </label>
+        </div>
+        <input type="password" id="ClientSecret" class="w-full border rounded px-2 py-1 backdrop--light">
+
+        <!-- Toggle 1 -->
+        <div class="flex items-center justify-between mb-3">
+            <span title="Use Local config to set custom: Name, Rank, Banner, Avatar... (incause ur banned for example)">Local config:</span>
+            <label class="switch">
+                <input type="checkbox" id="toggle1">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <!-- Toggle 2 -->
+        <div class="flex items-center justify-between mb-3">
+            <span>Toggle 2:</span>
+            <label class="switch">
+                <input type="checkbox" id="toggle2">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <!-- Text Input 3 -->
+        <div class="mb-3">
+            <label for="textInput3">Text Input 3:</label>
+            <input type="text" id="textInput3" class="w-full border rounded px-2 py-1 backdrop--light">
+        </div>
+
+        <!-- Save button -->
+        <div class="flex justify-center">
+        <button id="saveButton" class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full">
+            Save
+        </button>
+            </div>
+    </div>
+
+
     <div class="flex justify-center items-center">
 
-        <div class="content w-1/2 rounded-lg backdrop--medium text-white">
+        <div class="content w-1/2 rounded-lg backdrop--dark text-white">
 
             <!-- header -->
             <div class="backdrop--medium p-4 m-2">
                 <h1>Play History</h1>
             </div>
 
-            <div style="background-image: url(&quot;https://assets.ppy.sh/user-profile-covers/14100399/942248155c62a93b9429a779e07fc675e48c6e698ca830c603668a2086504eab.jpeg&quot;); height: 250px">
+            <div class="backdrop--light">
+                <div style="background-image: url(&quot;https://assets.ppy.sh/user-profile-covers/14100399/942248155c62a93b9429a779e07fc675e48c6e698ca830c603668a2086504eab.jpeg&quot;); height: 250px">
+
+                </div>
+
+                <div class="ml-60 text-left pt-6 pb-6">
+                    <p class="usernameplaceholder">Usernameplaceholder</p>
+                    <p class="countryplaceholder">countryplaceholder</p>
+                </div>
+
+                <div style="position: relative;" class="mb-7">
+                    <img src="https://a.ppy.sh/14100399?" style="position: absolute; top: -150px; left: 60px; right: 0; height:120px; width:120px" class="rounded-lg" />
+                </div>
+
 
             </div>
-
-            <div style="position: relative;" class="mb-20">
-                <img src="https://a.ppy.sh/14100399?" style="position: absolute; top: -60px; left: 60px; right: 0; height:120px; width:120px" class="rounded-lg" />
-                <p></p>
-            </div>
-
 
             <div class="border-b rounded-lg backdrop--light mb-4 p-4">
 
@@ -192,7 +272,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
     <script>
 
-
+        //datepicker
         flatpickr("#from", {
             enableTime: true,
             dateFormat: "Y-m-d H:i",
@@ -203,6 +283,7 @@
             dateFormat: "Y-m-d H:i",
         });
 
+        //chart rendering
         function renderChart(data) {
             const date = [];
             const BeatmapSetid = [];
@@ -536,6 +617,7 @@
             loaddata();
         });
 
+        //get data from internal api
         function loaddata() {
             fetch('/api/beatmaps')
                 .then(response => response.json())
@@ -567,6 +649,40 @@
                     console.error('Error loading data:', error);
                 });
         }
+
+        //settings menu
+        const settingsButton = document.getElementById("settingsButton");
+        const settingsPanel = document.getElementById("settingsPanel");
+        const saveButton = document.getElementById("saveButton");
+        const toggle1 = document.getElementById("toggle1");
+        const toggle2 = document.getElementById("toggle2");
+        const textInput1 = document.getElementById("textInput1");
+        const textInput2 = document.getElementById("textInput2");
+        const textInput3 = document.getElementById("textInput3");
+
+        settingsButton.addEventListener("click", () => {
+            if (settingsPanel.classList.contains("scale-0")) {
+                settingsPanel.classList.remove("scale-0");
+                settingsPanel.classList.add("scale-100");
+            } else {
+                settingsPanel.classList.remove("scale-100");
+                settingsPanel.classList.add("scale-0");
+            }
+        });
+
+        saveButton.addEventListener("click", () => {
+            // Handle saving settings here
+            const settings = {
+                toggle1: toggle1.checked,
+                toggle2: toggle2.checked,
+                textInput1: textInput1.value,
+                textInput2: textInput2.value,
+                textInput3: textInput3.value,
+            };
+            console.log("Saved settings:", settings);
+            // You can send the settings to your server or perform other actions as needed.
+        });
+
 
         // Trigger the initial data load when the page loads (optional)
         window.addEventListener('DOMContentLoaded', function () {

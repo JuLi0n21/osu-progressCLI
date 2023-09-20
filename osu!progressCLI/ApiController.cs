@@ -151,7 +151,7 @@ namespace osu_progressCLI
         public async Task<JObject> getuser(string user, string mode)
         {
 
-            JObject search = null;
+            JObject userJson = null;
 
             string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{user}/{mode}";
 
@@ -171,17 +171,17 @@ namespace osu_progressCLI
                 Console.WriteLine("search Recieved.");
                 Console.WriteLine(responseBody);
 
-                search = JObject.Parse(responseBody);
+                userJson = JObject.Parse(responseBody);
             }
             else
             {
                 Console.WriteLine($"Request failed with status code {reponse.StatusCode}");
-                return search;
+                return userJson;
             }
 
             client.Dispose();
 
-            return search;
+            return userJson;
         }
 
         public static ApiController Instance

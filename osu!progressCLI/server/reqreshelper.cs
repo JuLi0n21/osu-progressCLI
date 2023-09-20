@@ -23,7 +23,9 @@ namespace osu_progressCLI.server
 
         //defautl page
         public void defaultpage(HttpListenerRequest request, HttpListenerResponse response) {
-            ServeStaticFile(response, "server/html/index.html", "text/html");
+
+            WriteResponse(response, PageGenerator.Instance.generatepage("18767550", "osu"), "text/html");
+            //ServeStaticFile(response, "server/html/index.html", "text/html");
         }
 
         public void getAllBeatmapScroes(HttpListenerRequest request, HttpListenerResponse response) {
@@ -83,6 +85,7 @@ namespace osu_progressCLI.server
 
             //create db query frisrt
         }
+
         static void ServeStaticFile(HttpListenerResponse response, string filePath, string contentType)
         {
             if (File.Exists(filePath))
