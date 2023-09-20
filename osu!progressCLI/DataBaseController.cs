@@ -18,18 +18,21 @@ using System.Text.RegularExpressions;
 //Add proper debug messages and levels...
 //make it possible to retrive data 1. prepared stuff like, betweewn dates and or costuem request as a bonus maybe...
 //refactor sometime to make it proper data types instead of text, maybe....
+//FILTER FOREVERY THING THAT IS SAVED
+
+//importer for funoranges tracker
 namespace osu1progressbar.Game.Database
 {
     public class DatabaseController
     {
         private readonly string dbname = null;
         private readonly string connectionString = "Data Source=osu!progress.db;Version=3;";
-        ApiController apiController;
+       
         public DatabaseController()
         {
             //  configJson = File.ReadAllText(configJson);
             // JObject config = JObject.Parse(configJson);
-            apiController = new ApiController();
+            
         }
 
         public bool Init()
@@ -253,7 +256,7 @@ namespace osu1progressbar.Game.Database
         //maybe consider passed or failed/canceld retires// more beatmap attributes
         public async void InsertScore(OsuBaseAddresses baseAddresses)
         {
-            apiController.getuser("11705938", "osu");
+            //apiController.getuser("11705938", "osu");
 
             string starrating = "null", bpm = "null", creator = "null", artist = "null";
 
@@ -281,7 +284,7 @@ namespace osu1progressbar.Game.Database
                         }
                         else
                         {
-                            JObject beatmap = await apiController.getExpandedBeatmapinfo(baseAddresses.Beatmap.Id.ToString());
+                            JObject beatmap = await ApiController.Instance.getExpandedBeatmapinfo(baseAddresses.Beatmap.Id.ToString());
                             if (beatmap != null)
                             {
                                 starrating = beatmap["difficulty_rating"].ToString();

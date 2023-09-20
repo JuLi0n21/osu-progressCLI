@@ -10,12 +10,14 @@ using static Program;
 
 namespace osu_progressCLI
 {
-    internal class ApiController
+    public sealed class ApiController
     {
+
+        private static ApiController instance;
 
         private string clientid;
         private string clientsecret;
-        public ApiController() {
+        private ApiController() {
 
             clientid = Crendtials.Instance.GetClientId();
             clientsecret = Crendtials.Instance.GetClientSecret();
@@ -25,6 +27,7 @@ namespace osu_progressCLI
                 getAccessToken();
             }
         }
+
 
 
         private async void getAccessToken()
@@ -179,6 +182,18 @@ namespace osu_progressCLI
             client.Dispose();
 
             return search;
+        }
+
+        public static ApiController Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new ApiController();
+                }
+                return instance;
+            }
         }
 
     }

@@ -9,6 +9,8 @@ using osu1progressbar.Game.MemoryProvider;
 using OsuMemoryDataProvider.OsuMemoryModels;
 
 
+//add fior muliti
+
 namespace osu1progressbar.Game.Logicstuff
 {
     public class LogicController
@@ -19,6 +21,7 @@ namespace osu1progressbar.Game.Logicstuff
         private int oldRawStatus = -1;
         private string BanchoUserStatus = null;
         private int Audiotime;
+        private bool isReplay = false;
 
         private Stopwatch screenTimeStopWatch;
         private Stopwatch userTimeStopWatch;
@@ -52,14 +55,7 @@ namespace osu1progressbar.Game.Logicstuff
 
                 }
 
-                if (CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "SongSelect")
-                {
-                    Console.WriteLine("Song Failed detected");
-                    db.InsertScore(NewValues);
-                    timeSinceStartedPlaying.Reset();
-                }
-
-                if (CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "ResultsScreen")
+                if (!isReplay && CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() != "Playing")
                 {
                     Console.WriteLine("Song Passed detected");
                     db.InsertScore(NewValues);
@@ -84,12 +80,13 @@ namespace osu1progressbar.Game.Logicstuff
                     Console.WriteLine("Retry detected");
                     db.InsertScore(NewValues);
                     timeSinceStartedPlaying.Restart();
-                    };
+                };
                  
                 CurrentScreen = NewValues.GeneralData.OsuStatus.ToString();
                 BanchoUserStatus = NewValues.BanchoUser.BanchoStatus.ToString();
                 oldRawStatus = NewValues.GeneralData.RawStatus;
                 Audiotime = NewValues.GeneralData.AudioTime;
+                isReplay = NewValues.Player.IsReplay;
 
 
                 return true;

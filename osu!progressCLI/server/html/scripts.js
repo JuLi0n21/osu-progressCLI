@@ -25,6 +25,7 @@
     const Mode = [];
     const Mods = [];
 
+    // get data from osu website (api) call here or through api controller or refactor
     // Extract the relevant data from the JSON
     data.forEach(entry => {
         console.log(entry);

@@ -20,6 +20,8 @@ class Program
         Console.WriteLine("If this is ur first time running read the README.txt");
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");
 
+        //ApiController apiController = ApiController.Instance;
+
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
 
