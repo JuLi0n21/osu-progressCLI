@@ -26,7 +26,7 @@ namespace osu_progressCLI.server
         private reqreshelper helper;
 
         private string ip = "127.0.0.1";
-        private string port = "4200";
+        private string port = Credentials.Instance.GetConfig().port;
         public Webserver()
         {
             listener = new HttpListener();

@@ -22,16 +22,19 @@ namespace osu_progressCLI.server
 
         public string generatepage(string userid, string mode)
         {
+            Console.WriteLine(userid);
             JObject user = null;
             var config = Credentials.Instance.GetConfig();
 
+            Random rdm  = new Random();
+
             string username = "Guest";
             string avatar_url = "https://osu.ppy.sh/images/layout/avatar-guest.png";
-            string cover_url = "https://osu.ppy.sh/images/headers/profile-covers/c8.jpg";
+            string cover_url = "https://osu.ppy.sh/images/headers/profile-covers/c" + rdm.Next(1,9).ToString() + ".jpg";
             string country = "Unknown";
             string rank = "-";
 
-            if (config.Localconfig == "false") {
+            if (config.Localconfig == "False") {
                 user = ApiController.Instance.getuser(userid, mode).Result;
 
                 if (user != null)
@@ -184,7 +187,7 @@ namespace osu_progressCLI.server
             <i class=""fas fa-external-link-alt ml-2 text-blue-500 cursor-pointer hover:text-blue-700"" title=""You can get your OAuth credentials here!""></i>
         </a>
     </div>
-    <input type=""text"" id=""ClientId"" placeholder:{Credentials.Instance.GetClientId} class=""w-full border rounded px-2 py-1 backdrop--light"">
+    <input type=""text"" id=""ClientId"" placeholder=""42069"" value=""{Credentials.Instance.GetClientId()}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
 
     <!-- ClientSecret -->
     <div class=""mb-3 flex items-center"">
@@ -193,7 +196,7 @@ namespace osu_progressCLI.server
             <i class=""fas fa-info-circle ml-2 text-blue-500 cursor-pointer hover:text-blue-700"" title=""Never Share your Credentials with anyone, these are stored locally!""></i>
         </label>
     </div>
-    <input type=""password"" id=""ClientSecret""  placeholder:{Credentials.Instance.GetClientSecret} class=""w-full border rounded px-2 py-1 backdrop--light"">
+    <input type=""password"" id=""ClientSecret"" placeholder=""*******************"" value=""{Credentials.Instance.GetClientSecret()}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
 
     <!-- Toggle 1 -->
     <div class=""flex items-center justify-between mb-3"">
@@ -211,32 +214,32 @@ namespace osu_progressCLI.server
         
  <div class=""mb-3"">
         <label for=""textInput3"">Username:</label>
-        <input type=""text"" id=""username_input""  placeholder:{username} class=""w-full border rounded px-2 py-1 backdrop--light"">
+        <input type=""text"" id=""username_input""  placeholder=""cookieze"" value=""{username}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
     </div>
 
  <div class=""mb-3"">
         <label for=""textInput3"">Rank:</label>
-        <input type=""text"" id=""rank_input"" placeholder:{rank} class=""w-full border rounded px-2 py-1 backdrop--light"">
+        <input type=""text"" id=""rank_input"" placeholder=""1"" value=""{rank}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
     </div>
 
  <div class=""mb-3"">
         <label for=""textInput3"">Country:</label>
-        <input type=""text"" id=""country_input"" placeholder:{country} class=""w-full border rounded px-2 py-1 backdrop--light"">
+        <input type=""text"" id=""country_input"" placeholder=""Unknown"" value=""{country}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
     </div>
 
  <div class=""mb-3"">
         <label for=""textInput3"">Avatarurl:</label>
-        <input type=""text"" id=""avatarurl_input"" placeholder:{avatar_url} class=""w-full border rounded px-2 py-1 backdrop--light"">
+        <input type=""text"" id=""avatarurl_input"" placeholder=""https://image.stern.de/8470686/t/zB/v2/w960/r1.7778/-/trump-als-clown.jpg"" value=""{avatar_url}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
     </div>
 
  <div class=""mb-3"">
         <label for=""textInput3"">coverurl:</label>
-        <input type=""text"" id=""coverurl_input"" placeholder:{cover_url} class=""w-full border rounded px-2 py-1 backdrop--light"">
+        <input type=""text"" id=""coverurl_input"" placeholder=""https://i.gifer.com/origin/ec/ecd5961f42cedb3f4c6715fbddd39dc4_w200.webp"" value=""{cover_url}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
     </div>
 
  <div class=""mb-3"">
         <label for=""textInput3"">Port</label>
-        <input type=""text"" id=""port_input"" placeholder:{config.port} class=""w-full border rounded px-2 py-1 backdrop--light"">
+        <input type=""text"" id=""port_input"" placeholder=""42069"" value=""{config.port}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
     </div>
     </div>
 
@@ -252,7 +255,7 @@ namespace osu_progressCLI.server
     <!-- Text Input 3 -->
     <div class=""mb-3"">
         <label for=""userid"">Userid:</label>
-        <input type=""text"" id=""userid"" palceholder:{userid} class=""w-full border rounded px-2 py-1 backdrop--light"">
+        <input type=""text"" id=""userid"" palceholder=""{userid}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
     </div>
 
     <!-- Save button -->
@@ -622,7 +625,7 @@ namespace osu_progressCLI.server
 
             for (let i = 0; i < data.length; i++) {{
                 const item = data[i];
-                if (item.Key !== """" && item.Value >= 10000) {{
+                if (item.Key !== """" && item.Value >= 1000) {{
                     labels.push(item.Key);
                     item.Value = item.Value / 3600000;
                     values.push(item.Value);
@@ -679,7 +682,7 @@ namespace osu_progressCLI.server
 
             for (let i = 0; i < data.length; i++) {{
                 const item = data[i];
-                if (item.Key !== """" && item.Value >= 10000) {{
+                if (item.Key !== """" && item.Value >= 1000) {{
                     labels.push(item.Key);
                     item.Value = item.Value / 3600000;
                     values.push(item.Value);

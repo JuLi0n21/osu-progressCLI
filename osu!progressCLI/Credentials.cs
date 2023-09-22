@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.ModelConfiguration.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,21 +14,20 @@ namespace osu_progressCLI
     {
         private static Credentials instance;
 
-        //add access_token to shasre across the programm
         private string access_token { get; set; }
         private JsonCredentials dataHelper { get; set; }
 
         private JsonConfig config { get; set; }
 
+        string credentialsFilePath = "credentials.json";
+
 
         private Credentials()
         {
-            dataHelper = new JsonCredentials();
-            config = new JsonConfig();
 
             try
             {
-                string credentialsFilePath = "Credentials/Credentials.json";
+                
                 if (!File.Exists(credentialsFilePath))
                 {
                     UpdateApiCredentials("","");
@@ -39,9 +39,10 @@ namespace osu_progressCLI
                         string jsonCredentialsString = credentialsReader.ReadToEnd();
                         dataHelper = JsonConvert.DeserializeObject<JsonCredentials>(jsonCredentialsString);
                     }
+                    
                 }
 
-                string configFilePath = "Config/Config.json";
+                string configFilePath = "config.json";
                 if (!File.Exists(configFilePath))
                 {
                     UpdateConfig();
@@ -87,20 +88,28 @@ namespace osu_progressCLI
 
         public bool UpdateApiCredentials(string clientid, string clientsecret)
         {
-
+            //works i guess
+            Console.WriteLine("New: " + clientsecret + " " + clientid);
+            if (dataHelper == null) { 
+                dataHelper = new JsonCredentials();
+            }
+            Console.WriteLine("Stored: " + dataHelper.client_id + " " +  dataHelper.client_secret);
             try
             {
-                string filePath = "Credentials/Credentials.json";
 
-                if (!string.IsNullOrEmpty(clientid))
-                    dataHelper.client_id = clientid;
+                if (dataHelper.client_secret != clientsecret && dataHelper.client_id != clientid)
+                {
+                    if (!string.IsNullOrEmpty(clientid))
+                        dataHelper.client_id = clientid;
 
-                if (!string.IsNullOrEmpty(clientsecret))
-                    dataHelper.client_secret = clientsecret;
+                    if (!string.IsNullOrEmpty(clientsecret))
+                        dataHelper.client_secret = clientsecret;
 
-                ApiController.Instance.updateapitokken(dataHelper.client_id, dataHelper.client_secret);
+                   
+                    ApiController.Instance.updateapitokken(dataHelper.client_id, dataHelper.client_secret);
+                }
 
-                File.WriteAllText(filePath, JsonConvert.SerializeObject(dataHelper));
+                File.WriteAllText(credentialsFilePath, JsonConvert.SerializeObject(dataHelper));
 
                 return true;
             }
@@ -114,7 +123,7 @@ namespace osu_progressCLI
         
         }
 
-        public bool UpdateConfig(string localconfig = "false", string username = "", string rank = "", string country = "", string cover_url = "", string avatar_url = "", string port = "4200", string userid = "")
+        public bool UpdateConfig(string localconfig = "False", string username = "", string rank = "", string country = "", string cover_url = "", string avatar_url = "", string port = "4200", string userid = "")
         {
 
             try
@@ -147,6 +156,7 @@ namespace osu_progressCLI
 
                 File.WriteAllText(filePath, JsonConvert.SerializeObject(config));
 
+
                 return true;
             }
             catch (Exception ex)
@@ -178,7 +188,7 @@ namespace osu_progressCLI
 
     public class JsonConfig
     {
-        public string? Localconfig { get ; set; } = "false";
+        public string? Localconfig { get ; set; } = "False";
         public string? port { get; set; } = "4200";
         public string? username { get; set; } = String.Empty;
         public string? rank { get; set; } = String.Empty;
