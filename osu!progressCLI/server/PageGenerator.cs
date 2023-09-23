@@ -83,7 +83,7 @@ namespace osu_progressCLI.server
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-    <title>Your Website</title>
+    <title>osu!progress</title>
     <link href=""https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css"" rel=""stylesheet"">
     <title>osu!progress</title>
     <script src=""https://cdn.jsdelivr.net/npm/chart.js""></script>

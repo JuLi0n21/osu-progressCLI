@@ -88,11 +88,10 @@ namespace osu_progressCLI
 
         public bool UpdateApiCredentials(string clientid, string clientsecret)
         {
-            //works i guess
-            Console.WriteLine("New: " + clientsecret + " " + clientid);
             if (dataHelper == null) { 
                 dataHelper = new JsonCredentials();
             }
+
             Console.WriteLine("Stored: " + dataHelper.client_id + " " +  dataHelper.client_secret);
             try
             {
@@ -119,12 +118,13 @@ namespace osu_progressCLI
                 return false;
             }
 
-            
-        
         }
 
         public bool UpdateConfig(string localconfig = "False", string username = "", string rank = "", string country = "", string cover_url = "", string avatar_url = "", string port = "4200", string userid = "")
         {
+            if (config == null) {
+                config = new JsonConfig();
+            }
 
             try
             {

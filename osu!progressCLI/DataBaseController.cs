@@ -98,7 +98,8 @@ namespace osu1progressbar.Game.Database
                     Version TEXT,
                     Tags TEXT,
                     CoverList TEXT,
-                    Cover TEXT
+                    Cover TEXT,
+                    Time REAL
                 );
             ";
 
@@ -262,7 +263,7 @@ namespace osu1progressbar.Game.Database
         }
 
         //maybe consider passed or failed/canceld retires// more beatmap attributes
-        public async void InsertScore(OsuBaseAddresses baseAddresses)
+        public async void InsertScore(OsuBaseAddresses baseAddresses, float timeElapsed)
         {
 
             string starrating = "null", bpm = "null", creator = "null", artist = "null", status = "null", version = "null", tags = "null", coverlist ="null", cover = "null";
@@ -381,7 +382,8 @@ namespace osu1progressbar.Game.Database
                     Version,
                     Tags,
                     Cover,
-                    Coverlist
+                    Coverlist,
+                    Time,
                     ) VALUES (
                             @Date,
                             @BeatmapSetid,
@@ -411,7 +413,8 @@ namespace osu1progressbar.Game.Database
                             @Version,
                             @Tags,
                             @Cover,
-                            @Coverlist
+                            @Coverlist,
+                            @Time
                         );
                     ";
 
@@ -459,6 +462,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Cover", cover);
                         command.Parameters.AddWithValue("@Coverlist", coverlist);
                         command.Parameters.AddWithValue("@Tags", tags);
+                        command.Parameters.AddWithValue("@Time", timeElapsed);
 
 
 

@@ -12,20 +12,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OsuMemoryDataProvider" Version="0.10.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
-	  <None Update="Credentials\*.json">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		  <Pack>True</Pack>
-		  <PackagePath>Credentials</PackagePath>
-	  </None>
-	  <None Update="server\**\*">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		  <Pack>True</Pack>
-		  <PackagePath>server</PackagePath>
-	  </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Credentials\" />
   </ItemGroup>
 
 </Project>

@@ -58,7 +58,7 @@ namespace osu1progressbar.Game.Logicstuff
                 if (!isReplay && CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() != "Playing")
                 {
                     Console.WriteLine("Song Passed detected");
-                    db.InsertScore(NewValues);
+                    db.InsertScore(NewValues, timeSinceStartedPlaying.ElapsedMilliseconds);
                     timeSinceStartedPlaying.Reset();
                 }
 
@@ -78,7 +78,7 @@ namespace osu1progressbar.Game.Logicstuff
 
                 if ((NewValues.GeneralData.OsuStatus.ToString() == "Playing") && (Audiotime > NewValues.GeneralData.AudioTime) && (timeSinceStartedPlaying.ElapsedMilliseconds > 500) && (NewValues.Player.Hit300 > 0))  {
                     Console.WriteLine("Retry detected");
-                    db.InsertScore(NewValues);
+                    db.InsertScore(NewValues, timeSinceStartedPlaying.ElapsedMilliseconds);
                     timeSinceStartedPlaying.Restart();
                 };
                  
