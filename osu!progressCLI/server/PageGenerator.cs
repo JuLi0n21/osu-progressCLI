@@ -298,51 +298,8 @@ namespace osu_progressCLI.server
 
 <!-- Recent Scores -->
 <h1>Recent Scores</h1>
-<div class=""scorecontainer""></div>
-   <a href=""https://osu.ppy.sh/beatmapsets/1374845#osu/2845058"" target=""_blank"" rel=""noopener noreferrer"">
-<div class=""flex backdrop--medium justify-center rounded-lg"">
-    <!-- Cover Image -->
-    <div style=""width: 50px; height: 50px; background-size: cover; background-position: center center; background-image: url('https://assets.ppy.sh/beatmaps/1374845/covers/list@2x.jpg?1650707357');""></div>
-
-    <!-- Score Details with Blurred Background -->
-    <div class=""w-3/4 shadow-lg rounded-lg flex relative"" style=""background-size: cover; background-position: center center; background-image: url('https://assets.ppy.sh/beatmaps/1374845/covers/slimcover@2x.jpg?1650707357'); border: 2px solid black; border-radius: 10px;"">
-        <!-- Use backdrop-filter to blur the background of this div only -->
-        <div style=""backdrop-filter: blur(3px); position: absolute; top: 0; left: 0; right: 0; bottom: 0;""></div>
-
-        <!-- Score Details Container -->
-        <div class=""flex justify-between items-center w-full p-4 text-center"" style=""height:50px; z-index: 1;"">
-            <!-- Score Details Text -->
-            <div class=""text-left"">
-                <p class=""text-lg text-pink-500"">Akatsuki Records - KARMANATIONS (-Rik-) [Insane].osu</p>
-                <p class=""text-sm"">Insane</p>
-            </div>
-
-            <!-- Black Circle Behind Hits -->
-            <div class=""flex justify-center items-center"" style=""margin-left: 10px;"">
-                <!-- Hits in a downward list with backdrop-filter applied -->
-                <div style=""width: 30px; height: 20px; background-color: black; border-radius: 50%;"">
-                    <div class=""text-sm text-orange-500"">10</div>
-                </div>
-                <div style=""width: 30px; height: 20px; background-color: black; border-radius: 50%;"">
-                    <div class=""text-sm text-blue-500"">4</div>
-                </div>
-                <div style=""width: 30px; height: 20px; background-color: black; border-radius: 50%;"">
-                    <div class=""text-sm text-red-500"">12</div>
-                </div>
-            </div>
-
-            <!-- Black Circle Behind Accuracy -->
-            <div class=""flex justify-center items-center"" style=""width: 30px; height: 30px; background-color: black; border-radius: 50%;"">
-                <!-- Accuracy with backdrop-filter applied -->
-                <div class=""text-sm text-gray-600 shadow-text-black"">
-                    96.5
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-</a>
-
+<div class=""scorecontainer max-h-96 overflow-y-scroll""></div>
+  
 
     <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
 
