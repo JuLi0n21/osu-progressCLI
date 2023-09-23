@@ -105,7 +105,7 @@ namespace osu_progressCLI
             if (reponse.IsSuccessStatusCode)
             {
                 string responseBody = await reponse.Content.ReadAsStringAsync();
-                Console.WriteLine("Beatmap info Recieved.");
+                Console.WriteLine(responseBody);
 
                 beatmap = JObject.Parse(responseBody);
             }

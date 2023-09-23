@@ -295,7 +295,56 @@ namespace osu_progressCLI.server
 
             </div>
 
-            <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
+
+<!-- Recent Scores -->
+<h1>Recent Scores</h1>
+<div class=""scorecontainer""></div>
+   <a href=""https://osu.ppy.sh/beatmapsets/1374845#osu/2845058"" target=""_blank"" rel=""noopener noreferrer"">
+<div class=""flex backdrop--medium justify-center rounded-lg"">
+    <!-- Cover Image -->
+    <div style=""width: 50px; height: 50px; background-size: cover; background-position: center center; background-image: url('https://assets.ppy.sh/beatmaps/1374845/covers/list@2x.jpg?1650707357');""></div>
+
+    <!-- Score Details with Blurred Background -->
+    <div class=""w-3/4 shadow-lg rounded-lg flex relative"" style=""background-size: cover; background-position: center center; background-image: url('https://assets.ppy.sh/beatmaps/1374845/covers/slimcover@2x.jpg?1650707357'); border: 2px solid black; border-radius: 10px;"">
+        <!-- Use backdrop-filter to blur the background of this div only -->
+        <div style=""backdrop-filter: blur(3px); position: absolute; top: 0; left: 0; right: 0; bottom: 0;""></div>
+
+        <!-- Score Details Container -->
+        <div class=""flex justify-between items-center w-full p-4 text-center"" style=""height:50px; z-index: 1;"">
+            <!-- Score Details Text -->
+            <div class=""text-left"">
+                <p class=""text-lg text-pink-500"">Akatsuki Records - KARMANATIONS (-Rik-) [Insane].osu</p>
+                <p class=""text-sm"">Insane</p>
+            </div>
+
+            <!-- Black Circle Behind Hits -->
+            <div class=""flex justify-center items-center"" style=""margin-left: 10px;"">
+                <!-- Hits in a downward list with backdrop-filter applied -->
+                <div style=""width: 30px; height: 20px; background-color: black; border-radius: 50%;"">
+                    <div class=""text-sm text-orange-500"">10</div>
+                </div>
+                <div style=""width: 30px; height: 20px; background-color: black; border-radius: 50%;"">
+                    <div class=""text-sm text-blue-500"">4</div>
+                </div>
+                <div style=""width: 30px; height: 20px; background-color: black; border-radius: 50%;"">
+                    <div class=""text-sm text-red-500"">12</div>
+                </div>
+            </div>
+
+            <!-- Black Circle Behind Accuracy -->
+            <div class=""flex justify-center items-center"" style=""width: 30px; height: 30px; background-color: black; border-radius: 50%;"">
+                <!-- Accuracy with backdrop-filter applied -->
+                <div class=""text-sm text-gray-600 shadow-text-black"">
+                    96.5
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</a>
+
+
+    <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
 
                 <!-- filter menu -->
                 <div class=""flex justify-evenly text-black"">
@@ -733,6 +782,129 @@ namespace osu_progressCLI.server
             loaddata();
         }});
 
+        //recent plays generator
+function generateScoreElements(apiResponse) {{
+  // Get the container element where you want to add the generated HTML
+  const container = document.querySelector("".scorecontainer"");
+    console.log(apiResponse.length);
+  // Loop through the API response and create the HTML structure
+  for (let i = 0; i < apiResponse.length; i++) {{
+    const obj = apiResponse[i];
+    if (obj[28].Cover && obj[3].Osufilename) {{
+console.log(""fuck"");
+      const a = document.createElement(""a"");
+      a.href = `https://osu.ppy.sh/beatmapsets/${{obj[1].BeatmapSetid}}#osu/${{obj[2].Beatmapid}}`;
+      a.target = ""_blank"";
+      a.rel = ""noopener noreferrer"";
+
+      const div1 = document.createElement(""div"");
+      div1.classList.add(""flex"", ""backdrop--medium"", ""justify-center"", ""rounded-lg"");
+
+      const div2 = document.createElement(""div"");
+      div2.style.cssText =
+        ""width: 50px; height: 50px; background-size: cover; background-position: center center;"";
+      div2.style.backgroundImage = `url('${{obj[28].Cover}}')`;
+
+  const div3 = document.createElement(""div"");
+        div3.classList.add(""w-3/4"", ""shadow-lg"", ""rounded-lg"", ""flex"", ""relative"");
+        div3.style.cssText =
+          `background-size: cover; background-position: center center; background-image: url('${{obj[27].CoverList}}'); border: 2px solid black; border-radius: 10px;`;
+
+  const blurredBackground = document.createElement(""div"");
+      blurredBackground.style.cssText =
+        ""backdrop-filter: blur(3px); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"";
+
+      const div4 = document.createElement(""div"");
+      div4.style.cssText = ""backdrop-filter: blur(3px); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"";
+
+      const div5 = document.createElement(""div"");
+      div5.classList.add(""flex"", ""justify-between"", ""items-center"", ""w-full"", ""p-4"", ""text-center"");
+      div5.style.cssText = ""height:50px; z-index: 1;"";
+
+      // Score Details Text
+      const scoreDetailsText = document.createElement(""div"");
+      scoreDetailsText.classList.add(""text-left"");
+
+      const title = document.createElement(""p"");
+      title.classList.add(""text-lg"", ""text-pink-500"");
+      title.style.cssText = ""overflow: hidden; white-space: nowrap; text-overflow: hidden;"";
+      title.style.maxWidth = ""550px""; 
+      title.style.width = ""550px""; 
+      title.textContent = obj[3].Osufilename;
+
+    const versionAndDateContainer = document.createElement(""div"");
+    versionAndDateContainer.classList.add(""flex"", ""items-center"");
+
+      const difficulty = document.createElement(""p"");
+      difficulty.classList.add(""text-sm"");
+      difficulty.textContent = obj[25].Version;
+
+const date = document.createElement(""p"");
+date.classList.add(""text-sm"", ""text-gray-500"", ""ml-2""); // You can adjust the styling as needed
+date.textContent = obj[0].Date; 
+
+versionAndDateContainer.appendChild(difficulty);
+versionAndDateContainer.appendChild(date);
+
+      scoreDetailsText.appendChild(title);
+      scoreDetailsText.appendChild(versionAndDateContainer);
+
+      // Black Circle Behind Hits
+      const hitsContainer = document.createElement(""div"");
+      hitsContainer.classList.add(""flex"", ""justify-between"", ""items-center"");
+      hitsContainer.style.marginLeft = ""10px"";
+
+      const hit1 = createHitElement(""text-sm"", ""text-orange-500"", obj[18].Hit50);
+      const hit2 = createHitElement(""text-sm"", ""text-blue-500"", obj[19].Hit100);
+      const hit3 = createHitElement(""text-sm"", ""text-red-500"", obj[22].HitMiss);
+
+      hitsContainer.appendChild(hit1);
+      hitsContainer.appendChild(hit2);
+      hitsContainer.appendChild(hit3);
+
+      // Black Circle Behind Accuracy
+      const accuracyContainer = document.createElement(""div"");
+      accuracyContainer.style.cssText =
+        ""width: 30px; height: 30px; background-color: black; border-radius: 50%;"";
+
+      const accuracy = document.createElement(""div"");
+      accuracy.classList.add(""text-sm"", ""text-green-600"", ""shadow-text-black"");
+      accuracy.textContent = parseFloat(obj[14].Accuracy).toFixed(2);
+
+
+      accuracyContainer.appendChild(accuracy);
+
+      // Append elements to build the structure
+      div5.appendChild(scoreDetailsText);
+      div5.appendChild(hitsContainer);
+      div5.appendChild(accuracyContainer);
+      div3.appendChild(blurredBackground);
+      div4.appendChild(div5);
+      div3.appendChild(div4);
+      div1.appendChild(div2);
+      div1.appendChild(div3);
+      a.appendChild(div1);
+      container.appendChild(a);
+    }}
+  }}
+
+  // Helper function to create Hit elements
+  function createHitElement(textClass, textColorClass, value) {{
+    const hitContainer = document.createElement(""div"");
+    hitContainer.style.cssText =
+      ""width: 30px; height: 20px; background-color: black; border-radius: 50%;"";
+
+    const hitValue = document.createElement(""div"");
+    hitValue.classList.add(textClass, textColorClass);
+    hitValue.textContent = value;
+
+    hitContainer.appendChild(hitValue);
+
+    return hitContainer;
+  }}
+}}
+
+
         //get data from internal api
         function loaddata() {{
             fetch('/api/beatmaps')
@@ -740,6 +912,7 @@ namespace osu_progressCLI.server
                 .then(data => {{
                     console.log(data);
                     renderChart(data);
+                    generateScoreElements(data);
                 }})
                 .catch(error => {{
                     console.error('Error loading data:', error);

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Data.SQLite;
 using OsuMemoryDataProvider.OsuMemoryModels;
 using System.ComponentModel.Design;
-using static System.Formats.Asn1.AsnWriter;
 using Newtonsoft.Json.Linq;
 using System.Runtime.CompilerServices;
 using System.Net.Http.Headers;
@@ -95,7 +94,11 @@ namespace osu1progressbar.Game.Database
                     Ur TEXT,
                     HitMiss TEXT,
                     Mode TEXT,
-                    Mods TEXT
+                    Mods TEXT,
+                    Version TEXT,
+                    Tags TEXT,
+                    CoverList TEXT,
+                    Cover TEXT
                 );
             ";
 
@@ -122,8 +125,13 @@ namespace osu1progressbar.Game.Database
                 command.ExecuteNonQuery();
             }
 
+            //add stuff that is relavant later maybe... (or all idk)
+            //cover (list and Slimcover)
+            //version
+            //tags
+            //ranked status aswell 
             string ScoreHelperTableQuery = @"
-                CREATE TABLE IF NOT EXISTS BeatmapHelper (id TEXT, StarRating TEXT, Artist TEXT, Creator TEXT, Bpm TEXT)";
+                CREATE TABLE IF NOT EXISTS BeatmapHelper (id TEXT, StarRating TEXT, Artist TEXT, Creator TEXT, Bpm TEXT, Version TEXT, Status TEXT, Tags TEXT, CoverList TEXT, Cover TEXT)";
 
             using (var command = new SQLiteCommand(ScoreHelperTableQuery, connection))
             {
@@ -256,9 +264,8 @@ namespace osu1progressbar.Game.Database
         //maybe consider passed or failed/canceld retires// more beatmap attributes
         public async void InsertScore(OsuBaseAddresses baseAddresses)
         {
-            //apiController.getuser("11705938", "osu");
 
-            string starrating = "null", bpm = "null", creator = "null", artist = "null";
+            string starrating = "null", bpm = "null", creator = "null", artist = "null", status = "null", version = "null", tags = "null", coverlist ="null", cover = "null";
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -279,6 +286,11 @@ namespace osu1progressbar.Game.Database
                             bpm = reader["bpm"].ToString();
                             creator = reader["creator"].ToString();
                             artist = reader["artist"].ToString();
+                            status = reader["status"].ToString();
+                            coverlist = reader["coverlist"].ToString();
+                            cover = reader["cover"].ToString();
+                            tags = reader["tags"].ToString();
+                            version = reader["version"].ToString();
 
                             Console.WriteLine($"Beatmap with id: {baseAddresses.Beatmap.Id} exists");
                         }
@@ -291,20 +303,32 @@ namespace osu1progressbar.Game.Database
                                 bpm = beatmap["bpm"].ToString();
                                 creator = beatmap["beatmapset"]["creator"].ToString();
                                 artist = beatmap["beatmapset"]["artist"].ToString();
+                                status = beatmap["beatmapset"]["status"].ToString();
+                                coverlist = beatmap["beatmapset"]["covers"]["cover@2x"].ToString();
+                                cover = beatmap["beatmapset"]["covers"]["list@2x"].ToString();
+                                version = beatmap["version"].ToString();
+                                tags = beatmap["beatmapset"]["tags"].ToString();
                             }
 
                             // Create a new BeatmapHelper score with "null" values for everything except ID
                             using (SQLiteCommand insertCommand = new SQLiteCommand(connection))
                             {
-                                insertCommand.CommandText = @"
-                        INSERT INTO BeatmapHelper (id, starrating, bpm, creator, artist)
-                        VALUES (@id, @starrating, @bpm, @creator, @artist)";
 
+                                insertCommand.CommandText = @"
+                                 INSERT INTO BeatmapHelper (id, starrating, bpm, creator, artist, status, coverlist, cover, version, tags)
+                                 VALUES (@id, @starrating, @bpm, @creator, @artist, @status, @coverlist, @cover, @version, @tags)";
+
+                                // Providing the beatmap's attributes
                                 insertCommand.Parameters.AddWithValue("@id", baseAddresses.Beatmap.Id);
                                 insertCommand.Parameters.AddWithValue("@starrating", starrating);
                                 insertCommand.Parameters.AddWithValue("@bpm", bpm);
                                 insertCommand.Parameters.AddWithValue("@creator", creator);
                                 insertCommand.Parameters.AddWithValue("@artist", artist);
+                                insertCommand.Parameters.AddWithValue("@status", status);
+                                insertCommand.Parameters.AddWithValue("@coverlist", coverlist);
+                                insertCommand.Parameters.AddWithValue("@cover", cover);
+                                insertCommand.Parameters.AddWithValue("@version", version);
+                                insertCommand.Parameters.AddWithValue("@tags", tags);
 
                                 int rowsInserted = insertCommand.ExecuteNonQuery();
 
@@ -353,7 +377,11 @@ namespace osu1progressbar.Game.Database
                     Ur,
                     HitMiss,
                     Mode,
-                    Mods
+                    Mods,
+                    Version,
+                    Tags,
+                    Cover,
+                    Coverlist
                     ) VALUES (
                             @Date,
                             @BeatmapSetid,
@@ -379,7 +407,11 @@ namespace osu1progressbar.Game.Database
                             @Ur,
                             @HitMiss,
                             @Mode,
-                            @Mods
+                            @Mods,
+                            @Version,
+                            @Tags,
+                            @Cover,
+                            @Coverlist
                         );
                     ";
 
@@ -406,7 +438,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Cs", baseAddresses.Beatmap.Cs);
                         command.Parameters.AddWithValue("@Hp", baseAddresses.Beatmap.Hp);
                         command.Parameters.AddWithValue("@Od", baseAddresses.Beatmap.Od);
-                        command.Parameters.AddWithValue("@Status", baseAddresses.Beatmap.Status);
+                        command.Parameters.AddWithValue("@Status", baseAddresses.Beatmap.Status); //or status gotten from api
                         command.Parameters.AddWithValue("@StarRating", starrating);
                         command.Parameters.AddWithValue("@Bpm", bpm);
                         command.Parameters.AddWithValue("@Creator", creator);
@@ -419,10 +451,15 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Hit50", baseAddresses.Player.Hit50);
                         command.Parameters.AddWithValue("@Hit100", baseAddresses.Player.Hit100);
                         command.Parameters.AddWithValue("@Hit300", baseAddresses.Player.Hit300);
-                        command.Parameters.AddWithValue("@Ur", ur.ToString()); //this is a lie 
+                        command.Parameters.AddWithValue("@Ur", ur.ToString()); 
                         command.Parameters.AddWithValue("@HitMiss", baseAddresses.Player.HitMiss);
                         command.Parameters.AddWithValue("@Mode", baseAddresses.Player.Mode);
                         command.Parameters.AddWithValue("@Mods", baseAddresses.Player.Mods.Value);
+                        command.Parameters.AddWithValue("@Version", version);
+                        command.Parameters.AddWithValue("@Cover", cover);
+                        command.Parameters.AddWithValue("@Coverlist", coverlist);
+                        command.Parameters.AddWithValue("@Tags", tags);
+
 
 
                         command.ExecuteNonQuery();
