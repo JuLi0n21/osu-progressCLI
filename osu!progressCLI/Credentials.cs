@@ -88,15 +88,14 @@ namespace osu_progressCLI
 
         public bool UpdateApiCredentials(string clientid, string clientsecret)
         {
-            if (dataHelper == null) { 
+            if (dataHelper == null) {
                 dataHelper = new JsonCredentials();
             }
 
-            Console.WriteLine("Stored: " + dataHelper.client_id + " " +  dataHelper.client_secret);
             try
             {
 
-                if (dataHelper.client_secret != clientsecret && dataHelper.client_id != clientid)
+                if (dataHelper.client_secret != clientsecret || dataHelper.client_id != clientid)
                 {
                     if (!string.IsNullOrEmpty(clientid))
                         dataHelper.client_id = clientid;
@@ -195,6 +194,6 @@ namespace osu_progressCLI
         public string? country { get; set; } = String.Empty;
         public string? cover_url { get; set; } = String.Empty;
         public string? avatar_url { get; set; } = String.Empty;
-        public string? userid { get;set; } = "14100399";   
+        public string? userid { get;set; } = "2";   
     }
 }
