@@ -18,3 +18,6 @@
 - api endpoint for search functionaliy
 - make date picker work
 - importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
+
+## NOTES
+- rate limite api calls incause i ever make a importer (1 every 2 seconds)
