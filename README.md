@@ -17,3 +17,4 @@
 - page for a single score
 - api endpoint for search functionaliy
 - make date picker work
+- importer from [!](circle-tracker)[https://github.com/FunOrange/circle-tracker]
