@@ -105,6 +105,10 @@ namespace osu1progressbar.Game.MemoryProvider
                         Console.WriteLine("Waiting for Osu! Process");
                         Console.CursorLeft = 0;
                         Console.CursorTop = Console.CursorTop - 1;
+
+                        logic.userTimeStopWatch.Reset();
+                        logic.screenTimeStopWatch.Reset();
+                        logic.timeSinceStartedPlaying.Reset();
                         
                         //ReadDelay = throttledDelay;
                         await Task.Delay(ReadDelay);

@@ -23,10 +23,10 @@ namespace osu1progressbar.Game.Logicstuff
         private int Audiotime;
         private bool isReplay = false;
 
-        private Stopwatch screenTimeStopWatch;
-        private Stopwatch userTimeStopWatch;
+        public Stopwatch screenTimeStopWatch;
+        public Stopwatch userTimeStopWatch;
         private Stopwatch stopwatch;
-        private Stopwatch timeSinceStartedPlaying;
+        public Stopwatch timeSinceStartedPlaying;
         public LogicController()
         {
             db = new DatabaseController();
