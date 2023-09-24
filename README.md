@@ -11,8 +11,9 @@
 5. CLick the Pen on the Website insert ur Clientid and ClientSecret and ur userid.
 6. Hit save and refresh the Page ur Profile Stats should appear
 
-## TODOs
+## TODOs (no prioritys)
 
+- Add pp
 - Add grades (SS, S, A ...)
 - Add possiblity to reload api data incase no internet (or beatmap changed)  (automatic or manual)
 - localbeatmap parser (offline, not submitted maps support)
