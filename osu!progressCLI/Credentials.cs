@@ -195,5 +195,6 @@ namespace osu_progressCLI
         public string? cover_url { get; set; } = String.Empty;
         public string? avatar_url { get; set; } = String.Empty;
         public string? userid { get;set; } = "2";   
+        public string? songfolder { get; set; } = "C:\\users\\<pc username>\\AppData\\Songs";
     }
 }

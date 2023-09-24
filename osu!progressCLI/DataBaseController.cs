@@ -99,7 +99,8 @@ namespace osu1progressbar.Game.Database
                     Tags TEXT,
                     CoverList TEXT,
                     Cover TEXT,
-                    Time REAL
+                    Time REAL,
+                    PP REAL
                 );
             ";
 
@@ -126,11 +127,6 @@ namespace osu1progressbar.Game.Database
                 command.ExecuteNonQuery();
             }
 
-            //add stuff that is relavant later maybe... (or all idk)
-            //cover (list and Slimcover)
-            //version
-            //tags
-            //ranked status aswell 
             string ScoreHelperTableQuery = @"
                 CREATE TABLE IF NOT EXISTS BeatmapHelper (id TEXT, StarRating TEXT, Artist TEXT, Creator TEXT, Bpm TEXT, Version TEXT, Status TEXT, Tags TEXT, CoverList TEXT, Cover TEXT)";
 
@@ -157,7 +153,7 @@ namespace osu1progressbar.Game.Database
             DateTime time = DateTime.UtcNow;
             string date = time.ToString("yyyy-MM-dd HH:00");
 
-            Console.WriteLine(date);
+            Console.Write(date);
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -214,6 +210,11 @@ namespace osu1progressbar.Game.Database
 
             Console.WriteLine(date);
 
+            if (BanchoStatus == null || timeElapsed == 0)
+            {
+                return;
+            }
+
             using (var connection = new SQLiteConnection(connectionString))
             {
 
@@ -267,6 +268,19 @@ namespace osu1progressbar.Game.Database
         {
 
             string starrating = "null", bpm = "null", creator = "null", artist = "null", status = "null", version = "null", tags = "null", coverlist ="null", cover = "null";
+            
+            double pp = 0.00;
+
+            pp = PPhelper.CalculatePP(
+                                baseAddresses.Beatmap.FolderName,
+                                baseAddresses.Beatmap.OsuFileName,
+                                baseAddresses.Player.Mods.Value,
+                                baseAddresses.Player.HitMiss,
+                                baseAddresses.Player.Hit50,
+                                baseAddresses.Player.Hit100,
+                                baseAddresses.Player.MaxCombo);
+
+            Console.WriteLine(pp);
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -383,7 +397,8 @@ namespace osu1progressbar.Game.Database
                     Tags,
                     Cover,
                     Coverlist,
-                    Time
+                    Time,
+                    pp
                     ) VALUES (
                             @Date,
                             @BeatmapSetid,
@@ -414,7 +429,8 @@ namespace osu1progressbar.Game.Database
                             @Tags,
                             @Cover,
                             @Coverlist,
-                            @Time
+                            @Time,
+                            @pp
                         );
                     ";
 
@@ -463,6 +479,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Coverlist", coverlist);
                         command.Parameters.AddWithValue("@Tags", tags);
                         command.Parameters.AddWithValue("@Time", timeElapsed);
+                        command.Parameters.AddWithValue("@pp", pp);
 
 
 

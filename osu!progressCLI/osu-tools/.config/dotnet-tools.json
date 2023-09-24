@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "CodeFileSanity": {
+      "version": "0.0.36",
+      "commands": [
+        "CodeFileSanity"
+      ]
+    },
+    "jetbrains.resharper.globaltools": {
+      "version": "2022.1.2",
+      "commands": [
+        "jb"
+      ]
+    },
+    "nvika": {
+      "version": "3.0.0",
+      "commands": [
+        "nvika"
+      ]
+    }
+  }
+}

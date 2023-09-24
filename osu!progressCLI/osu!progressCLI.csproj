@@ -9,9 +9,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="osu-tools\**" />
+    <EmbeddedResource Remove="osu-tools\**" />
+    <None Remove="osu-tools\**" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Content Include="osu-tools\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OsuMemoryDataProvider" Version="0.10.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
   </ItemGroup>
+	
+	
 
 </Project>
