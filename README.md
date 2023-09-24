@@ -13,6 +13,8 @@
 
 ## TODOs
 
+- Add grades (SS, S, A ...)
+- Add possiblity to reload api data incase no internet (or beatmap changed)  (automatic or manual)
 - localbeatmap parser (offline, not submitted maps support)
 - highconfigurable website (showing what graphs u want and what not)
 - page for a single score
