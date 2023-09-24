@@ -13,10 +13,8 @@
 
 ## TODOs (no prioritys)
 
-- Add pp
-- Add grades (SS, S, A ...)
 - Add possiblity to reload api data incase no internet (or beatmap changed)  (automatic or manual)
-- localbeatmap parser (offline, not submitted maps support)
+- localbeatmap parser (offline, not submitted maps support) (use osu-tools)
 - highconfigurable website (showing what graphs u want and what not)
 - page for a single score
 - api endpoint for search functionaliy
@@ -24,5 +22,5 @@
 - importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
 
 ## NOTES
-- rate limite api calls incause i ever make a importer (1 every 2 seconds)
-- change form .net 6.0 to somehting lower (to not have people install dependencys)
+- rate limite api calls incause i ever make a importer (1 every 2 seconds) 
+- change form .net 6.0 to somehting lower (to not have people install dependencys) (could nbot work cause osu tools is net6)
