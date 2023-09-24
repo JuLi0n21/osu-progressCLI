@@ -1,4 +1,5 @@
 # osu!progressCLI  
+### THIS PROGRAMM IS IN EARLY ACCESS, BREAKING CHANGES ARE TO BE EXPECTED
 
 -- add images and descripton here
 
