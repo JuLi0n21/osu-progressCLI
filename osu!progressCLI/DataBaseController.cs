@@ -383,7 +383,7 @@ namespace osu1progressbar.Game.Database
                     Tags,
                     Cover,
                     Coverlist,
-                    Time,
+                    Time
                     ) VALUES (
                             @Date,
                             @BeatmapSetid,

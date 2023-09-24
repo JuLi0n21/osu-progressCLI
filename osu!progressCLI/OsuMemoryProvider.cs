@@ -102,7 +102,10 @@ namespace osu1progressbar.Game.MemoryProvider
                     if (!sreader.CanRead)
                     {
 
-                        Console.WriteLine("osu! process not found");
+                        Console.WriteLine("Waiting for Osu! Process");
+                        Console.CursorLeft = 0;
+                        Console.CursorTop = Console.CursorTop - 1;
+                        
                         //ReadDelay = throttledDelay;
                         await Task.Delay(ReadDelay);
                         continue;

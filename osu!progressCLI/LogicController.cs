@@ -88,7 +88,6 @@ namespace osu1progressbar.Game.Logicstuff
                 Audiotime = NewValues.GeneralData.AudioTime;
                 isReplay = NewValues.Player.IsReplay;
 
-
                 return true;
             }
            
