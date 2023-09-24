@@ -21,3 +21,4 @@
 
 ## NOTES
 - rate limite api calls incause i ever make a importer (1 every 2 seconds)
+- change form .net 6.0 to somehting lower (to not have people install dependencys)
