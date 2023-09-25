@@ -748,7 +748,8 @@ function generateScoreElements(apiResponse) {{
   for (let i = 0; i < apiResponse.length; i++) {{
     const obj = apiResponse[i];
     if (obj[28].Cover && obj[3].Osufilename) {{
-console.log(""fuck"");
+      const div0 = document.createElement(""div"");
+      div0.classList.add(""m-1"")
       const a = document.createElement(""a"");
       a.href = `https://osu.ppy.sh/beatmapsets/${{obj[1].BeatmapSetid}}#osu/${{obj[2].Beatmapid}}`;
       a.target = ""_blank"";
@@ -757,15 +758,25 @@ console.log(""fuck"");
       const div1 = document.createElement(""div"");
       div1.classList.add(""flex"", ""backdrop--medium"", ""justify-center"", ""rounded-lg"");
 
+      const gradediv = document.createElement(""div"");
+      const grade = document.createElement(""p"");
+      grade.textContent = obj[34].Grade;
+
+      gradediv.appendChild(grade);
+      div1.appendChild(gradediv);
+
       const div2 = document.createElement(""div"");
       div2.style.cssText =
         ""width: 50px; height: 50px; background-size: cover; background-position: center center;"";
       div2.style.backgroundImage = `url('${{obj[28].Cover}}')`;
 
   const div3 = document.createElement(""div"");
-        div3.classList.add(""w-3/4"", ""shadow-lg"", ""rounded-lg"", ""flex"", ""relative"");
-        div3.style.cssText =
-          `background-size: cover; background-position: center center; background-image: url('${{obj[27].CoverList}}'); border: 2px solid black; border-radius: 10px;`;
+        div3.classList.add(""w-3/4"", ""shadow-lg"", ""rounded-lg"", ""flex"", ""relative"", ""backdrop--dark"");
+      //  div3.style.cssText =
+      //    `background-size: cover; background-position: center center; background-image: url('${{obj[27].CoverList}}');`;
+
+ div3.style.cssText =
+          ` border: 2px solid black; border-radius: 10px;`;
 
   const blurredBackground = document.createElement(""div"");
       blurredBackground.style.cssText =
@@ -841,7 +852,8 @@ versionAndDateContainer.appendChild(date);
       div1.appendChild(div2);
       div1.appendChild(div3);
       a.appendChild(div1);
-      container.appendChild(a);
+      div0.appendChild(a);
+      container.appendChild(div0);
     }}
   }}
 
