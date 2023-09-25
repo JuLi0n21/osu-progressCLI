@@ -436,31 +436,31 @@ namespace osu_progressCLI.server
             // Extract the relevant data from the JSON
             data.forEach(entry => {{
                 console.log(entry);
-                date.push(entry[0].Date);
-                BeatmapSetid.push(entry[1].BeatmapSetid);
-                Beatmapid.push(entry[2].Beatmapid);
-                Osufilename.push(entry[3].Osufilename.slice(0, 5) + ""..."");
-                Ar.push(entry[4].Ar);
-                Cs.push(entry[5].Cs);
-                Hp.push(entry[6].Hp);
-                Od.push(entry[7].Od);
-                Status.push(entry[8].Status);
-                StarRating.push(parseFloat(entry[9].StarRating));
-                Bpm.push(entry[10].Bpm);
-                Artist.push(entry[11].Artist);
-                Creator.push(entry[12].Creator);
-                Username.push(entry[13].Username);
-                Accuracy.push(parseFloat(entry[14].Accuracy));
-                MaxCombo.push(entry[15].MaxCombo);
-                Score.push(entry[16].Score);
-                Combo.push(entry[17].Combo);
-                Hit50.push(entry[18].Hit50);
-                Hit100.push(entry[19].Hit100);
-                Hit300.push(entry[20].Hit300);
-                Ur.push(entry[21].Ur);
-                HitMiss.push(entry[22].HitMiss);
-                Mode.push(entry[23].Mode);
-                Mods.push(entry[24].Mods);
+                date.push(entry.Date);
+                BeatmapSetid.push(entry.BeatmapSetid);
+                Beatmapid.push(entry.Beatmapid);
+                Osufilename.push(entry.Osufilename.slice(0, 5) + ""..."");
+                Ar.push(entry.Ar);
+                Cs.push(entry.Cs);
+                Hp.push(entry.Hp);
+                Od.push(entry.Od);
+                Status.push(entry.Status);
+                StarRating.push(parseFloat(entry.StarRating));
+                Bpm.push(entry.Bpm);
+                Artist.push(entry.Artist);
+                Creator.push(entry.Creator);
+                Username.push(entry.Username);
+                Accuracy.push(parseFloat(entry.Accuracy));
+                MaxCombo.push(entry.MaxCombo);
+                Score.push(entry.Score);
+                Combo.push(entry.Combo);
+                Hit50.push(entry.Hit50);
+                Hit100.push(entry.Hit100);
+                Hit300.push(entry.Hit300);
+                Ur.push(entry.Ur);
+                HitMiss.push(entry.HitMiss);
+                Mode.push(entry.Mode);
+                Mods.push(entry.Mods);
             }});
 
 
@@ -747,11 +747,11 @@ function generateScoreElements(apiResponse) {{
   // Loop through the API response and create the HTML structure
   for (let i = 0; i < apiResponse.length; i++) {{
     const obj = apiResponse[i];
-    if (obj[28].Cover && obj[3].Osufilename) {{
+    if (obj.Cover && obj.Osufilename) {{
       const div0 = document.createElement(""div"");
       div0.classList.add(""m-1"")
       const a = document.createElement(""a"");
-      a.href = `https://osu.ppy.sh/beatmapsets/${{obj[1].BeatmapSetid}}#osu/${{obj[2].Beatmapid}}`;
+      a.href = `https://osu.ppy.sh/beatmapsets/${{obj.BeatmapSetid}}#osu/${{obj.Beatmapid}}`;
       a.target = ""_blank"";
       a.rel = ""noopener noreferrer"";
 
@@ -760,7 +760,7 @@ function generateScoreElements(apiResponse) {{
 
       const gradediv = document.createElement(""div"");
       const grade = document.createElement(""p"");
-      grade.textContent = obj[34].Grade;
+      grade.textContent = obj.Grade;
 
       gradediv.appendChild(grade);
       div1.appendChild(gradediv);
@@ -768,12 +768,12 @@ function generateScoreElements(apiResponse) {{
       const div2 = document.createElement(""div"");
       div2.style.cssText =
         ""width: 50px; height: 50px; background-size: cover; background-position: center center;"";
-      div2.style.backgroundImage = `url('${{obj[28].Cover}}')`;
+      div2.style.backgroundImage = `url('${{obj.Cover}}')`;
 
   const div3 = document.createElement(""div"");
         div3.classList.add(""w-3/4"", ""shadow-lg"", ""rounded-lg"", ""flex"", ""relative"", ""backdrop--dark"");
       //  div3.style.cssText =
-      //    `background-size: cover; background-position: center center; background-image: url('${{obj[27].CoverList}}');`;
+      //    `background-size: cover; background-position: center center; background-image: url('${{obj.CoverList}}');`;
 
  div3.style.cssText =
           ` border: 2px solid black; border-radius: 10px;`;
@@ -785,7 +785,7 @@ function generateScoreElements(apiResponse) {{
       const div4 = document.createElement(""div"");
       div4.style.cssText = ""backdrop-filter: blur(3px); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"";
 
-      const div5 = document.createElement(""div"");
+      const div5 = document.createElement(""div""); 
       div5.classList.add(""flex"", ""justify-between"", ""items-center"", ""w-full"", ""p-4"", ""text-center"");
       div5.style.cssText = ""height:50px; z-index: 1;"";
 
@@ -798,18 +798,18 @@ function generateScoreElements(apiResponse) {{
       title.style.cssText = ""overflow: hidden; white-space: nowrap; text-overflow: hidden;"";
       title.style.maxWidth = ""550px""; 
       title.style.width = ""550px""; 
-      title.textContent = obj[3].Osufilename;
+      title.textContent = obj.Osufilename;
 
     const versionAndDateContainer = document.createElement(""div"");
     versionAndDateContainer.classList.add(""flex"", ""items-center"");
 
       const difficulty = document.createElement(""p"");
       difficulty.classList.add(""text-sm"");
-      difficulty.textContent = obj[25].Version;
+      difficulty.textContent = obj.Version;
 
 const date = document.createElement(""p"");
 date.classList.add(""text-sm"", ""text-gray-500"", ""ml-2""); // You can adjust the styling as needed
-date.textContent = obj[0].Date; 
+date.textContent = obj.Date; 
 
 versionAndDateContainer.appendChild(difficulty);
 versionAndDateContainer.appendChild(date);
@@ -822,9 +822,9 @@ versionAndDateContainer.appendChild(date);
       hitsContainer.classList.add(""flex"", ""justify-between"", ""items-center"");
       hitsContainer.style.marginLeft = ""10px"";
 
-      const hit1 = createHitElement(""text-sm"", ""text-orange-500"", obj[18].Hit50);
-      const hit2 = createHitElement(""text-sm"", ""text-blue-500"", obj[19].Hit100);
-      const hit3 = createHitElement(""text-sm"", ""text-red-500"", obj[22].HitMiss);
+      const hit1 = createHitElement(""text-sm"", ""text-orange-500"", obj.Hit50);
+      const hit2 = createHitElement(""text-sm"", ""text-blue-500"", obj.Hit100);
+      const hit3 = createHitElement(""text-sm"", ""text-red-500"", obj.HitMiss);
 
       hitsContainer.appendChild(hit1);
       hitsContainer.appendChild(hit2);
@@ -837,7 +837,7 @@ versionAndDateContainer.appendChild(date);
 
       const accuracy = document.createElement(""div"");
       accuracy.classList.add(""text-sm"", ""text-green-600"", ""shadow-text-black"");
-      accuracy.textContent = parseFloat(obj[14].Accuracy).toFixed(2);
+      accuracy.textContent = parseFloat(obj.Accuracy).toFixed(2);
 
 
       accuracyContainer.appendChild(accuracy);
