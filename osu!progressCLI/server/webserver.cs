@@ -90,6 +90,7 @@ namespace osu_progressCLI.server
             }
             else if (path == "/api/beatmaps/search" && queryparams["searchquery"] != null)
             {
+
                 //convert timespan 
                 DateTime from = DateTime.Now;
                 DateTime to = DateTime.Now;

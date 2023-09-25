@@ -85,8 +85,13 @@ namespace osu_progressCLI.server
 
         public void search(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
 
+            Console.WriteLine("searchquery: " + parameters[0].ToString());
+            DateTime to = DateTime.Now;
+            DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
-            //create db query frisrt
+           
+
+            WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScores1(from, to, QueryParser.Filter(parameters[0].ToString()))) ,"application/json");
         }
 
         public void save(HttpListenerRequest request, HttpListenerResponse response) {

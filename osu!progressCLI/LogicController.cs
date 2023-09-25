@@ -9,7 +9,8 @@ using osu1progressbar.Game.MemoryProvider;
 using OsuMemoryDataProvider.OsuMemoryModels;
 
 
-//add fior muliti
+//detect score fails 
+//change saved time to seconds
 
 namespace osu1progressbar.Game.Logicstuff
 {
@@ -76,6 +77,7 @@ namespace osu1progressbar.Game.Logicstuff
                     userTimeStopWatch.Restart();
                 }
 
+                //can be buggy with broken game (fix ur game then wat)
                 if ((NewValues.GeneralData.OsuStatus.ToString() == "Playing") && (Audiotime > NewValues.GeneralData.AudioTime) && (timeSinceStartedPlaying.ElapsedMilliseconds > 500) && (NewValues.Player.Hit300 > 0) && (NewValues.Player.Score >= 10000))  {
                     Console.WriteLine("Retry detected");
                     db.InsertScore(NewValues, timeSinceStartedPlaying.ElapsedMilliseconds);

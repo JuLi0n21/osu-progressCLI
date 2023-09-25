@@ -363,6 +363,7 @@ namespace osu_progressCLI.server
                     <input type=""text"" id=""from"">
                     <label for=""to"">Select Date and Time:</label>
                     <input type=""text"" id=""to"">
+                    <input type=""text"" id=""mapsearch"">
                 </div>
             </div>
 
@@ -988,7 +989,27 @@ versionAndDateContainer.appendChild(date);
         }});
     }}
 
+        const searchbar = document.getElementById('mapsearch');
 
+searchbar.addEventListener('input', function() {{
+  console.log(searchbar.value.trim());
+const searchText = searchbar.value.trim();
+
+  if (searchText.length > 5) {{
+    const apiUrl = 'api/beatmaps/search';
+    
+    fetch(`${{apiUrl}}?searchquery=${{searchText}}`)
+      .then(response => response.json())
+      .then(data => {{
+        console.log(data);
+      }})
+      .catch(error => {{
+        console.error(error);
+      }});
+  }}
+}});
+
+    
         // Trigger the initial data load when the page loads (optional)
         window.addEventListener('DOMContentLoaded', function () {{
             // You can choose to load data immediately or wait for the button click
@@ -996,6 +1017,8 @@ versionAndDateContainer.appendChild(date);
             // document.getElementById('loadDataButton').click();
             loaddata();
         }});
+
+    
 
 
     </script>

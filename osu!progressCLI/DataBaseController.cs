@@ -597,11 +597,12 @@ namespace osu1progressbar.Game.Database
 
                     connection.Open();
 
-                    StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ScoreData WHERE 1=1");
+                    StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ScoreData WHERE 1=1 ");
                     
 
                     if (from != null || to != null) {
-                        queryBuilder.Append("datetime(Date) BETWEEN @from AND @to;")    ;
+                        queryBuilder.Append("AND datetime(Date) BETWEEN @from AND @to ");
+                        queryBuilder.Append(search);
                         command.Parameters.AddWithValue("@from", fromFormatted);
                         command.Parameters.AddWithValue("@to", toFormatted);
                     }
@@ -610,28 +611,40 @@ namespace osu1progressbar.Game.Database
                     command.CommandText = queryBuilder.ToString();
                     DateTime dateString = DateTime.Now;
 
-                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    Console.WriteLine(queryBuilder.ToString());
+
+                    try
                     {
-                        //Console.WriteLine(reader.HasRows.ToString
-
-                        while (reader.Read())
+                        using (SQLiteDataReader reader = command.ExecuteReader())
                         {
-                            //List<Dictionary<string, object>> row = new List<Dictionary<string, object>>();
-                            //Turn it back into a beatmap
-                            Dictionary<string, object> score = new Dictionary<string, object>();
-                            for (int i = 0; i < reader.FieldCount; i++)
+                            //Console.WriteLine(reader.HasRows.ToString
+
+                            while (reader.Read())
                             {
-                                string columnName = reader.GetName(i);
-                                object columnValue = reader.GetValue(i);
+                                //List<Dictionary<string, object>> row = new List<Dictionary<string, object>>();
+                                //Turn it back into a beatmap
+                                Dictionary<string, object> score = new Dictionary<string, object>();
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    string columnName = reader.GetName(i);
+                                    object columnValue = reader.GetValue(i);
 
-                                // Create a dictionary entry for each 
-                                score.Add(columnName, columnValue);
+                                    // Create a dictionary entry for each 
+                                    score.Add(columnName, columnValue);
 
+                                }
+                                scores.Add(score);
                             }
-                            scores.Add(score);
                         }
+
                     }
-                    connection.Close();
+                    catch {
+                        return null;
+                    }
+                    finally {
+                        connection.Close();
+                    }
+                    
                 }
                 return scores;
             }

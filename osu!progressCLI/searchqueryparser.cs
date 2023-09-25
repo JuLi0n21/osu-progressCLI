@@ -17,7 +17,7 @@ public class QueryParser
 
         foreach (string part in parts)
         {
-            Match match = Regex.Match(part, @"^(?<name>[a-zA-Z]+)(?<operator>[<>]=?)?(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
+            Match match = Regex.Match(part, @"^(?<name>[a-zA-Z]+)(?<operator>[<>]=)(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
 
             if (match.Success)
             {
@@ -31,7 +31,7 @@ public class QueryParser
 
         foreach (string param in parameters)
         {
-            Match match = Regex.Match(param, @"^(?<name>[a-zA-Z]+)(?<operator>[<>]=?)?(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
+            Match match = Regex.Match(param, @"^(?<name>[a-zA-Z]+)(?<operator>[<>]=)(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
 
             if (match.Success)
             {
@@ -57,18 +57,18 @@ public class QueryParser
             }
         }
     }
-    public static void Filter()
+    public static string Filter(string queryString)
     {
-        string queryString = " Ichinose cs<=4 sadadfsasf cs>=2 cs<=4 hp>=6";
+        //string queryString = " Ichinose cs<=4 sadadfsasf cs>=2 cs<=4 hp>=6";
 
         QueryParser parser = new QueryParser();
         parser.Parse(queryString);
 
-        StringBuilder commandBuilder = new StringBuilder("SELECT * FROM ScoreData WHERE ");
+        StringBuilder commandBuilder = new StringBuilder();
 
         if (parser.SearchTerms.Count > 0)
         {
-            commandBuilder.Append("(");
+            commandBuilder.Append("AND (");
             foreach (string term in parser.SearchTerms)
             {
                 commandBuilder.Append($"Osufilename LIKE '%{term}%' OR ");
@@ -89,6 +89,7 @@ public class QueryParser
 
         // Print the generated SQL query
         Console.WriteLine(commandBuilder.ToString());
+        return commandBuilder.ToString();
     }
 
 }
