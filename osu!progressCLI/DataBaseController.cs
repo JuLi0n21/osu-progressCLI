@@ -573,7 +573,6 @@ namespace osu1progressbar.Game.Database
                             {
                                 string columnName = reader.GetName(i);
                                 object columnValue = reader.GetValue(i);
-
                                 // Create a dictionary entry for each 
                                  score.Add(columnName, columnValue);
 
@@ -639,7 +638,6 @@ namespace osu1progressbar.Game.Database
                                     string columnName = reader.GetName(i);
                                     object columnValue = reader.GetValue(i);
 
-                                    // Create a dictionary entry for each 
                                     score.Add(columnName, columnValue);
 
                                 }

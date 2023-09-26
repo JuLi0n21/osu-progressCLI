@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace osu_progressCLI.server
 {
@@ -101,7 +102,7 @@ namespace osu_progressCLI.server
             max-width: 1000px;
             min-width: 1000px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            text-align: center;
+          
         }}
 
 
@@ -153,6 +154,79 @@ namespace osu_progressCLI.server
         .backdrop--dark {{
             background-color: rgba(42,34,38,255);
         }}
+
+          .backdrop--dark {{
+            background-color: rgba(28, 23, 25, 1);
+        }}
+
+        .backdrop--medium--dark {{
+            background-color: rgba(42, 34, 38, 1);
+        }}
+
+        .backdrop--medium {{
+            background-color: rgba(56, 46, 50, 1);
+        }}
+
+        .backdrop--medium--light {{
+            background-color: rgba(70, 57, 63, 1);
+        }}
+
+        .backdrop--light {{
+            background-color: rgba(84, 69, 76, 1);
+        }}
+
+         .text--dark--yellow {{
+            color: rgba(221, 159, 8, 255);
+        }}
+
+        .text--gray {{
+            color: rgba(162, 142, 151, 255);
+        }}
+
+        .text--yellow {{
+            color: rgba(252, 198, 51, 255);
+        }}
+
+        .text--pink {{
+            color: rgba(255, 102, 171, 255);
+        }}
+
+        .text--orange {{
+            color: #dc8726;
+        }}
+
+        .page-width {{
+            max-width: 1000px;
+            min-width: 1000px;
+        }}
+
+        .grade-rank-container {{
+            max-width: 150px;
+            min-width: 150px;
+        }}
+
+        .icon {{
+            max-width: 64px;
+            min-width: 64px;
+
+        }}
+
+        .scoreinfo-container {{
+            max-width: 400px;
+            min-width: 400px;
+        }}
+
+        .acc-container {{
+            max-width: 120px;
+            min-width: 120px;
+        }}
+
+        .pp-container {{
+            max-width: 100px;
+            min-width: 100px;
+        }}
+        
+
     </style>
 </head>
 <body>
@@ -295,11 +369,13 @@ namespace osu_progressCLI.server
 
             </div>
 
-
 <!-- Recent Scores -->
-<h1>Recent Scores</h1>
-<div class=""scorecontainer max-h-96 overflow-y-scroll""></div>
-  
+<div class""flex backdrop--medium"">
+<h1  style=""text-align: center;"" >Recent Scores</h1>
+</div>
+    <div id=""scorecontainer"" class=""flex-col overflow-y-scroll page-width backdrop--medium max-h-96"">
+</div>
+
 
     <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
 
@@ -373,8 +449,6 @@ namespace osu_progressCLI.server
                     <canvas id=""myChart""></canvas>
                 </div>
             </div>
-
-
 
             <div class=""flex backdrop--medium m-4"">
                 <div class=""w-1/2 rounded-l-lg backdrop--light"">
@@ -689,9 +763,9 @@ namespace osu_progressCLI.server
 
             for (let i = 0; i < data.length; i++) {{
                 const item = data[i];
-                if (item.Key !== """" && item.Value >= 1000) {{
+                if (item.Key !== """" && item.Value >= 10) {{
                     labels.push(item.Key);
-                    item.Value = item.Value / 3600000;
+                    item.Value = item.Value / 3600;
                     values.push(item.Value);
                     colors.push('#' + (Math.random() * 0xFFFFFF << 0).toString(16));
                 }}
@@ -740,147 +814,6 @@ namespace osu_progressCLI.server
             loaddata();
         }});
 
-        //recent plays generator
-function generateScoreElements(apiResponse) {{
-  // Get the container element where you want to add the generated HTML
-  const container = document.querySelector("".scorecontainer"");
-container.innerHTML = """";
-    if(apiResponse != null) {{
-                
-    console.log(apiResponse.length);
-  // Loop through the API response and create the HTML structure
-  for (let i = 0; i < apiResponse.length; i++) {{
-    const obj = apiResponse[i];
-    if (obj.Cover && obj.Osufilename) {{
-      const div0 = document.createElement(""div"");
-      div0.classList.add(""m-1"")
-      const a = document.createElement(""a"");
-      a.href = `https://osu.ppy.sh/beatmapsets/${{obj.BeatmapSetid}}#osu/${{obj.Beatmapid}}`;
-      a.target = ""_blank"";
-      a.rel = ""noopener noreferrer"";
-
-      const div1 = document.createElement(""div"");
-      div1.classList.add(""flex"", ""backdrop--medium"", ""justify-center"", ""rounded-lg"");
-
-      const gradediv = document.createElement(""div"");
-      const grade = document.createElement(""p"");
-      grade.textContent = obj.Grade;
-
-      gradediv.appendChild(grade);
-      div1.appendChild(gradediv);
-
-      const div2 = document.createElement(""div"");
-      div2.style.cssText =
-        ""width: 50px; height: 50px; background-size: cover; background-position: center center;"";
-      div2.style.backgroundImage = `url('${{obj.Cover}}')`;
-
-  const div3 = document.createElement(""div"");
-        div3.classList.add(""w-3/4"", ""shadow-lg"", ""rounded-lg"", ""flex"", ""relative"", ""backdrop--dark"");
-      //  div3.style.cssText =
-      //    `background-size: cover; background-position: center center; background-image: url('${{obj.CoverList}}');`;
-
- div3.style.cssText =
-          ` border: 2px solid black; border-radius: 10px;`;
-
-  const blurredBackground = document.createElement(""div"");
-      blurredBackground.style.cssText =
-        ""backdrop-filter: blur(3px); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"";
-
-      const div4 = document.createElement(""div"");
-      div4.style.cssText = ""backdrop-filter: blur(3px); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"";
-
-      const div5 = document.createElement(""div""); 
-      div5.classList.add(""flex"", ""justify-between"", ""items-center"", ""w-full"", ""p-4"", ""text-center"");
-      div5.style.cssText = ""height:50px; z-index: 1;"";
-
-      // Score Details Text
-      const scoreDetailsText = document.createElement(""div"");
-      scoreDetailsText.classList.add(""text-left"");
-
-      const title = document.createElement(""p"");
-      title.classList.add(""text-lg"", ""text-pink-500"");
-      title.style.cssText = ""overflow: hidden; white-space: nowrap; text-overflow: hidden;"";
-      title.style.maxWidth = ""550px""; 
-      title.style.width = ""550px""; 
-      title.textContent = obj.Osufilename;
-
-    const versionAndDateContainer = document.createElement(""div"");
-    versionAndDateContainer.classList.add(""flex"", ""items-center"");
-
-      const difficulty = document.createElement(""p"");
-      difficulty.classList.add(""text-sm"");
-      difficulty.textContent = obj.Version;
-
-const date = document.createElement(""p"");
-date.classList.add(""text-sm"", ""text-gray-500"", ""ml-2""); // You can adjust the styling as needed
-date.textContent = obj.Date; 
-
-versionAndDateContainer.appendChild(difficulty);
-versionAndDateContainer.appendChild(date);
-
-      scoreDetailsText.appendChild(title);
-      scoreDetailsText.appendChild(versionAndDateContainer);
-
-      // Black Circle Behind Hits
-      const hitsContainer = document.createElement(""div"");
-      hitsContainer.classList.add(""flex"", ""justify-between"", ""items-center"");
-      hitsContainer.style.marginLeft = ""10px"";
-
-      const hit1 = createHitElement(""text-sm"", ""text-orange-500"", obj.Hit50);
-      const hit2 = createHitElement(""text-sm"", ""text-blue-500"", obj.Hit100);
-      const hit3 = createHitElement(""text-sm"", ""text-red-500"", obj.HitMiss);
-
-      hitsContainer.appendChild(hit1);
-      hitsContainer.appendChild(hit2);
-      hitsContainer.appendChild(hit3);
-
-      // Black Circle Behind Accuracy
-      const accuracyContainer = document.createElement(""div"");
-      accuracyContainer.style.cssText =
-        ""width: 30px; height: 30px; background-color: black; border-radius: 50%;"";
-
-      const accuracy = document.createElement(""div"");
-      accuracy.classList.add(""text-sm"", ""text-green-600"", ""shadow-text-black"");
-      accuracy.textContent = parseFloat(obj.Accuracy).toFixed(2);
-
-
-      accuracyContainer.appendChild(accuracy);
-
-      // Append elements to build the structure
-      div5.appendChild(scoreDetailsText);
-      div5.appendChild(hitsContainer);
-      div5.appendChild(accuracyContainer);
-      div3.appendChild(blurredBackground);
-      div4.appendChild(div5);
-      div3.appendChild(div4);
-      div1.appendChild(div2);
-      div1.appendChild(div3);
-      a.appendChild(div1);
-      div0.appendChild(a);
-      container.appendChild(div0);
-        }} else {{
-container.innerHTML = ""<p>No matching Scores Found</p>"";        
-}}
-    }}
-  }}
-
-  // Helper function to create Hit elements
-  function createHitElement(textClass, textColorClass, value) {{
-    const hitContainer = document.createElement(""div"");
-    hitContainer.style.cssText =
-      ""width: 30px; height: 20px; background-color: black; border-radius: 50%;"";
-
-    const hitValue = document.createElement(""div"");
-    hitValue.classList.add(textClass, textColorClass);
-    hitValue.textContent = value;
-
-    hitContainer.appendChild(hitValue);
-
-    return hitContainer;
-  }}
-}}
-
-
         //get data from internal api
         function loaddata() {{
             fetch('/api/beatmaps')
@@ -888,7 +821,7 @@ container.innerHTML = ""<p>No matching Scores Found</p>"";
                 .then(data => {{
                     console.log(data);
                     renderChart(data);
-                    generateScoreElements(data);
+                    createScoreElements(data);
                 }})
                 .catch(error => {{
                     console.error('Error loading data:', error);
@@ -1014,7 +947,7 @@ searchbar.addEventListener('input', function() {{
         .then(response => response.json())
         .then(data => {{
           console.log(data);
-          generateScoreElements(data);
+          createScoreElements(data);
         }})
         .catch(error => {{
           console.error(error);
@@ -1022,6 +955,86 @@ searchbar.addEventListener('input', function() {{
     }}, 2000); // Delay for 2 seconds (2000 milliseconds)
   }}
 }});
+
+
+function createScoreElements(scores) {{
+const scoresContainer =  document.getElementById(""scorecontainer"");
+scoresContainer.innerHTML = """";
+  scores.forEach((score) => {{
+    const scoreElement = document.createElement(""div"");
+    scoreElement.className = ""flex justify-center mb-0"";
+
+    // Build the HTML structure for each score using the provided data
+    scoreElement.innerHTML = 
+        `<div class=""flex backdrop--light h-16 rounded justify-between m-4 w-5/6 mb-1 mt-1"">
+
+        <!-- Status and Grade-->
+        <div class=""flex flex-col grade-rank-container rounded justify-evenly w-1/6"">
+            <div class=""flex justify-center"">
+                <p class=""text--gray"">${{score.Status}}</p>
+            </div>
+            <div class=""flex justify-center"">
+
+                <img src=""https://osu.ppy.sh/assets/images/GradeSmall-A.d785e824.svg"" alt=""${{score.Grade}}"" class=""w-20"">
+            </div>
+        </div>
+        <div class=""bg-red-200 icon rounded-lg flex-nowrap"">
+            <img src=""${{score.Cover}}"" class=""w-16 h-16"" alt=""list"">
+        </div>
+
+        <!-- Name, Score/Combo, Grade Date -->
+        <div class=""flex flex-col rounded justify-evenly scoreinfo-container"">
+            <div>
+                <p class=""text-white whitespace-nowrap overflow-hidden"">${{score.Osufilename}}</p>
+            </div>
+            <div>
+                <p class=""text-white"">${{score.Score}} / ${{score.MaxCombo}} {{${{score.MaxCombo}}}}</p>
+            </div>
+            <div class=""flex"">
+                <p class=""text--dark--yellow"">${{score.Version}}</p>
+                <p class=""text--gray ml-4"">${{score.Date}}</p>
+            </div>
+        </div>
+
+        <!-- ACC and Hits-->
+        <div class=""flex acc-container"">
+            <div class=""flex flex-col justify-evenly justify-self-end rounded w-1/4 ml-3"">
+                <div>
+                    <p class=""text--yellow"">${{score.Accuracy}}%</p>
+                </div>
+                <div class=""flex"">
+                    <p class=""text-white"">{{</p>
+                    <p class=""text-blue-500"">${{score.Hit300}}</p>
+                    <p class=""text-white"">,</p>
+                    <p class=""text-green-500"">${{score.Hit100}}</p>
+                    <p class=""text-white"">,</p>
+                    <p class=""text--orange"">${{score.Hit50}}</p>
+                    <p class=""text-white"">,</p>
+                    <p class=""text-red-600"">${{score.HitMiss}}</p>
+                    <p class=""text-white"">}}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PP -->
+        <div class=""flex flex-col justify-evenly rounded backdrop--medium--light w-1/6 pp-container"">
+            <div class=""flex justify-center"">
+                <p class=""text--pink"">${{score.PP}}pp</p>
+            </div>
+            <div class=""flex justify-center"">
+                <p class=""text--pink justify-self-center"">(${{score.FCPP}}pp)</p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>`;
+
+    // Append the score element to the container
+    scoresContainer.appendChild(scoreElement);
+  }});
+}}
+
+
     
         // Trigger the initial data load when the page loads (optional)
         window.addEventListener('DOMContentLoaded', function () {{
