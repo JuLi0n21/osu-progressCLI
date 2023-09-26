@@ -81,7 +81,7 @@ namespace osu1progressbar.Game.Database
                     Od REAL,
                     Status TEXT,
                     StarRating REAL,
-                    Bpm INTEGER,
+                    Bpm REAL,
                     Artist TEXT,
                     Creator TEXT,
                     Username TEXT,
@@ -134,7 +134,7 @@ namespace osu1progressbar.Game.Database
             }
 
             string ScoreHelperTableQuery = @"
-                CREATE TABLE IF NOT EXISTS BeatmapHelper (id INTEGER, StarRating REAL, Artist TEXT, Creator TEXT, Bpm INTEGER, Version TEXT, Status TEXT, Tags TEXT, CoverList TEXT, Cover TEXT)";
+                CREATE TABLE IF NOT EXISTS BeatmapHelper (id INTEGER, StarRating REAL, Artist TEXT, Creator TEXT, Bpm REAL, Version TEXT, Status TEXT, Tags TEXT, CoverList TEXT, Cover TEXT)";
 
             using (var command = new SQLiteCommand(ScoreHelperTableQuery, connection))
             {
@@ -159,7 +159,10 @@ namespace osu1progressbar.Game.Database
             DateTime time = DateTime.UtcNow;
             string date = time.ToString("yyyy-MM-dd HH:00");
 
-            Console.Write(date);
+            if(OldStatus == -1)
+            {
+                return;
+            }
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -214,7 +217,6 @@ namespace osu1progressbar.Game.Database
             DateTime time = DateTime.UtcNow;
             string date = time.ToString("yyyy-MM-dd HH:00");
 
-            Console.WriteLine(date);
 
             if (BanchoStatus == null || timeElapsed == 0)
             {
@@ -274,12 +276,12 @@ namespace osu1progressbar.Game.Database
         {
 
             string creator = "null", artist = "null", status = "null", version = "null", tags = "null", coverlist = "null", cover = "null";
-            int bpm = -1;
+            double bpm = -1;
             double starrating = -1;
 
 
             PerfomanceAttributes perfomanceAttributes = new PerfomanceAttributes();
-            PerfomanceAttributes perfomanceAttributesfc = new PerfomanceAttributes();
+
 
             perfomanceAttributes = DifficultyAttributes.CalculatePP(
                                 baseAddresses.Beatmap.FolderName,
@@ -312,7 +314,7 @@ namespace osu1progressbar.Game.Database
                         {
                             // Update variables with the fetched data
                             starrating = double.Parse(reader["starrating"].ToString());
-                            bpm = int.Parse(reader["bpm"].ToString());
+                            bpm = double.Parse(reader["bpm"].ToString());
                             creator = reader["creator"].ToString();
                             artist = reader["artist"].ToString();
                             status = reader["status"].ToString();
@@ -329,7 +331,7 @@ namespace osu1progressbar.Game.Database
                             if (beatmap != null)
                             {
                                 starrating = double.Parse(beatmap["difficulty_rating"].ToString());
-                                bpm = int.Parse(beatmap["bpm"].ToString());
+                                bpm = double.Parse(beatmap["bpm"].ToString());
                                 creator = beatmap["beatmapset"]["creator"].ToString();
                                 artist = beatmap["beatmapset"]["artist"].ToString();
                                 status = beatmap["beatmapset"]["status"].ToString();
@@ -504,7 +506,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Tags", tags);
                         command.Parameters.AddWithValue("@Time", timeElapsed);
                         command.Parameters.AddWithValue("@pp", perfomanceAttributes.pp);
-                        command.Parameters.AddWithValue("@fcpp", perfomanceAttributesfc.pp);
+                        command.Parameters.AddWithValue("@fcpp", fcpp);
                         command.Parameters.AddWithValue("@aim", perfomanceAttributes.aim);
                         command.Parameters.AddWithValue("@speed", perfomanceAttributes.speed);
                         command.Parameters.AddWithValue("@accuracyatt", perfomanceAttributes.accuracy);

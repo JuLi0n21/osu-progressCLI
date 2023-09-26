@@ -63,7 +63,6 @@ namespace osu_progressCLI
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 Console.WriteLine("Recieved Accesstoken, expanded Beatmap data should be availabe now.");
-                //Console.WriteLine(responseContent);
 
                 TokenResponse tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
 
@@ -72,7 +71,6 @@ namespace osu_progressCLI
             }
             else
             {
-                //retireve beatmap info next time a 
                 Console.WriteLine($"HTTP Error: {response.StatusCode}, beatmap info will only be limited available");
             }
 
@@ -88,8 +86,8 @@ namespace osu_progressCLI
 
         public async Task<JObject> getExpandedBeatmapinfo(string id)
         {
+            Console.WriteLine($"Requesting Beatmap info for: {id}");
             JObject beatmap = null;
-            //Console.WriteLine($"{DateTime.Now:T} Error reading {e.propPath}{Environment.NewLine}");
             string beatmapEndpoint = $"https://osu.ppy.sh/api/v2/beatmaps/lookup?id={id}";
 
             var client = new HttpClient();
@@ -105,7 +103,7 @@ namespace osu_progressCLI
             if (reponse.IsSuccessStatusCode)
             {
                 string responseBody = await reponse.Content.ReadAsStringAsync();
-                Console.WriteLine(responseBody);
+                Console.WriteLine($"Rechieved Beatmap info for: {id}");
 
                 beatmap = JObject.Parse(responseBody);
             }
@@ -157,6 +155,7 @@ namespace osu_progressCLI
         public async Task<JObject> getuser(string userid, string mode)
         {
 
+            Console.WriteLine($"Requesting User info for: {userid}");
             JObject userJson = null;
 
             string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{userid}/{mode}";
@@ -173,8 +172,8 @@ namespace osu_progressCLI
 
             if (reponse.IsSuccessStatusCode)
             {
+                Console.WriteLine($"Recieved User info for: {userid}");
                 string responseBody = await reponse.Content.ReadAsStringAsync();
-                Console.WriteLine("search Recieved.");
                 Console.WriteLine(responseBody);
 
                 userJson = JObject.Parse(responseBody);

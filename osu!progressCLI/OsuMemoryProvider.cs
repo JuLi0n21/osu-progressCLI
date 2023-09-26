@@ -106,7 +106,7 @@ namespace osu1progressbar.Game.MemoryProvider
                         Console.CursorLeft = 0;
                         Console.CursorTop = Console.CursorTop - 1;
 
-                        logic.userTimeStopWatch.Reset();
+                        logic.BanchoTimeStopWatch.Reset();
                         logic.screenTimeStopWatch.Reset();
                         logic.timeSinceStartedPlaying.Reset();
                         

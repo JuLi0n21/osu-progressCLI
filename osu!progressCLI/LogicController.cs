@@ -25,7 +25,7 @@ namespace osu1progressbar.Game.Logicstuff
         private bool isReplay = false;
 
         public Stopwatch screenTimeStopWatch;
-        public Stopwatch userTimeStopWatch;
+        public Stopwatch BanchoTimeStopWatch;
         private Stopwatch stopwatch;
         public Stopwatch timeSinceStartedPlaying;
         public LogicController()
@@ -36,14 +36,15 @@ namespace osu1progressbar.Game.Logicstuff
             screenTimeStopWatch = new Stopwatch();
             screenTimeStopWatch.Start();
 
-            userTimeStopWatch = new Stopwatch();
-            userTimeStopWatch.Start();
+            BanchoTimeStopWatch = new Stopwatch();
+            BanchoTimeStopWatch.Start();
 
             stopwatch = Stopwatch.StartNew();
 
             timeSinceStartedPlaying = new Stopwatch();
         }
 
+        //the first time gets currentliy ignored cause it gets restarted after first entry (and is probably not running cause its set to stop in the memoryprovider incase no osu is found
         public bool Logiccheck(OsuBaseAddresses NewValues)
         {
             try
@@ -57,30 +58,31 @@ namespace osu1progressbar.Game.Logicstuff
                 }
 
                 if (CurrentScreen != NewValues.GeneralData.OsuStatus.ToString())
-                { 
-                    Console.WriteLine("Spend: " + (DateTime.Now + ": " + screenTimeStopWatch.ElapsedMilliseconds) + "s in: " + CurrentScreen);
-                    db.UpdateTimeWasted(oldRawStatus, screenTimeStopWatch.Elapsed.Seconds);
+                {
+                    Console.WriteLine(DateTime.Now + "| " + "Screentime: "  + screenTimeStopWatch.ElapsedMilliseconds / 1000 + "s : " + CurrentScreen);
+                    db.UpdateTimeWasted(oldRawStatus, screenTimeStopWatch.ElapsedMilliseconds / 1000);
                     screenTimeStopWatch.Restart();
                 }
 
                 if (BanchoUserStatus != NewValues.BanchoUser.BanchoStatus.ToString())
                 {
-                    Console.WriteLine("Spend: " + (DateTime.Now + ": " + screenTimeStopWatch.ElapsedMilliseconds) + "s as: " + BanchoUserStatus);
-                    db.UpdateBanchoTime(BanchoUserStatus, screenTimeStopWatch.Elapsed.Seconds);
-                    userTimeStopWatch.Restart();
+                    Console.WriteLine(DateTime.Now + "| " + "Banchotime: "+ BanchoTimeStopWatch.ElapsedMilliseconds / 1000 + "s : " + BanchoUserStatus);
+                    db.UpdateBanchoTime(BanchoUserStatus, BanchoTimeStopWatch.ElapsedMilliseconds / 1000);
+                    BanchoTimeStopWatch.Restart();
                 }
+
 
                 if (!isReplay && CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() != "Playing")
                 {
                     Console.WriteLine("Play Detected");
-                    db.InsertScore(NewValues, timeSinceStartedPlaying.Elapsed.Seconds);
+                    db.InsertScore(NewValues, timeSinceStartedPlaying.ElapsedMilliseconds / 1000);
                     timeSinceStartedPlaying.Reset();
                 }
 
                 //can be buggy with broken game (fix ur game then wat)
                 if ((NewValues.GeneralData.OsuStatus.ToString() == "Playing") && (Audiotime > NewValues.GeneralData.AudioTime) && (timeSinceStartedPlaying.ElapsedMilliseconds > 2500) && (NewValues.Player.Score >= 1000))  {
                     Console.WriteLine("Retry detected");
-                    db.InsertScore(NewValues, timeSinceStartedPlaying.Elapsed.Seconds);
+                    db.InsertScore(NewValues, timeSinceStartedPlaying.ElapsedMilliseconds / 1000);
                     timeSinceStartedPlaying.Restart();
                 };
                  
