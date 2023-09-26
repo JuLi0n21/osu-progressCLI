@@ -632,9 +632,9 @@ namespace osu_progressCLI.server
 
             for (let i = 0; i < data.length; i++) {{
                 const item = data[i];
-                if (item.Key !== """" && item.Value >= 1000) {{
+                if (item.Key !== """" && item.Value >= 10) {{
                     labels.push(item.Key);
-                    item.Value = item.Value / 3600000;
+                    item.Value = item.Value / 3600;
                     values.push(item.Value);
                 }}
             }}
@@ -744,6 +744,9 @@ namespace osu_progressCLI.server
 function generateScoreElements(apiResponse) {{
   // Get the container element where you want to add the generated HTML
   const container = document.querySelector("".scorecontainer"");
+container.innerHTML = """";
+    if(apiResponse != null) {{
+                
     console.log(apiResponse.length);
   // Loop through the API response and create the HTML structure
   for (let i = 0; i < apiResponse.length; i++) {{
@@ -855,6 +858,9 @@ versionAndDateContainer.appendChild(date);
       a.appendChild(div1);
       div0.appendChild(a);
       container.appendChild(div0);
+        }} else {{
+container.innerHTML = ""<p>No matching Scores Found</p>"";        
+}}
     }}
   }}
 
@@ -989,26 +995,33 @@ versionAndDateContainer.appendChild(date);
         }});
     }}
 
-        const searchbar = document.getElementById('mapsearch');
+
+const searchbar = document.getElementById('mapsearch');
+let throttleTimeout;
+let lastSearchText = '';
 
 searchbar.addEventListener('input', function() {{
-  console.log(searchbar.value.trim());
-const searchText = searchbar.value.trim();
+  const searchText = searchbar.value.trim();
 
-  if (searchText.length > 5) {{
-    const apiUrl = 'api/beatmaps/search';
-    
-    fetch(`${{apiUrl}}?searchquery=${{searchText}}`)
-      .then(response => response.json())
-      .then(data => {{
-        console.log(data);
-      }})
-      .catch(error => {{
-        console.error(error);
-      }});
+  if (searchText.length > 5 && searchText !== lastSearchText) {{
+    lastSearchText = searchText;
+
+    clearTimeout(throttleTimeout);
+    throttleTimeout = setTimeout(() => {{
+      const apiUrl = 'api/beatmaps/search';
+
+      fetch(`${{apiUrl}}?searchquery=${{searchText}}`)
+        .then(response => response.json())
+        .then(data => {{
+          console.log(data);
+          generateScoreElements(data);
+        }})
+        .catch(error => {{
+          console.error(error);
+        }});
+    }}, 2000); // Delay for 2 seconds (2000 milliseconds)
   }}
 }});
-
     
         // Trigger the initial data load when the page loads (optional)
         window.addEventListener('DOMContentLoaded', function () {{

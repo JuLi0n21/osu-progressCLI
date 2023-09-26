@@ -10,8 +10,47 @@ namespace osu_progressCLI
 {
     internal class DifficultyAttributes
     {
-        private const string CalculatorPath = "osu-tools\\PerformanceCalculator";
 
+        public static double CalculateFcWithAcc(string folderName, string fileName, double Acc) {
+            double pp = 0;
+
+
+            string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
+            string command = $"dotnet run -- simulate osu \"{fullPath}\" -a {Acc} -C 100";
+
+            string output = cmdOutput(command);
+            try {
+                pp = ParsePPFromOutput(output);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return pp;
+        }
+
+        public static double CalculateFcWithAcc(int id, double Acc)
+        {
+            double pp = 0;
+
+
+            string command = $"dotnet run -- simulate osu {id} -a {Acc} -C 100";
+
+            string output = cmdOutput(command);
+            try
+            {
+                pp = ParsePPFromOutput(output);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return pp;
+        }
+
+        //add mods (need to be parsed from bit format to string 
         public static PerfomanceAttributes CalculatePP(string folderName, string fileName, int mods, int missCount, int mehCount, int goodCount, int perfectcount, int combo)
         {
             PerfomanceAttributes perfomanceAttributes = new PerfomanceAttributes();
@@ -19,7 +58,31 @@ namespace osu_progressCLI
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
             string command = $"dotnet run -- simulate osu \"{fullPath}\" -c {combo} -X {missCount} -M {mehCount} -G {goodCount}";
 
-            ProcessStartInfo psi = new ProcessStartInfo
+            string output = cmdOutput(command);
+
+            try
+            {
+                perfomanceAttributes.pp = ParsePPFromOutput(output);
+                perfomanceAttributes.aim = ParseAimFromOutput(output);
+                perfomanceAttributes.speed = ParseSpeedFromOutput(output);
+                perfomanceAttributes.accuracy = ParseAccuracyFromOutput(output);
+                perfomanceAttributes.grade = CalculateGrade(perfectcount, goodCount, mehCount, missCount);
+
+                return perfomanceAttributes;
+            }
+            catch (InvalidOperationException)
+            {
+                return perfomanceAttributes;
+            }
+        }
+
+
+
+        private static string cmdOutput(string command) {
+
+        const string CalculatorPath = "osu-tools\\PerformanceCalculator";
+
+        ProcessStartInfo psi = new ProcessStartInfo
             {
                 FileName = "cmd.exe",
                 WorkingDirectory = CalculatorPath,
@@ -33,7 +96,6 @@ namespace osu_progressCLI
             process.Start();
 
             StreamWriter sw = process.StandardInput;
-            Console.WriteLine(command);
             sw.WriteLine(command);
             sw.WriteLine("exit");
 
@@ -41,21 +103,7 @@ namespace osu_progressCLI
 
             process.WaitForExit();
 
-            try
-            {
-                perfomanceAttributes.pp = ParsePPFromOutput(output);
-                perfomanceAttributes.aim = ParseAimFromOutput(output);
-                perfomanceAttributes.speed = ParseSpeedFromOutput(output);
-                perfomanceAttributes.accuracy = ParseAccuracyFromOutput(output);
-                perfomanceAttributes.grade = CalculateGrade(perfectcount, goodCount, mehCount, missCount);
-
-                Console.WriteLine(perfomanceAttributes.pp + " | " + perfomanceAttributes.aim + " | " + perfomanceAttributes.speed + " | " + perfomanceAttributes.accuracy + " | " + perfomanceAttributes.grade);
-                return perfomanceAttributes;
-            }
-            catch (InvalidOperationException)
-            {
-                return perfomanceAttributes;
-            }
+            return output;
         }
 
         private static double ParseAimFromOutput(string output)
@@ -168,7 +216,7 @@ namespace osu_progressCLI
        public double aim { get; set; }
        public double speed { get;set; }
        public double accuracy { get; set; }
-       public double pp { get; set; } 
+       public double pp { get; set; }
         public string grade { get; set; }
     }
 }
