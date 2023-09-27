@@ -66,6 +66,8 @@ namespace osu_progressCLI
                 perfomanceAttributes.aim = ParseAimFromOutput(output);
                 perfomanceAttributes.speed = ParseSpeedFromOutput(output);
                 perfomanceAttributes.accuracy = ParseAccuracyFromOutput(output);
+                perfomanceAttributes.starrating = ParseStarRatingFromOutput(output);
+                perfomanceAttributes.Maxcombo = ParseMaxComboFromOutput(output);
                 perfomanceAttributes.grade = CalculateGrade(perfectcount, goodCount, mehCount, missCount);
 
                 return perfomanceAttributes;
@@ -100,7 +102,7 @@ namespace osu_progressCLI
             sw.WriteLine("exit");
 
             string output = process.StandardOutput.ReadToEnd();
-
+            //Console.WriteLine(output);
             process.WaitForExit();
 
             return output;
@@ -157,6 +159,41 @@ namespace osu_progressCLI
             {
 
                 throw new InvalidOperationException("accuracy value not found in the output.");
+            }
+        }
+
+        private static double ParseStarRatingFromOutput(string output)
+        {
+            string pattern = @"star rating\s+:\s+(?<starrating>[\d.]+)";
+
+            Match match = Regex.Match(output, pattern);
+
+            if (match.Success)
+            {
+
+                return double.Parse(match.Groups["starrating"].Value) / 100; // Parse as double and 
+            }
+            else
+            {
+
+                throw new InvalidOperationException("starrating value not found in the output.");
+            }
+        }
+
+        private static int ParseMaxComboFromOutput(string output)
+        {
+            string pattern = @"max combo\s+:\s+(?<maxcombo>[\d.]+)";
+
+           Match match = Regex.Match(output, pattern);
+
+            if (match.Success)
+            {
+                return (int)Math.Round(double.Parse(match.Groups["maxcombo"].Value) / 100 ); // Parse as double and 
+            }
+            else
+            {
+
+                throw new InvalidOperationException("max combo value not found in the output.");
             }
         }
 
@@ -217,6 +254,8 @@ namespace osu_progressCLI
        public double speed { get;set; }
        public double accuracy { get; set; }
        public double pp { get; set; }
+        public double starrating { get; set; }
+        public int Maxcombo { get; set; }
         public string grade { get; set; }
     }
 }

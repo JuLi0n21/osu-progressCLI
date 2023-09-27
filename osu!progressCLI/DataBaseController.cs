@@ -293,6 +293,14 @@ namespace osu1progressbar.Game.Database
                                 baseAddresses.Player.Hit300,
                                 baseAddresses.Player.MaxCombo);
 
+            if(baseAddresses.Player.HP == 0)
+            {
+                perfomanceAttributes.grade = "F";
+            }
+
+            starrating = perfomanceAttributes.starrating;
+            Console.WriteLine(perfomanceAttributes.Maxcombo);
+
             double fcpp = DifficultyAttributes.CalculateFcWithAcc(
                                 baseAddresses.Beatmap.FolderName,
                                 baseAddresses.Beatmap.OsuFileName,
@@ -485,16 +493,16 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Cs", baseAddresses.Beatmap.Cs);
                         command.Parameters.AddWithValue("@Hp", baseAddresses.Beatmap.Hp);
                         command.Parameters.AddWithValue("@Od", baseAddresses.Beatmap.Od);
-                        command.Parameters.AddWithValue("@Status", status); //or status gotten from api
+                        command.Parameters.AddWithValue("@Status", status);
                         command.Parameters.AddWithValue("@StarRating", starrating);
                         command.Parameters.AddWithValue("@Bpm", bpm);
                         command.Parameters.AddWithValue("@Creator", creator);
                         command.Parameters.AddWithValue("@Artist", artist);
                         command.Parameters.AddWithValue("@Username", baseAddresses.Player.Username);
                         command.Parameters.AddWithValue("@Accuracy", baseAddresses.Player.Accuracy);
-                        command.Parameters.AddWithValue("@MaxCombo", baseAddresses.Player.MaxCombo);
+                        command.Parameters.AddWithValue("@MaxCombo", perfomanceAttributes.Maxcombo);
                         command.Parameters.AddWithValue("@Score", baseAddresses.Player.Score);
-                        command.Parameters.AddWithValue("@Combo", baseAddresses.Player.Combo);
+                        command.Parameters.AddWithValue("@Combo", baseAddresses.Player.MaxCombo);
                         command.Parameters.AddWithValue("@Hit50", baseAddresses.Player.Hit50);
                         command.Parameters.AddWithValue("@Hit100", baseAddresses.Player.Hit100);
                         command.Parameters.AddWithValue("@Hit300", baseAddresses.Player.Hit300);
