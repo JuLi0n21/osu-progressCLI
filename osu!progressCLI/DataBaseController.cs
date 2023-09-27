@@ -275,7 +275,7 @@ namespace osu1progressbar.Game.Database
         public async void InsertScore(OsuBaseAddresses baseAddresses, float timeElapsed)
         {
 
-            string creator = "null", artist = "null", status = "null", version = "null", tags = "null", coverlist = "null", cover = "null";
+            string creator = "null", artist = "null", status = baseAddresses.Beatmap.Status.ToString(), version = "null", tags = "null", coverlist = "null", cover = "null";
             double bpm = -1;
             double starrating = -1;
 
@@ -328,6 +328,7 @@ namespace osu1progressbar.Game.Database
                         else
                         {
                             JObject beatmap = await ApiController.Instance.getExpandedBeatmapinfo(baseAddresses.Beatmap.Id.ToString());
+                            Console.WriteLine(beatmap);
                             if (beatmap != null)
                             {
                                 starrating = double.Parse(beatmap["difficulty_rating"].ToString());
@@ -335,6 +336,7 @@ namespace osu1progressbar.Game.Database
                                 creator = beatmap["beatmapset"]["creator"].ToString();
                                 artist = beatmap["beatmapset"]["artist"].ToString();
                                 status = beatmap["beatmapset"]["status"].ToString();
+                                Console.WriteLine(status);
                                 coverlist = beatmap["beatmapset"]["covers"]["cover@2x"].ToString();
                                 cover = beatmap["beatmapset"]["covers"]["list@2x"].ToString();
                                 version = beatmap["version"].ToString();
@@ -483,7 +485,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Cs", baseAddresses.Beatmap.Cs);
                         command.Parameters.AddWithValue("@Hp", baseAddresses.Beatmap.Hp);
                         command.Parameters.AddWithValue("@Od", baseAddresses.Beatmap.Od);
-                        command.Parameters.AddWithValue("@Status", baseAddresses.Beatmap.Status); //or status gotten from api
+                        command.Parameters.AddWithValue("@Status", status); //or status gotten from api
                         command.Parameters.AddWithValue("@StarRating", starrating);
                         command.Parameters.AddWithValue("@Bpm", bpm);
                         command.Parameters.AddWithValue("@Creator", creator);

@@ -195,14 +195,18 @@ namespace osu_progressCLI.server
             color: #dc8726;
         }}
 
+        .text--pink--dark {{
+            color: #663e70;
+        }}
+
         .page-width {{
             max-width: 1000px;
             min-width: 1000px;
         }}
 
         .grade-rank-container {{
-            max-width: 150px;
-            min-width: 150px;
+            max-width: 100px;
+            min-width: 100px;
         }}
 
         .icon {{
@@ -963,7 +967,8 @@ scoresContainer.innerHTML = """";
   scores.forEach((score) => {{
     const scoreElement = document.createElement(""div"");
     scoreElement.className = ""flex justify-center mb-0"";
-
+    
+    score.Accuracy = score.Accuracy.toFixed(2);
     // Build the HTML structure for each score using the provided data
     scoreElement.innerHTML = 
         `<div class=""flex backdrop--light h-16 rounded justify-between m-4 w-5/6 mb-1 mt-1"">
@@ -978,8 +983,8 @@ scoresContainer.innerHTML = """";
                 <img src=""https://osu.ppy.sh/assets/images/GradeSmall-A.d785e824.svg"" alt=""${{score.Grade}}"" class=""w-20"">
             </div>
         </div>
-        <div class=""bg-red-200 icon rounded-lg flex-nowrap"">
-            <img src=""${{score.Cover}}"" class=""w-16 h-16"" alt=""list"">
+        <div class=""backdrop--dark icon rounded-lg flex-nowrap"">
+            <img src=""${{score.Cover}}"" class=""w-16 h-16"" alt=""?"">
         </div>
 
         <!-- Name, Score/Combo, Grade Date -->
@@ -1022,7 +1027,7 @@ scoresContainer.innerHTML = """";
                 <p class=""text--pink"">${{score.PP}}pp</p>
             </div>
             <div class=""flex justify-center"">
-                <p class=""text--pink justify-self-center"">(${{score.FCPP}}pp)</p>
+                <p class=""text--pink--dark justify-self-center"">(${{score.FCPP}}pp)</p>
             </div>
         </div>
     </div>
