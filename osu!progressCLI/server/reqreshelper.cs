@@ -78,6 +78,28 @@ namespace osu_progressCLI.server
 
             WriteResponse(response, beatmapstring, "application/json");
         }
+
+        public void getBanchoTimebyday(HttpListenerRequest request, HttpListenerResponse response)
+        {
+            DateTime to = DateTime.Now;
+            DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
+
+            string beatmapstring = GetBanchoTime(from, to);
+
+            WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTimebyDay(from, to)), "application/json");
+        }
+
+        public void getTimeWastedbyday(HttpListenerRequest request, HttpListenerResponse response)
+        {
+            DateTime to = DateTime.Now;
+            DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
+
+            string beatmapstring = GetBanchoTime(from, to);
+
+            WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWastedByDay(from, to)), "application/json");
+
+        }
+
         public void getBanchoTimeinTineSpan(HttpListenerRequest request, HttpListenerResponse response, DateTime from, DateTime to)
         {
             //create db query firts
@@ -92,6 +114,13 @@ namespace osu_progressCLI.server
            
 
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScores1(from, to, QueryParser.Filter(parameters[0].ToString()))) ,"application/json");
+        }
+
+        public void getScoreAverages(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
+            DateTime to = DateTime.Now;
+            DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
+
+            WriteResponse(response, GetScoreAverages(from, to), "application/json");
         }
 
         public void save(HttpListenerRequest request, HttpListenerResponse response) {
@@ -164,6 +193,12 @@ namespace osu_progressCLI.server
             string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWasted(from, to));
             return jsondata;
 
+        }
+
+        private string GetScoreAverages(DateTime from, DateTime to)
+        {
+            string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetScoreAveragesbyDay(from, to));
+            return jsondata;
         }
 
     }

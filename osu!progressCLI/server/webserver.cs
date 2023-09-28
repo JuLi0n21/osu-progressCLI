@@ -88,6 +88,10 @@ namespace osu_progressCLI.server
 
                 helper.search(request, response, queryparams);
             }
+            else if (path == "/api/beatmaps/averages")
+            {
+                helper.getScoreAverages(request, response, queryparams);
+            }
             else if (path == "/api/beatmaps/search" && queryparams["searchquery"] != null)
             {
 
@@ -100,9 +104,17 @@ namespace osu_progressCLI.server
             {
                 helper.getAllBanchoTime(request, response);
             }
+            else if (path == "/api/banchotimebyday" && request.HttpMethod == "GET")
+            {
+                helper.getBanchoTimebyday(request, response);
+            }
             else if (path == "/api/timewasted" && request.HttpMethod == "GET")
             {
                 helper.getAllTimeWasted(request, response);
+            }
+            else if (path == "/api/timewastedbyday" && request.HttpMethod == "GET")
+            {
+                helper.getTimeWastedbyday(request, response);
             }
             else if (path == "/api/save" && request.HttpMethod == "POST")
             {

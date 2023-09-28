@@ -89,7 +89,10 @@ namespace osu_progressCLI.server
     <title>osu!progress</title>
     <script src=""https://cdn.jsdelivr.net/npm/chart.js""></script>
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"">
+    <script src=""https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline""></script>
     <script src=""https://cdn.jsdelivr.net/npm/flatpickr""></script>
+    <script src=""https://cdn.jsdelivr.net/npm/moment""></script>
+    <script src=""https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1""></script>
     <link href=""https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css"" rel=""stylesheet"" />
     <link rel=""stylesheet"" href=""https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"">
     <style>
@@ -454,10 +457,28 @@ namespace osu_progressCLI.server
                 </div>
             </div>
 
+            
             <div class=""flex backdrop--medium m-4"">
                 <div class=""w-1/2 rounded-l-lg backdrop--light"">
                     <h2>BanchoTime</h2>
-                    <canvas id=""pieChart"" width=""450""></canvas>
+                    <canvas id=""BanchoTimeChart"" width=""450""></canvas>
+                </div>
+                <div class=""w-1/2 rounded-r-lg backdrop--light"">
+                    <h2>TimeWasted</h2>
+                    <canvas id=""TimeWastedChart"" width=""450""></canvas>
+                </div>
+            </div>
+
+            <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
+                <div style=""height: 460px"">
+                    <canvas id=""avaergeschart""></canvas>
+                </div>
+            </div>
+
+            <div class=""flex backdrop--medium m-4"" style=""height: 460px"">
+                <div class=""w-1/2 rounded-l-lg backdrop--light"">
+                    <h2>BanchoTime</h2>
+                    <canvas id=""pieBanchoTimeChart"" width=""450""></canvas>
                 </div>
                 <div class=""w-1/2 rounded-r-lg backdrop--light"">
                     <h2>TimeWasted</h2>
@@ -709,7 +730,7 @@ namespace osu_progressCLI.server
             const values = [];
 
     const labelColors = {{
-        ""AFK"": ""red"",
+        ""Afk"": ""red"",
         ""Editing"": ""cyan"",
         ""Playing"": ""rgb(204, 51, 255)"",
         ""Idle"": ""green"",
@@ -750,10 +771,10 @@ namespace osu_progressCLI.server
             }};
 
             // Get the canvas element
-            const pie = document.getElementById('pieChart').getContext('2d');
+            const pie = document.getElementById('pieBanchoTimeChart').getContext('2d');
 
 
-            const existingChart = Chart.getChart('pieChart');
+            const existingChart = Chart.getChart('pieBanchoTimeChart');
             if (existingChart) {{
                 existingChart.destroy();
             }}
@@ -824,6 +845,289 @@ namespace osu_progressCLI.server
             loaddata();
         }});
 
+function getRandomColor() {{
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {{
+                color += letters[Math.floor(Math.random() * 16)];
+            }}
+            return color;
+        }}
+
+function createBanchoTimeChart(data) {{
+            // Extract the unique dates
+            var dates = [...new Set(data.map(entry => entry.Date))];
+
+            // Extract the labels and values for each date
+            var labels = Object.keys(data[0]).filter(key => key !== ""Date"");
+
+            var colors = {{
+                ""Afk"": 'rgba(255, 0, 0, 0.6)',     // Red
+                ""Playing"": 'rgba(0, 255, 0, 0.6)', // Green
+                ""Idle"": 'rgba(0, 0, 255, 0.6)'    // Blue
+            }};
+
+            var datasets = [];
+            labels.forEach(label => {{
+                if (label in colors) {{
+                    datasets.push({{
+                        label: label,
+                        data: [],
+                        backgroundColor: colors[label],
+                        yAxisID: ""sharedAxis"", // Specify the same axis ID for ""Afk,"" ""Playing,"" and ""Idle""
+                        stack: ""stack"", // Stack the values
+                    }});
+                }} else {{
+                    datasets.push({{
+                        label: label,
+                        data: [],
+                        backgroundColor: getRandomColor(), // Assign random colors for other categories
+                        yAxisID: ""sharedAxis"",
+                        stack: ""stack"",
+                    }});
+                }}
+            }});
+
+            dates.forEach(date => {{
+                var values = data.find(entry => entry.Date === date);
+                labels.forEach(label => {{
+                    datasets.find(dataset => dataset.label === label).data.push(values[label] || 0);
+                }});
+            }});
+
+            var ctx = document.getElementById('BanchoTimeChart').getContext('2d');
+            var myChart = new Chart(ctx, {{
+                type: 'bar',
+                data: {{
+                    labels: dates,
+                    datasets: datasets
+                }},
+                options: {{
+                    scales: {{
+                        x: {{
+                            beginAtZero: true,
+                        }},
+                        y: {{
+                            stacked: true,
+                            id: ""sharedAxis"", // Define the shared axis with the same ID
+                        }}
+                    }}
+                }}
+            }});
+        }}
+
+
+        function createTimeWastedChart(data) {{
+            // Extract the unique dates
+            var dates = [...new Set(data.map(entry => entry.Date))];
+
+            // Extract the labels and values for each date
+            var labels = Object.keys(data[0]).filter(key => key !== ""Date"");
+
+            var colors = {{
+                ""Afk"": 'rgba(255, 0, 0, 0.6)',     // Red
+                ""Playing"": 'rgba(0, 255, 0, 0.6)', // Green
+                ""Idle"": 'rgba(0, 0, 255, 0.6)'    // Blue
+            }};
+
+            var datasets = [];
+            labels.forEach(label => {{
+                if (label in colors) {{
+                    datasets.push({{
+                        label: label,
+                        data: [],
+                        backgroundColor: colors[label],
+                        yAxisID: ""sharedAxis"", // Specify the same axis ID for ""Afk,"" ""Playing,"" and ""Idle""
+                        stack: ""stack"", // Stack the values
+                    }});
+                }} else {{
+                    datasets.push({{
+                        label: label,
+                        data: [],
+                        backgroundColor: getRandomColor(), // Assign random colors for other categories
+                        yAxisID: ""sharedAxis"",
+                        stack: ""stack"",
+                    }});
+                }}
+            }});
+
+            dates.forEach(date => {{
+                var values = data.find(entry => entry.Date === date);
+                labels.forEach(label => {{
+                    datasets.find(dataset => dataset.label === label).data.push(values[label] || 0);
+                }});
+            }});
+
+            var ctx = document.getElementById('TimeWastedChart').getContext('2d');
+            var myChart = new Chart(ctx, {{
+                type: 'bar',
+                data: {{
+                    labels: dates,
+                    datasets: datasets
+                }},
+                options: {{
+                    scales: {{
+                        x: {{
+                            beginAtZero: true,
+                        }},
+                        y: {{
+                            stacked: true,
+                            id: ""sharedAxis"", // Define the shared axis with the same ID
+                        }}
+                    }}
+                }}
+            }});
+        }}
+
+
+function createchart(data) {{
+
+const threeMonthsAgo = moment().subtract(3, 'months');
+
+    // Filter data to include only data points from the last 3 months
+    const filteredData = data.filter(item => moment(item.Date, ""YYYY-MM-DD HH:mm:ss.SSSSSSS"").isAfter(threeMonthsAgo));
+
+    const dates = filteredData.map(item => moment(item.Date, ""YYYY-MM-DD HH:mm:ss.SSSSSSS"").toDate());
+    const averageBpm = filteredData.map(item => item.AverageBpm);
+    const averageSR = filteredData.map(item => item.AverageSR);
+    const averageAccuracy = filteredData.map(item => item.AverageAccuracy);
+    const averageAr = filteredData.map(item => item.AverageAr);
+    const averageCs = filteredData.map(item => item.AverageCs);
+    const averageHp = filteredData.map(item => item.AverageHp);
+    const averageOd = filteredData.map(item => item.AverageOd);
+
+const ctx = document.getElementById('avaergeschart').getContext('2d');
+
+const myChart = new Chart(ctx, {{
+    type: 'line',
+    data: {{
+        labels: dates,
+        datasets: [
+            {{
+                label: 'Average BPM',
+                data: averageBpm,
+                yAxisID: 'bpm',
+                borderColor: 'blue',
+                fill: false,
+            }},
+            {{
+                label: 'Average SR',
+                data: averageSR,
+                yAxisID: 'sr',
+                borderColor: 'red',
+                fill: false,
+            }},
+            {{
+                label: 'Average Accuracy',
+                data: averageAccuracy,
+                yAxisID: 'acc',
+                borderColor: 'green',
+                fill: false,
+            }},
+            {{
+                label: 'Average AR',
+                data: averageAr,
+                yAxisID: 'arcshpod',
+                borderColor: 'purple',
+                fill: false,
+            }},
+            {{
+                label: 'Average CS',
+                data: averageCs,
+                yAxisID: 'arcshpod',
+                borderColor: 'orange',
+                fill: false,
+            }},
+            {{
+                label: 'Average HP',
+                data: averageHp,
+                yAxisID: 'arcshpod',
+                borderColor: 'brown',
+                fill: false,
+            }},
+            {{
+                label: 'Average OD',
+                data: averageOd,
+                yAxisID: 'arcshpod',
+                borderColor: 'pink',
+                fill: false,
+            }},
+        ],
+    }},
+    options: {{
+    scales: {{
+        x: {{
+            type: 'time',
+            time: {{
+                unit: 'day',
+                displayFormats: {{
+                    day: 'D MMM YYYY',
+                }},
+            }},
+        }},
+     bpm: {{
+                position: 'right',
+                beginAtZero: true,
+                title: {{
+                    display: true,
+                    text: 'BPM',
+                    color: 'red',
+                }},
+                gird: {{
+                    drawOnChartArea: false,                
+                }},
+            }},         
+     sr: {{
+                position: 'right',
+                beginAtZero: true,
+                title: {{
+                    display: true,
+                    text: 'Star Rating',
+                    color: 'blue',
+                }},
+                gird: {{
+                    drawOnChartArea: false,           
+                }},
+            }},
+            
+     acc: {{
+                position: 'left',
+                beginAtZero: true,
+                title: {{
+                    display: true,
+                    text: 'Accuracy',
+                    color: 'Green',
+                }},
+                gird: {{
+                   drawOnChartArea: false,        
+                }},
+     plugins: {{
+        regression: {{
+          type: 'linear', // You can use 'linear', 'polynomial', or other types as needed
+        }},
+           }},
+             }},
+     arcshpod: {{
+                position: 'left',
+                beginAtZero: true,
+                suggestedMax: 12,
+                suggestedMin: 0,
+                title: {{
+                    display: true,
+                    text: 'Map Attributes',
+                    color: 'white',
+                }},
+                gird: {{
+                    drawOnChartArea: true,
+                }},
+            }},      
+        }},
+    }},
+    }});
+}}
+
+
+
         //get data from internal api
         function loaddata() {{
             fetch('/api/beatmaps')
@@ -856,6 +1160,36 @@ namespace osu_progressCLI.server
                 .catch(error => {{
                     console.error('Error loading data:', error);
                 }});
+
+            fetch('/api/beatmaps/averages')
+                .then(response => response.json())
+                .then(data => {{
+                    console.log(data);
+                    createchart(data);
+                }})
+                .catch(error => {{
+                    console.error('Error loading data:', error);
+                }});
+            fetch('/api/timewastedbyday')
+                .then(response => response.json())
+                .then(data => {{
+                    console.log(data);
+                    createTimeWastedChart(data);
+                }})
+                .catch(error => {{
+                    console.error('Error loading data:', error);
+                }});
+            fetch('/api/banchotimebyday')
+                .then(response => response.json())
+                .then(data => {{
+                    console.log(data);
+                    createBanchoTimeChart(data);
+                }})
+                .catch(error => {{
+                    console.error('Error loading data:', error);
+                }});
+
+ 
         }}
 
         //settings menu

@@ -14,6 +14,7 @@ using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Text.RegularExpressions;
 using static System.Formats.Asn1.AsnWriter;
 using System.Web;
+using System.Data.SqlClient;
 
 
 //Add proper debug messages and levels...
@@ -27,8 +28,8 @@ namespace osu1progressbar.Game.Database
     public class DatabaseController
     {
         private readonly string dbname = null;
-        //private readonly string connectionString = "Data Source=osu!progress.db;Version=3;";
-        private readonly string connectionString = "Data Source=osu!TEST.db;Version=3;";
+        private readonly string connectionString = "Data Source=osu!progress.db;Version=3;";
+        //private readonly string connectionString = "Data Source=osu!TEST.db;Version=3;";
 
         public DatabaseController()
         {
@@ -674,6 +675,61 @@ namespace osu1progressbar.Game.Database
             }
         }
 
+        public List<Dictionary<string, object>> GetScoreAveragesbyDay(DateTime from, DateTime to) {
+
+            List<Dictionary<string, object>> scoreAverages = new List<Dictionary<string, object>>();
+
+            string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
+            string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                string commandstring = @"
+            SELECT 
+                strftime('%Y-%m-%d', Date) AS FDate,
+                AVG(Bpm) AS AverageBpm,
+                AVG(StarRating) AS AverageSR,
+                AVG(Accuracy) AS AverageAccuracy,
+                AVG(Ar) AS AverageAr,
+                AVG(Cs) AS AverageCs,
+                AVG(Hp) AS AverageHp,
+                AVG(Od) AS AverageOd
+            FROM ScoreData
+            WHERE Date BETWEEN @from AND @to
+            GROUP BY Date(Date)
+        ";
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = commandstring;
+                    command.Parameters.AddWithValue("@from", fromFormatted);
+                    command.Parameters.AddWithValue("@to", toFormatted);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Dictionary<string, object> result = new Dictionary<string, object>();
+
+                            result["Date"] = reader["FDate"].ToString();
+                            result["AverageBpm"] = Convert.ToDouble(reader["AverageBpm"]);
+                            result["AverageSR"] = Convert.ToDouble(reader["AverageSR"]);
+                            result["AverageAccuracy"] = Convert.ToDouble(reader["AverageAccuracy"]);
+                            result["AverageAr"] = Convert.ToDouble(reader["AverageAr"]);
+                            result["AverageCs"] = Convert.ToDouble(reader["AverageCs"]);
+                            result["AverageHp"] = Convert.ToDouble(reader["AverageHp"]);
+                            result["AverageOd"] = Convert.ToDouble(reader["AverageOd"]);
+
+                            scoreAverages.Add(result);
+                        }
+                    }
+                }
+            }
+            return scoreAverages;
+        }
+
         public int GetScoreAmounts(DateTime from, DateTime to)
         {
             int rows = -1;
@@ -742,6 +798,67 @@ namespace osu1progressbar.Game.Database
             return BanchoTime;
         }
 
+
+
+        public List<Dictionary<string, object>> GetBanchoTimebyDay(DateTime from, DateTime to)
+        {
+            List<Dictionary<string, object>> result = new List<Dictionary<string, object>>();
+
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
+                    SELECT strftime('%Y-%m-%d', Date) AS FormattedDate, BanchoStatus, SUM(Time) AS TotalTime
+                    FROM BanchoTime
+                    GROUP BY FormattedDate, BanchoStatus;";
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var date = DateTime.Parse(reader["FormattedDate"].ToString());
+                            var banchoStatus = reader["BanchoStatus"].ToString();
+                            var totalTime = Convert.ToDouble(reader["TotalTime"]);
+
+                            // Check if there is an entry for the current date in the result list.
+                            var entry = result.FirstOrDefault(dict => dict.ContainsKey("Date") && ((DateTime)dict["Date"]).Date == date.Date);
+
+                            if (entry == null)
+                            {
+                                // If the entry doesn't exist, create a new dictionary for the date.
+                                entry = new Dictionary<string, object>
+                        {
+                            { "Date", date.Date },
+                            { banchoStatus, totalTime }
+                        };
+                                result.Add(entry);
+                            }
+                            else
+                            {
+                                // If the entry exists, update the existing dictionary.
+                                if (entry.ContainsKey(banchoStatus))
+                                {
+                                    entry[banchoStatus] = Convert.ToDouble(entry[banchoStatus]) + totalTime;
+                                }
+                                else
+                                {
+                                    entry[banchoStatus] = totalTime;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+
+
+
         public List<KeyValuePair<string, double>> GetTimeWasted(DateTime from, DateTime to)
         {
             List<KeyValuePair<string, double>> BanchoTime = new List<KeyValuePair<string, double>>();
@@ -757,7 +874,7 @@ namespace osu1progressbar.Game.Database
 
                 using (var command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = "SELECT RawStatus, SUM(Time) as Time FROM TimeWasted WHERE datetime(Date) BETWEEN @from AND @to Group by RawStatus";
+                    command.CommandText = "SELECT strftime('%Y-%m-%d', Date) as Day, RawStatus, SUM(Time) as Time FROM TimeWasted WHERE datetime(Date) BETWEEN @from AND @to Group by RawStatus, Day";
 
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
@@ -775,7 +892,65 @@ namespace osu1progressbar.Game.Database
             }
             return BanchoTime;
         }
-    }
+
+        public List<Dictionary<string, object>> GetTimeWastedByDay(DateTime from, DateTime to)
+        {
+            List<Dictionary<string, object>> result = new List<Dictionary<string, object>>();
+
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
+                    SELECT strftime('%Y-%m-%d', Date) AS FormattedDate, RawStatus, SUM(Time) AS TotalTime
+                    FROM TimeWasted
+                    GROUP BY FormattedDate, RawStatus;
+                    ";
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var date = DateTime.Parse(reader["FormattedDate"].ToString());
+                            var banchoStatus = reader["RawStatus"].ToString();
+                            var totalTime = Convert.ToDouble(reader["TotalTime"]);
+
+                            // Check if there is an entry for the current date in the result list.
+                            var entry = result.FirstOrDefault(dict => dict.ContainsKey("Date") && ((DateTime)dict["Date"]).Date == date.Date);
+
+                            if (entry == null)
+                            {
+                                // If the entry doesn't exist, create a new dictionary for the date.
+                                entry = new Dictionary<string, object>
+                        {
+                            { "Date", date.Date },
+                            { banchoStatus, totalTime }
+                        };
+                                result.Add(entry);
+                            }
+                            else
+                            {
+                                // If the entry exists, update the existing dictionary.
+                                if (entry.ContainsKey(banchoStatus))
+                                {
+                                    entry[banchoStatus] = Convert.ToDouble(entry[banchoStatus]) + totalTime;
+                                }
+                                else
+                                {
+                                    entry[banchoStatus] = totalTime;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        }
 }
 
 
