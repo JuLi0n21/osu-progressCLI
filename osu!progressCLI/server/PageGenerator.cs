@@ -708,6 +708,13 @@ namespace osu_progressCLI.server
             const labels = [];
             const values = [];
 
+    const labelColors = {{
+        ""AFK"": ""red"",
+        ""Editing"": ""cyan"",
+        ""Playing"": ""rgb(204, 51, 255)"",
+        ""Idle"": ""green"",
+    }};
+
             for (let i = 0; i < data.length; i++) {{
                 const item = data[i];
                 if (item.Key !== """" && item.Value >= 10) {{
@@ -717,8 +724,7 @@ namespace osu_progressCLI.server
                 }}
             }}
 
-            // Create an array of random colors for each segment
-            const colors = values.map(() => '#' + (Math.random() * 0xFFFFFF << 0).toString(16));
+ const colors = labels.map(label => labelColors[label]);
 
             console.log(labels, values)
             // Data for the pie chart

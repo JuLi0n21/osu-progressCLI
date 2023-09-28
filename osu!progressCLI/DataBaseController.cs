@@ -27,8 +27,9 @@ namespace osu1progressbar.Game.Database
     public class DatabaseController
     {
         private readonly string dbname = null;
-        private readonly string connectionString = "Data Source=osu!progress.db;Version=3;";
-       
+        //private readonly string connectionString = "Data Source=osu!progress.db;Version=3;";
+        private readonly string connectionString = "Data Source=osu!TEST.db;Version=3;";
+
         public DatabaseController()
         {
             //  configJson = File.ReadAllText(configJson);
@@ -560,7 +561,11 @@ namespace osu1progressbar.Game.Database
                     //command.CommandText = "SELECT Date FROM TimeWasted";
                     //command.CommandText = "SELECT  datetime(Date, '%Y-%m-%d %H:%M') AS Date FROM TimeWasted ";
                     //command.CommandText = " SELECT datetime(Date) AS FormattedDate FROM TimeWasted";
-                    command.CommandText = "SELECT * FROM ScoreData WHERE datetime(Date) BETWEEN @from AND @to;";
+                    command.CommandText = "SELECT * " +
+                        "FROM ScoreData " +
+                        "WHERE datetime(Date) BETWEEN @from AND @to " +
+                        "ORDER BY Date DESC " +
+                        "LIMIT 1000;";
                     //command.CommandText = "SELECT Date FROM ScoreData";
                     //command.CommandText = "SELECT strftime('%Y-%m-%d-%H-',Date) AS parsedDate, RawStatus, Time  FROM TimeWasted;";
                     //Console.WriteLine(fromFormatted + " " + toFormatted);
@@ -622,6 +627,7 @@ namespace osu1progressbar.Game.Database
                     if (from != null || to != null) {
                         queryBuilder.Append("AND datetime(Date) BETWEEN @from AND @to ");
                         queryBuilder.Append(search);
+                        queryBuilder.Append("ORDER BY Date DESC LIMIT 1000;");
                         command.Parameters.AddWithValue("@from", fromFormatted);
                         command.Parameters.AddWithValue("@to", toFormatted);
                     }
@@ -681,7 +687,7 @@ namespace osu1progressbar.Game.Database
 
                 using (var command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = "SELECT * FROM ScoreData WHERE datetime(Date) BETWEEN @from AND @to;";
+                    command.CommandText = "SELECT * FROM ScoreData WHERE datetime(Date) BETWEEN @from AND @to ;";
 
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
@@ -716,7 +722,7 @@ namespace osu1progressbar.Game.Database
 
                 using (var command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = "SELECT BanchoStatus, SUM(Time) as Time FROM BanchoTime WHERE datetime(Date) BETWEEN @from AND @to Group by BanchoStatus";
+                    command.CommandText = "SELECT BanchoStatus, SUM(Time) as Time FROM BanchoTime WHERE datetime(Date) BETWEEN @from AND @to Group by BanchoStatus;";
 
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
