@@ -137,7 +137,7 @@ namespace osu_progressCLI
             {
                 string responseBody = await reponse.Content.ReadAsStringAsync();
                 Console.WriteLine("search Recieved.");
-                Console.WriteLine(responseBody);
+                //Console.WriteLine(responseBody);
 
                 search = JObject.Parse(responseBody);
             }

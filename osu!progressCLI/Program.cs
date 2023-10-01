@@ -23,7 +23,7 @@ class Program
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
 
-        QueryParser.Filter("asdfsadfsadfsdfadsafsdafkjsadfk;jlasdkflslj");
+      //  QueryParser.Filter("asdfsadfsadfsdfadsafsdafkjsadfk;jlasdkflslj");
         Webserver webserver = new Webserver();
         Task listenTask = Task.Run(async () =>
         {

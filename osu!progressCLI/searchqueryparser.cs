@@ -88,7 +88,7 @@ public class QueryParser
         }
 
         // Print the generated SQL query
-        Console.WriteLine(commandBuilder.ToString());
+       // Console.WriteLine(commandBuilder.ToString());
         return commandBuilder.ToString();
     }
 

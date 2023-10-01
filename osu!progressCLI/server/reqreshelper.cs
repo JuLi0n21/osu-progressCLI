@@ -94,8 +94,6 @@ namespace osu_progressCLI.server
             DateTime to = DateTime.Now;
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
-            string beatmapstring = GetBanchoTime(from, to);
-
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWastedByDay(from, to)), "application/json");
 
         }

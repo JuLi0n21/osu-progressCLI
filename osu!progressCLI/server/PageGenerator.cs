@@ -535,7 +535,6 @@ namespace osu_progressCLI.server
 
             // Extract the relevant data from the JSON
             data.forEach(entry => {{
-                console.log(entry);
                 date.push(entry.Date);
                 BeatmapSetid.push(entry.BeatmapSetid);
                 Beatmapid.push(entry.Beatmapid);
@@ -1133,7 +1132,7 @@ const myChart = new Chart(ctx, {{
             fetch('/api/beatmaps')
                 .then(response => response.json())
                 .then(data => {{
-                    console.log(data);
+                    //console.log(data);
                     renderChart(data);
                     createScoreElements(data);
                 }})
@@ -1144,7 +1143,7 @@ const myChart = new Chart(ctx, {{
             fetch('/api/banchotime')
                 .then(response => response.json())
                 .then(data => {{
-                    console.log(data);
+                    //console.log(data);
                     renderPie(data);
                 }})
                 .catch(error => {{
@@ -1164,7 +1163,7 @@ const myChart = new Chart(ctx, {{
             fetch('/api/beatmaps/averages')
                 .then(response => response.json())
                 .then(data => {{
-                    console.log(data);
+                    //console.log(data);
                     createchart(data);
                 }})
                 .catch(error => {{
@@ -1173,7 +1172,7 @@ const myChart = new Chart(ctx, {{
             fetch('/api/timewastedbyday')
                 .then(response => response.json())
                 .then(data => {{
-                    console.log(data);
+                    //console.log(data);
                     createTimeWastedChart(data);
                 }})
                 .catch(error => {{
@@ -1182,7 +1181,7 @@ const myChart = new Chart(ctx, {{
             fetch('/api/banchotimebyday')
                 .then(response => response.json())
                 .then(data => {{
-                    console.log(data);
+                    //console.log(data);
                     createBanchoTimeChart(data);
                 }})
                 .catch(error => {{
@@ -1320,7 +1319,7 @@ scoresContainer.innerHTML = """";
             </div>
             <div class=""flex justify-center"">
 
-                <img src=""https://osu.ppy.sh/assets/images/GradeSmall-A.d785e824.svg"" alt=""${{score.Grade}}"" class=""w-20"">
+                <img src="""" alt=""${{score.Grade}}"" class=""w-20"">
             </div>
         </div>
         <div class=""backdrop--dark icon rounded-lg flex-nowrap"">

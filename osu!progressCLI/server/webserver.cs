@@ -62,7 +62,7 @@ namespace osu_progressCLI.server
             HttpListenerResponse response = context.Response;
 
 
-            Console.WriteLine($"queryparams: {request.Url.Query}");
+           // Console.WriteLine($"queryparams: {request.Url.Query}");
 
             string path = request.Url.AbsolutePath;
             NameValueCollection queryparams = HttpUtility.ParseQueryString(request.Url.Query);
