@@ -21,11 +21,25 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="public\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	
+	
+	<ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OsuMemoryDataProvider" Version="0.10.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
   </ItemGroup>
 	
 	
+	<ItemGroup>
+	  <Folder Include="public\js\" />
+	  <Folder Include="public\img\" />
+	</ItemGroup>
 
+	<ItemGroup>
+		<Folder Include="server\" />
+	</ItemGroup>
 </Project>
