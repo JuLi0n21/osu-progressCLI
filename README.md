@@ -14,11 +14,12 @@
 ## TODOs (no prioritys)
 
 - Add possiblity to reload api data incase no internet (or beatmap changed)  (automatic or manual)
-- localbeatmap parser (offline, not submitted maps support) (use osu-tools)
+- localbeatmap parser (offline, not submitted maps support) (use osu-tools) (bpm still missing)
 - highconfigurable website (showing what graphs u want and what not)
 - page for a single score
-- api endpoint for search functionaliy
+- api endpoint for search functionaliy (add date functionaliy)
 - make date picker work
+- mod support
 - importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
 
 ## NOTES
