@@ -3,14 +3,14 @@ using Newtonsoft.Json.Linq;
 using osu_progressCLI;
 using osu_progressCLI.server;
 using osu1progressbar.Game.MemoryProvider;
-
+using OsuMemoryDataProvider.OsuMemoryModels.Abstract;
 
 class Program
 {
 
     static async Task Main(string[] args)
     {
-        
+         
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");
@@ -23,6 +23,10 @@ class Program
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
 
+        int mods = 0;
+
+        Console.WriteLine(ModParser.ParseMods(mods));
+        
       //  QueryParser.Filter("asdfsadfsadfsdfadsafsdafkjsadfk;jlasdkflslj");
         Webserver webserver = new Webserver();
         Task listenTask = Task.Run(async () =>

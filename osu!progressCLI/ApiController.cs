@@ -174,7 +174,7 @@ namespace osu_progressCLI
             {
                 Console.WriteLine($"Recieved User info for: {userid}");
                 string responseBody = await reponse.Content.ReadAsStringAsync();
-                Console.WriteLine(responseBody);
+                //Console.WriteLine(responseBody);
 
                 userJson = JObject.Parse(responseBody);
             }

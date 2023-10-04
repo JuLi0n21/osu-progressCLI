@@ -5,16 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SQLite;
 using OsuMemoryDataProvider.OsuMemoryModels;
-using System.ComponentModel.Design;
 using Newtonsoft.Json.Linq;
-using System.Runtime.CompilerServices;
-using System.Net.Http.Headers;
 using osu_progressCLI;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
-using System.Text.RegularExpressions;
-using static System.Formats.Asn1.AsnWriter;
-using System.Web;
-using System.Data.SqlClient;
 
 
 //Add proper debug messages and levels...
@@ -306,7 +298,8 @@ namespace osu1progressbar.Game.Database
             double fcpp = DifficultyAttributes.CalculateFcWithAcc(
                                 baseAddresses.Beatmap.FolderName,
                                 baseAddresses.Beatmap.OsuFileName,
-                                baseAddresses.Player.Accuracy);
+                                baseAddresses.Player.Accuracy,
+                                baseAddresses.Player.Mods.Value);
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -338,7 +331,7 @@ namespace osu1progressbar.Game.Database
                         else
                         {
                             JObject beatmap = await ApiController.Instance.getExpandedBeatmapinfo(baseAddresses.Beatmap.Id.ToString());
-                            Console.WriteLine(beatmap);
+                            //Console.WriteLine(beatmap);
                             if (beatmap != null)
                             {
                                 starrating = double.Parse(beatmap["difficulty_rating"].ToString());

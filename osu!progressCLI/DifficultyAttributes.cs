@@ -11,12 +11,12 @@ namespace osu_progressCLI
     internal class DifficultyAttributes
     {
 
-        public static double CalculateFcWithAcc(string folderName, string fileName, double Acc) {
+        public static double CalculateFcWithAcc(string folderName, string fileName, double Acc = 100, int mods = 0) {
             double pp = 0;
 
 
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
-            string command = $"dotnet run -- simulate osu \"{fullPath}\" -a {Acc} -C 100";
+            string command = $"dotnet run -- simulate osu \"{fullPath}\" --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
 
             string output = cmdOutput(command);
             try {
@@ -30,12 +30,12 @@ namespace osu_progressCLI
             return pp;
         }
 
-        public static double CalculateFcWithAcc(int id, double Acc)
+        public static double CalculateFcWithAcc(int id, double Acc = 100, int mods = 0)
         {
             double pp = 0;
 
 
-            string command = $"dotnet run -- simulate osu {id} -a {Acc} -C 100";
+            string command = $"dotnet run -- simulate osu {id} --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
 
             string output = cmdOutput(command);
             try
@@ -56,7 +56,7 @@ namespace osu_progressCLI
             PerfomanceAttributes perfomanceAttributes = new PerfomanceAttributes();
 
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
-            string command = $"dotnet run -- simulate osu \"{fullPath}\" -c {combo} -X {missCount} -M {mehCount} -G {goodCount}";
+            string command = $"dotnet run -- simulate osu \"{fullPath}\" --combo {combo} --misses {missCount} --mehs {mehCount} --goods {goodCount} {ModParser.PPCalcMods(mods)}";
 
             string output = cmdOutput(command);
 

@@ -1132,7 +1132,7 @@ const myChart = new Chart(ctx, {{
             fetch('/api/beatmaps')
                 .then(response => response.json())
                 .then(data => {{
-                    //console.log(data);
+                    console.log(data);
                     renderChart(data);
                     createScoreElements(data);
                 }})
