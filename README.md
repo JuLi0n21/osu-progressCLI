@@ -13,6 +13,7 @@
 
 ## TODOs (no prioritys)
 
+- [ ] extract js and css out of the page generation (server side serving needed)
 - [ ] Add possiblity to reload api data incase no internet (or beatmap changed)  (automatic or manual)
 - [x] localbeatmap parser (offline, not submitted maps support) (use osu-tools) (bpm still missing)
 - [ ] highconfigurable website (showing what graphs u want and what not)
