@@ -62,11 +62,19 @@ namespace osu_progressCLI.server
             HttpListenerResponse response = context.Response;
 
 
-           // Console.WriteLine($"queryparams: {request.Url.Query}");
+            // Console.WriteLine($"queryparams: {request.Url.Query}");
 
             string path = request.Url.AbsolutePath;
             NameValueCollection queryparams = HttpUtility.ParseQueryString(request.Url.Query);
 
+            if (path.EndsWith(".jpg") || path.EndsWith(".jpeg") || path.EndsWith(".png") || path.EndsWith(".gif") || path.EndsWith(".bmp") || path.EndsWith(".tiff") || path.EndsWith(".ico") || path.EndsWith(".webp") || path.EndsWith(".svg"))
+            {
+                helper.serveimage(request, response, path);
+            }
+
+            if (path.EndsWith(".js")) { 
+                helper.servejs(request, response, path);
+            }
 
             //default page
             if (path == "/")

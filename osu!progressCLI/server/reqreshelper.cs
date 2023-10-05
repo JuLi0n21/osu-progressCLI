@@ -137,39 +137,6 @@ namespace osu_progressCLI.server
             Credentials.Instance.UpdateConfig(parameters["localsettings"].ToString(), parameters["username"].ToString(), parameters["rank"].ToString(), parameters["country"].ToString(), parameters["coverUrl"].ToString(), parameters["avatarUrl"].ToString(), parameters["port"].ToString(), parameters["userid"].ToString());
         }
 
-        static void ServeStaticFile(HttpListenerResponse response, string filePath, string contentType)
-        {
-            if (File.Exists(filePath))
-            {
-                string content = File.ReadAllText(filePath);
-                WriteResponse(response, content, contentType);
-            }
-            else
-            {
-                response.StatusCode = 404;
-                string responseString = $"404 - Not Found: File not found at {filePath}";
-                WriteResponse(response, responseString, "text/plain");
-            }
-        }
-
-        static void WriteResponse(HttpListenerResponse response, string responseString, string contentType)
-        {
-            try
-            {
-                byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-
-                response.ContentType = contentType;
-                response.ContentLength64 = buffer.Length;
-
-                Stream output = response.OutputStream;
-                output.Write(buffer, 0, buffer.Length);
-                output.Close();
-            }
-            catch (Exception e) {
-            
-            }
-        }
-
         private string GetBeatmapData(DateTime from, DateTime to)
         {
 
@@ -197,6 +164,108 @@ namespace osu_progressCLI.server
         {
             string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetScoreAveragesbyDay(from, to));
             return jsondata;
+        }
+
+        public void serveimage(HttpListenerRequest request, HttpListenerResponse response, string filepath) {
+
+            //testign needed
+            //Console.WriteLine("image/" + filepath.Split(".")[1]);
+            ServeStaticImage(response, "public/img" + filepath);
+        }
+
+        public void servejs(HttpListenerRequest request, HttpListenerResponse response, string filepath) { 
+            ServeStaticJavaScript(response, "public/js" + filepath);
+        }
+
+        static void ServeStaticJavaScript(HttpListenerResponse response, string jsFilePath)
+        {
+            if (File.Exists(jsFilePath))
+            {
+                string contentType = "application/javascript"; // Set the content type for JavaScript
+
+                string jsContent = File.ReadAllText(jsFilePath);
+                WriteResponse(response, jsContent, contentType);
+            }
+            else
+            {
+                response.StatusCode = 404;
+                string responseString = $"404 - Not Found: JavaScript file not found at {jsFilePath}";
+                WriteResponse(response, responseString, "text/plain");
+            }
+        }
+
+        static void ServeStaticFile(HttpListenerResponse response, string filePath, string contentType)
+        {
+            if (File.Exists(filePath))
+            {
+                string content = File.ReadAllText(filePath);
+                WriteResponse(response, content, contentType);
+            }
+            else
+            {
+                response.StatusCode = 404;
+                string responseString = $"404 - Not Found: File not found at {filePath}";
+                WriteResponse(response, responseString, "text/plain");
+            }
+        }
+
+        static void ServeStaticImage(HttpListenerResponse response, string imagePath)
+        {
+            if (File.Exists(imagePath))
+            {
+                string contentType = GetContentType(Path.GetExtension(imagePath));
+
+                byte[] imageBytes = File.ReadAllBytes(imagePath);
+                response.ContentType = contentType;
+                response.ContentLength64 = imageBytes.Length;
+                response.OutputStream.Write(imageBytes, 0, imageBytes.Length);
+                response.OutputStream.Close();
+            }
+            else
+            {
+                response.StatusCode = 404;
+                string responseString = $"404 - Not Found: Image not found at {imagePath}";
+                WriteResponse(response, responseString, "text/plain");
+            }
+        }
+
+        static string GetContentType(string fileExtension)
+        {
+            switch (fileExtension.ToLower())
+            {
+                case ".jpg":
+                case ".jpeg":
+                    return "image/jpeg";
+                case ".png":
+                    return "image/png";
+                case ".gif":
+                    return "image/gif";
+                case ".bmp":
+                    return "image/bmp";
+                case ".ico":
+                    return "image/x-icon";
+                default:
+                    return "application/octet-stream";
+            }
+        }
+
+        static void WriteResponse(HttpListenerResponse response, string responseString, string contentType)
+        {
+            try
+            {
+                byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+
+                response.ContentType = contentType;
+                response.ContentLength64 = buffer.Length;
+
+                Stream output = response.OutputStream;
+                output.Write(buffer, 0, buffer.Length);
+                output.Close();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
     }

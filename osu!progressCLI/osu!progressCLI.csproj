@@ -25,6 +25,13 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="public\js\configmenu.js" />
+	  <None Remove="public\js\jsconfig1.json" />
+	  <None Remove="public\js\savebutton.js" />
+	  <None Remove="public\js\scoreexample.js" />
+	</ItemGroup>
 	
 	
 	<ItemGroup>
@@ -35,7 +42,6 @@
 	
 	
 	<ItemGroup>
-	  <Folder Include="public\js\" />
 	  <Folder Include="public\img\" />
 	</ItemGroup>
 
