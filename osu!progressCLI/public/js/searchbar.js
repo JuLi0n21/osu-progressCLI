@@ -5,8 +5,10 @@ let lastSearchText = '';
 searchbar.addEventListener('input', function () {
     const searchText = searchbar.value.trim();
 
-    if (searchText.length > 5 && searchText !== lastSearchText) {
+    if (searchText.length > 3 && searchText !== lastSearchText) {
         lastSearchText = searchText;
+
+        scorecontainer.innerHTML = "";
 
         clearTimeout(throttleTimeout);
         throttleTimeout = setTimeout(() => {
@@ -21,6 +23,21 @@ searchbar.addEventListener('input', function () {
                 .catch(error => {
                     console.error(error);
                 });
-        }, 2000); // Delay for 2 seconds (2000 milliseconds)
+        }, 500); // Delay for 2 seconds (2000 milliseconds)
+    }
+
+    if (searchText.length == 0) {
+
+        const apiUrl = 'api/beatmaps';
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                createScoreElements(data);
+            })
+            .catch(error => {
+                console.error(error);
+            });
     }
 });

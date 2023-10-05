@@ -1,6 +1,10 @@
 function createScoreElements(scores) {
 const scoresContainer =  document.getElementById("scorecontainer");
-scoresContainer.innerHTML = "";
+    scoresContainer.innerHTML = "";
+
+    if (scores.length == 0) {
+        scoresContainer.innerHTML = "<p>No Score Found!</p>";
+    }
   scores.forEach((score) => {
     const scoreElement = document.createElement("div");
     scoreElement.className = "flex justify-center mb-0";

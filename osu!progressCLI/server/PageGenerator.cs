@@ -74,7 +74,7 @@ namespace osu_progressCLI.server
                     rank = config.rank;
                 }
             }
-        
+
 
 
 
@@ -350,10 +350,10 @@ namespace osu_progressCLI.server
 
     <div class=""flex justify-center items-center"">
 
-        <div class=""content w-1/2 rounded-lg backdrop--dark text-white"">
+        <div class=""content w-1/2 rounded-lg backdrop--medium--dark text-white"">
 
             <!-- header -->
-            <div class=""backdrop--medium p-4 m-2"">
+            <div class=""backdrop--medium justify-center items-center flex p-4 m-2"">
                 <h1>Play History</h1>
             </div>
 
@@ -372,34 +372,35 @@ namespace osu_progressCLI.server
                     <img src=""{avatar_url}"" style=""position: absolute; top: -150px; left: 60px; right: 0; height:120px; width:120px"" class=""rounded-lg"" />
                     </a>
                 </div>
-
-
             </div>
 
-<!-- Recent Scores -->
-<div class""flex backdrop--medium"">
-<h1  style=""text-align: center;"" >Recent Scores</h1>
-</div>
-    <div id=""scorecontainer"" class=""flex-col overflow-y-scroll page-width backdrop--medium max-h-96"">
-</div>
-
-
-    <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
+ <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
 
                 <!-- filter menu -->
-                <div class=""flex justify-evenly text-black"">
-
-
-                  
-
-
-
+                <div class=""flex justify-evenly text-black
                     <input type=""text"" id=""from"">
                     <label for=""to"">Select Date and Time:</label>
                     <input type=""text"" id=""to"">
-                    <input type=""text"" id=""mapsearch"">
+                  
                 </div>
             </div>
+
+<!-- Recent Scores -->
+<div class=""flex rounded-t-lg justify-between backdrop--medium"">
+      
+        <div id=""filler"" class="""">
+        </div>
+            <h1 class=""m-4""></h1>
+             <h1 class=""m-4"">Recent Scores</h1>
+            <div>
+                <input type=""text"" id=""mapsearch"" class=""text--yellow backdrop--medium border-b-4""  title=""Supported Terms cs, hp, od, ar, sr, acc, pp, fcpp, bpm!"">
+            </div>
+
+        </div>
+
+    <div id=""scorecontainer"" class=""flex-col overflow-y-scroll backdrop--medium page-width max-h-96 rounded-b-lg"">
+    </div>
+   
 
             <!-- Charts -->
             <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
