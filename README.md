@@ -24,7 +24,7 @@ This will change!
 - [NET 6.0.x Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is required to run this programm
 
 ## Feedback / Problems
-- Ask in the [Discord}(https://discord.gg/FtF2HNSJNC)
+- Ask in the [Discord](https://discord.gg/FtF2HNSJNC)
 - Open An Issue 
 - I got some changes/ features -> Make a pull request and maybe ill merge it
   
