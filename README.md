@@ -44,6 +44,7 @@ current endpoints are
 - [ ] rename some Colums to enable "better" searching
 - [ ] api and example for costume webpages
 - [ ] importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
+- [ ] add more stuff to the beatmap helper (images maybe) if someone asks or i guess?
 
 ## NOTES
 - rate limite api calls incause i ever make a importer (1 every 2 seconds) 
