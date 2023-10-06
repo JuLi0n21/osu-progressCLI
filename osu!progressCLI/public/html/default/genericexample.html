@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recent OSU! Scores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #007acc;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .score {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+            .score .song-info {
+                flex: 1;
+            }
+
+            .score .score-info {
+                flex: 1;
+                text-align: right;
+            }
+
+        /* CSS for the sidebar, active link, toggle button, and toggle rectangle */
+        .sidebar {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            z-index: 1;
+            width: 180px; /* Adjust the width of the sidebar */
+            transition: left 0.3s ease-in-out;
+        }
+
+            .sidebar.hidden {
+                left: -180px; /* Hide the sidebar partially */
+            }
+
+            .sidebar a {
+                display: block;
+                margin-bottom: 10px;
+                color: #fff;
+                text-decoration: none;
+            }
+
+        /* CSS for the active link */
+        .active-link {
+            background-color: #555;
+        }
+
+        /* CSS for the toggle button */
+        .toggle-button {
+            position: absolute;
+            top: 10px;
+            right: -30px; /* Adjust the right position */
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* CSS for the toggle rectangle */
+        .toggle-rectangle {
+            position: absolute;
+            top: 0;
+            right: -20px; /* Adjust the right position */
+            height: 100%;
+            width: 20px;
+            background-color: #555; /* Different color for the rectangle */
+            cursor: pointer;
+            z-index: 3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Recent OSU! Scores</h1>
+    </header>
+    <div class="container">
+        <div class="score">
+            <div class="song-info">
+                <h2>Song Title 1</h2>
+                <p>Artist: Artist Name 1</p>
+            </div>
+            <div class="score-info">
+                <p>Score: 1,000,000</p>
+                <p>Combo: 1000x</p>
+            </div>
+        </div>
+
+        <div class="score">
+            <div class="song-info">
+                <h2>Song Title 2</h2>
+                <p>Artist: Artist Name 2</p>
+            </div>
+            <div class="score-info">
+                <p>Score: 950,000</p>
+                <p>Combo: 800x</p>
+            </div>
+        </div>
+        <h2 id="section2">Section 2</h2>
+        <p>This is the content of Section 2.</p>
+        <!-- Add more score entries here -->
+
+    </div>
+    <div class="toggle-button" id="toggleButton">Toggle</div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <a href="#section1" class="nav-link">Section 1</a>
+        <a href="#section2" class="nav-link">Section 2</a>
+        <a href="#section3" class="nav-link">Section 3</a>
+        <!-- Toggle rectangle to show and hide the sidebar -->
+        <div class="toggle-rectangle" id="toggleRectangle"></div>
+    </div>
+
+    <!-- Page Content -->
+    <div style="margin-left: 200px; padding: 20px;">
+        <h1 id="section1">Section 1</h1>
+        <p>This is the content of Section 1.</p>
+
+
+
+        <h2 id="section3">Section 3</h2>
+        <p>This is the content of Section 3.</p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sidebar = document.getElementById("sidebar");
+            const toggleButton = document.getElementById("toggleRectangle");
+
+            // Toggle the sidebar when clicking on the button
+            toggleButton.addEventListener("click", function () {
+                sidebar.classList.toggle("hidden");
+            });
+        });
+    </script>
+</body>
+</html>

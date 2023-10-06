@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Osu! Beatmap Viewer</title>
+    <style>
+        /* Reset some default styles */
+        body, h1, p {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Set a background color */
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Style the header */
+        h1 {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        /* Style the container */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style the beatmap information */
+        .beatmap-info {
+            margin-top: 20px;
+        }
+
+        /* Style links */
+        a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+
+            /* Style links on hover */
+            a:hover {
+                text-decoration: underline;
+            }
+    </style>
+</head>
+<body>
+    <h1>Score Page</h1>
+    <div id="imageplaceholder"></div>
+    <div id="beatmapData">
+        <!-- Beatmap data will be displayed here -->
+    </div>
+
+    <script>
+        // Function to fetch and display Osu! beatmap data
+        function fetchOsuBeatmap() {
+            // Get the beatmap ID from the URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const beatmapId = urlParams.get('id');
+
+            // Check if beatmapId is provided in the URL
+            if (!beatmapId) {
+                document.getElementById('beatmapData').innerHTML = 'Beatmap ID not provided.';
+                return;
+            }
+
+            // Construct the API URL
+            const apiUrl = `/api/beatmaps/score?id=${beatmapId}`;
+
+            // Make a request to the Osu! API
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    // Display beatmap data
+
+                    document.getElementById('imageplaceholder').innerHTML = `
+                    <img src="${data.CoverList}">
+                    <img src="${data.Cover}">
+                    `;
+
+                    document.getElementById('beatmapData').innerHTML = `
+    <h2>Beatmap Information</h2>
+     <p>
+    Link: <a href="https://osu.ppy.sh/beatmapsets/${data.BeatmapSetid}#osu/${data.Beatmapid}" target="_blank">https://osu.ppy.sh/beatmapsets/${data.BeatmapSetid}#osu/${data.Beatmapid}</a>
+    </p>
+    <p>Title: ${data.Osufilename}</p>
+    <p>Artist: ${data.Artist}</p>
+    <p>Creator: ${data.Creator}</p>
+    <p>Difficulty: ${data.Version}</p>
+    <p>Mode: ${data.Mode}</p>
+    <p>Score: ${data.Score}</p>
+    <p>Max Combo: ${data.MaxCombo}</p>
+    <p>Accuracy: ${data.Acc.toFixed(2)}%</p>
+    <p>Grade: ${data.Grade}</p>
+    <p>PP: ${data.PP}</p>
+    <p>AR (Approach Rate): ${data.Ar}</p>
+    <p>CS (Circle Size): ${data.Cs}</p>
+    <p>HP (Health Points): ${data.Hp}</p>
+    <p>OD (Overall Difficulty): ${data.Od}</p>
+    <p>Status: ${data.Status}</p>
+    <p>SR (Star Rating): ${data.SR}</p>
+    <p>BPM: ${data.Bpm}</p>
+    <p>Username: ${data.Username}</p>
+    <p>Combo: ${data.Combo}</p>
+    <p>Hit50: ${data.Hit50}</p>
+    <p>Hit100: ${data.Hit100}</p>
+    <p>Hit300: ${data.Hit300}</p>
+    <p>UR (Unstable Rate): ${data.Ur}</p>
+    <p>HitMiss: ${data.HitMiss}</p>
+    <p>Mods: ${data.Mods}</p>
+    <p>Tags: ${data.Tags}</p>
+    <p>Time: ${data.Time}</p>
+    <p>AIM: ${data.AIM}</p>
+    <p>SPEED: ${data.SPEED}</p>
+    <p>ACCURACYATT: ${data.ACCURACYATT}</p>
+    <p>FCPP: ${data.FCPP}</p>
+    <p>
+        CoverList: <a href="${data.CoverList}" target="_blank">${data.CoverList}</a>
+    </p>
+    <p>
+        Cover: <a href="${data.Cover}" target="_blank">${data.Cover}</a
+    </p>
+`;
+
+                })
+                .catch(error => {
+                    console.error('Error fetching beatmap data:', error);
+                    document.getElementById('beatmapData').innerHTML = 'An error occurred while fetching data.';
+                });
+        }
+
+        // Call the fetchOsuBeatmap function when the page loads
+        window.onload = fetchOsuBeatmap;
+    </script>
+</body>
+</html>

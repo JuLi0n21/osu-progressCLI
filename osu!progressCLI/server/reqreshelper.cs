@@ -109,7 +109,12 @@ namespace osu_progressCLI.server
 
            
 
-            WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScores1(from, to, QueryParser.Filter(parameters[0].ToString()))) ,"application/json");
+            WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(parameters[0].ToString()))) ,"application/json");
+        }
+
+        public void getScore(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
+
+            WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScore(int.Parse(parameters[0]))), "application/json");
         }
 
         public void getScoreAverages(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
@@ -161,6 +166,12 @@ namespace osu_progressCLI.server
         private string GetScoreAverages(DateTime from, DateTime to)
         {
             string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetScoreAveragesbyDay(from, to));
+            return jsondata;
+        }
+
+        private string GetScore(int id)
+        {
+            string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetScore(id));
             return jsondata;
         }
 

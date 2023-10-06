@@ -12,6 +12,7 @@ using static System.Formats.Asn1.AsnWriter;
 using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using System.Runtime.ConstrainedExecution;
+using System.Reflection.PortableExecutable;
 
 
 //Add proper debug messages and levels...
@@ -587,6 +588,7 @@ namespace osu1progressbar.Game.Database
                                 score.Add("id", reader["id"]);
                                 score.Add("Date", reader["Date"]);
                                 score.Add("BeatmapSetid", reader["BeatmapSetid"]);
+                                score.Add("Beatmapid", reader["Beatmapid"]);
                                 score.Add("Osufilename", reader["Osufilename"]);
                                 score.Add("Ar", reader["Ar"]);
                                 score.Add("Cs", reader["Cs"]);
@@ -631,7 +633,7 @@ namespace osu1progressbar.Game.Database
         }
 
         //ar(0-12) od(0-12) cs(0-12) sr(0-XX) bpm(0-XXX) pp(0-XXXX) hp(0-12  grade(A, S, SS...) time(seconds) mods(hd, dt, nc, ...) status(0-4)
-        public List<Dictionary<string, object>> GetScores1(DateTime from = new DateTime(), 
+        public List<Dictionary<string, object>> GetScoreSearch(DateTime from = new DateTime(), 
             DateTime to = new DateTime(), 
             string search = "")
         {
@@ -680,6 +682,7 @@ namespace osu1progressbar.Game.Database
                                 score.Add("id", reader["id"]);
                                 score.Add("Date", reader["Date"]);
                                 score.Add("BeatmapSetid", reader["BeatmapSetid"]);
+                                score.Add("Beatmapid", reader["Beatmapid"]);
                                 score.Add("Osufilename", reader["Osufilename"]);
                                 score.Add("Ar", reader["Ar"]);
                                 score.Add("Cs", reader["Cs"]);
@@ -913,7 +916,76 @@ namespace osu1progressbar.Game.Database
         }
 
 
+        public Dictionary<string, object> GetScore(int id) {
+            Dictionary<string, object> score = new Dictionary<string, object>();
 
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+
+                connection.Open();
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "SELECT rowid as id, * FROM SCOREDATA WHERE id = @id";
+
+                    command.Parameters.AddWithValue("@id", id);
+
+                    command.ExecuteNonQuery();
+
+                    {
+                        using (SQLiteDataReader reader = command.ExecuteReader())
+                        {
+
+                            while (reader.Read())
+                            {
+
+                                score.Add("id", reader["id"]);
+                                score.Add("Date", reader["Date"]);
+                                score.Add("BeatmapSetid", reader["BeatmapSetid"]);
+                                score.Add("Beatmapid", reader["Beatmapid"]);
+                                score.Add("Osufilename", reader["Osufilename"]);
+                                score.Add("Ar", reader["Ar"]);
+                                score.Add("Cs", reader["Cs"]);
+                                score.Add("Hp", reader["Hp"]);
+                                score.Add("Od", reader["Od"]);
+                                score.Add("Status", reader["Status"]);
+                                score.Add("SR", reader["SR"]);
+                                score.Add("Bpm", reader["Bpm"]);
+                                score.Add("Artist", reader["Artist"]);
+                                score.Add("Creator", reader["Creator"]);
+                                score.Add("Username", reader["Username"]);
+                                score.Add("Acc", reader["Acc"]);
+                                score.Add("MaxCombo", reader["MaxCombo"]);
+                                score.Add("Score", reader["Score"]);
+                                score.Add("Combo", reader["Combo"]);
+                                score.Add("Hit50", reader["Hit50"]);
+                                score.Add("Hit100", reader["Hit100"]);
+                                score.Add("Hit300", reader["Hit300"]);
+                                score.Add("Ur", reader["Ur"]);
+                                score.Add("HitMiss", reader["HitMiss"]);
+                                score.Add("Mode", reader["Mode"]);
+                                score.Add("Mods", reader["Mods"]);
+                                score.Add("Version", reader["Version"]);
+                                score.Add("Tags", reader["Tags"]);
+                                score.Add("CoverList", reader["CoverList"]);
+                                score.Add("Cover", reader["Cover"]);
+                                score.Add("Time", reader["Time"]);
+                                score.Add("PP", reader["PP"]);
+                                score.Add("AIM", reader["AIM"]);
+                                score.Add("SPEED", reader["SPEED"]);
+                                score.Add("ACCURACYATT", reader["ACCURACYATT"]);
+                                score.Add("Grade", reader["Grade"]);
+                                score.Add("FCPP", reader["FCPP"]);
+
+
+                            }
+                        }
+                    }
+                }
+            }
+             
+            return score;
+        }
 
         public List<KeyValuePair<string, double>> GetTimeWasted(DateTime from, DateTime to)
         {

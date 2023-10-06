@@ -11,7 +11,7 @@ const scoresContainer =  document.getElementById("scorecontainer");
     
       score.Acc = score.Acc.toFixed(2);
 
-      scoreElement.href = `/scores.html?id=${score.id}`;
+      scoreElement.href = `/score.html?id=${score.id}`;
       scoreElement.target = "_blank";
       scoreElement.rel = "noopener noreferrer";
 

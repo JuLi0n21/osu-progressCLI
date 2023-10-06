@@ -115,6 +115,11 @@ namespace osu_progressCLI.server
             {
                 helper.getScoreAverages(request, response, queryparams);
             }
+            else if (path == "/api/beatmaps/score" && queryparams["id"] != null)
+            {
+                Console.WriteLine("score requested: " + queryparams[0]);
+                helper.getScore(request, response, queryparams);
+            }
             else if (path == "/api/beatmaps/search" && queryparams["searchquery"] != null)
             {
 
