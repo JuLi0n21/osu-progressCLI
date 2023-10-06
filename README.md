@@ -7,7 +7,7 @@ CURRETN DESIGN (SUBJECT TO CHANGE)
 
 ![Imgur](https://i.imgur.com/sA7HPQM.png)
 
-![Imgur](https://i.imgur.com/xstUVex.png)
+![Imgur](https://i.imgur.com/XUIgJiq.png)
 
 ![Imgur](https://i.imgur.com/HgHABum.png)
 
