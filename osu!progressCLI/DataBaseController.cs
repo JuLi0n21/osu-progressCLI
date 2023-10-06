@@ -7,6 +7,11 @@ using System.Data.SQLite;
 using OsuMemoryDataProvider.OsuMemoryModels;
 using Newtonsoft.Json.Linq;
 using osu_progressCLI;
+using OsuMemoryDataProvider.OsuMemoryModels.Abstract;
+using static System.Formats.Asn1.AsnWriter;
+using System.Diagnostics.Metrics;
+using System.Diagnostics;
+using System.Runtime.ConstrainedExecution;
 
 
 //Add proper debug messages and levels...
@@ -74,12 +79,12 @@ namespace osu1progressbar.Game.Database
                     Hp REAL,
                     Od REAL,
                     Status TEXT,
-                    StarRating REAL,
+                    SR REAL,
                     Bpm REAL,
                     Artist TEXT,
                     Creator TEXT,
                     Username TEXT,
-                    Accuracy REAL,
+                    ACC REAL,
                     MaxCombo INTEGER,
                     Score INTEGER,
                     Combo INTEGER,
@@ -128,7 +133,7 @@ namespace osu1progressbar.Game.Database
             }
 
             string ScoreHelperTableQuery = @"
-                CREATE TABLE IF NOT EXISTS BeatmapHelper (id INTEGER, StarRating REAL, Artist TEXT, Creator TEXT, Bpm REAL, Version TEXT, Status TEXT, Tags TEXT, CoverList TEXT, Cover TEXT)";
+                CREATE TABLE IF NOT EXISTS BeatmapHelper (id INTEGER, SR REAL, Artist TEXT, Creator TEXT, Bpm REAL, Version TEXT, Status TEXT, Tags TEXT, CoverList TEXT, Cover TEXT)";
 
             using (var command = new SQLiteCommand(ScoreHelperTableQuery, connection))
             {
@@ -351,12 +356,12 @@ namespace osu1progressbar.Game.Database
                             {
 
                                 insertCommand.CommandText = @"
-                                 INSERT INTO BeatmapHelper (id, starrating, bpm, creator, artist, status, coverlist, cover, version, tags)
+                                 INSERT INTO BeatmapHelper (id, sr, bpm, creator, artist, status, coverlist, cover, version, tags)
                                  VALUES (@id, @starrating, @bpm, @creator, @artist, @status, @coverlist, @cover, @version, @tags)";
 
                                 // Providing the beatmap's attributes
                                 insertCommand.Parameters.AddWithValue("@id", baseAddresses.Beatmap.Id);
-                                insertCommand.Parameters.AddWithValue("@starrating", starrating);
+                                insertCommand.Parameters.AddWithValue("@sr", starrating);
                                 insertCommand.Parameters.AddWithValue("@bpm", bpm);
                                 insertCommand.Parameters.AddWithValue("@creator", creator);
                                 insertCommand.Parameters.AddWithValue("@artist", artist);
@@ -398,12 +403,12 @@ namespace osu1progressbar.Game.Database
                     Hp,
                     Od,
                     Status,
-                    StarRating,
+                    SR,
                     Bpm,
                     Creator,
                     Artist,
                     Username,
-                    Accuracy,
+                    Acc,
                     MaxCombo,
                     Score,
                     Combo,
@@ -435,12 +440,12 @@ namespace osu1progressbar.Game.Database
                             @Hp,
                             @Od,
                             @Status,
-                            @StarRating,
+                            @SR,
                             @Bpm,
                             @Creator,
                             @Artist,
                             @Username,
-                            @Accuracy,
+                            @Acc,
                             @MaxCombo,
                             @Score,
                             @Combo,
@@ -489,12 +494,12 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Hp", baseAddresses.Beatmap.Hp);
                         command.Parameters.AddWithValue("@Od", baseAddresses.Beatmap.Od);
                         command.Parameters.AddWithValue("@Status", status);
-                        command.Parameters.AddWithValue("@StarRating", starrating);
+                        command.Parameters.AddWithValue("@SR", starrating);
                         command.Parameters.AddWithValue("@Bpm", bpm);
                         command.Parameters.AddWithValue("@Creator", creator);
                         command.Parameters.AddWithValue("@Artist", artist);
                         command.Parameters.AddWithValue("@Username", baseAddresses.Player.Username);
-                        command.Parameters.AddWithValue("@Accuracy", baseAddresses.Player.Accuracy);
+                        command.Parameters.AddWithValue("@Acc", baseAddresses.Player.Accuracy);
                         command.Parameters.AddWithValue("@MaxCombo", perfomanceAttributes.Maxcombo);
                         command.Parameters.AddWithValue("@Score", baseAddresses.Player.Score);
                         command.Parameters.AddWithValue("@Combo", baseAddresses.Player.MaxCombo);
@@ -555,7 +560,7 @@ namespace osu1progressbar.Game.Database
                     //command.CommandText = "SELECT Date FROM TimeWasted";
                     //command.CommandText = "SELECT  datetime(Date, '%Y-%m-%d %H:%M') AS Date FROM TimeWasted ";
                     //command.CommandText = " SELECT datetime(Date) AS FormattedDate FROM TimeWasted";
-                    command.CommandText = "SELECT * " +
+                    command.CommandText = "SELECT rowid as id, * " +
                         "FROM ScoreData " +
                         "WHERE datetime(Date) BETWEEN @from AND @to " +
                         "ORDER BY Date DESC " +
@@ -578,14 +583,44 @@ namespace osu1progressbar.Game.Database
                             //List<Dictionary<string, object>> row = new List<Dictionary<string, object>>();
                             //Turn it back into a beatmap
                             Dictionary<string, object> score = new Dictionary<string, object>();
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-                                string columnName = reader.GetName(i);
-                                object columnValue = reader.GetValue(i);
-                                // Create a dictionary entry for each 
-                                 score.Add(columnName, columnValue);
 
-                            }
+                                score.Add("id", reader["id"]);
+                                score.Add("Date", reader["Date"]);
+                                score.Add("BeatmapSetid", reader["BeatmapSetid"]);
+                                score.Add("Osufilename", reader["Osufilename"]);
+                                score.Add("Ar", reader["Ar"]);
+                                score.Add("Cs", reader["Cs"]);
+                                score.Add("Hp", reader["Hp"]);
+                                score.Add("Od", reader["Od"]);
+                                score.Add("Status", reader["Status"]);
+                                score.Add("SR", reader["SR"]);
+                                score.Add("Bpm", reader["Bpm"]);
+                                score.Add("Artist", reader["Artist"]);
+                                score.Add("Creator", reader["Creator"]);
+                                score.Add("Username", reader["Username"]);
+                                score.Add("Acc", reader["Acc"]);
+                                score.Add("MaxCombo", reader["MaxCombo"]);
+                                score.Add("Score", reader["Score"]);
+                                score.Add("Combo", reader["Combo"]);
+                                score.Add("Hit50", reader["Hit50"]);
+                                score.Add("Hit100", reader["Hit100"]);
+                                score.Add("Hit300", reader["Hit300"]);
+                                score.Add("Ur", reader["Ur"]);
+                                score.Add("HitMiss", reader["HitMiss"]);
+                                score.Add("Mode", reader["Mode"]);
+                                score.Add("Mods", reader["Mods"]);
+                                score.Add("Version", reader["Version"]);
+                                score.Add("Tags", reader["Tags"]);
+                                score.Add("CoverList", reader["CoverList"]);
+                                score.Add("Cover", reader["Cover"]);
+                                score.Add("Time", reader["Time"]);
+                                score.Add("PP", reader["PP"]);
+                                score.Add("AIM", reader["AIM"]);
+                                score.Add("SPEED", reader["SPEED"]);
+                                score.Add("ACCURACYATT", reader["ACCURACYATT"]);
+                                score.Add("Grade", reader["Grade"]);
+                                score.Add("FCPP", reader["FCPP"]);
+                            
                             scores.Add(score);
                         }
                     }
@@ -615,7 +650,7 @@ namespace osu1progressbar.Game.Database
 
                     connection.Open();
 
-                    StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ScoreData WHERE 1=1 ");
+                    StringBuilder queryBuilder = new StringBuilder("SELECT rowid as id, * FROM ScoreData WHERE 1=1 ");
                     
 
                     if (from != null || to != null) {
@@ -640,17 +675,45 @@ namespace osu1progressbar.Game.Database
 
                             while (reader.Read())
                             {
-                                //List<Dictionary<string, object>> row = new List<Dictionary<string, object>>();
-                                //Turn it back into a beatmap
                                 Dictionary<string, object> score = new Dictionary<string, object>();
-                                for (int i = 0; i < reader.FieldCount; i++)
-                                {
-                                    string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
 
-                                    score.Add(columnName, columnValue);
-
-                                }
+                                score.Add("id", reader["id"]);
+                                score.Add("Date", reader["Date"]);
+                                score.Add("BeatmapSetid", reader["BeatmapSetid"]);
+                                score.Add("Osufilename", reader["Osufilename"]);
+                                score.Add("Ar", reader["Ar"]);
+                                score.Add("Cs", reader["Cs"]);
+                                score.Add("Hp", reader["Hp"]);
+                                score.Add("Od", reader["Od"]);
+                                score.Add("Status", reader["Status"]);
+                                score.Add("SR", reader["SR"]);
+                                score.Add("Bpm", reader["Bpm"]);
+                                score.Add("Artist", reader["Artist"]);
+                                score.Add("Creator", reader["Creator"]); 
+                                score.Add("Username", reader["Username"]); 
+                                score.Add("Acc", reader["Acc"]);
+                                score.Add("MaxCombo", reader["MaxCombo"]);
+                                score.Add("Score", reader["Score"]);
+                                score.Add("Combo", reader["Combo"]);
+                                score.Add("Hit50", reader["Hit50"]);
+                                score.Add("Hit100", reader["Hit100"]);
+                                score.Add("Hit300", reader["Hit300"]);
+                                score.Add("Ur", reader["Ur"]);
+                                score.Add("HitMiss", reader["HitMiss"]);
+                                score.Add("Mode", reader["Mode"]);
+                                score.Add("Mods", reader["Mods"]);
+                                score.Add("Version", reader["Version"]);
+                                score.Add("Tags", reader["Tags"]);
+                                score.Add("CoverList", reader["CoverList"]);
+                                score.Add("Cover", reader["Cover"]);
+                                score.Add("Time", reader["Time"]);
+                                score.Add("PP", reader["PP"]);
+                                score.Add("AIM", reader["AIM"]);
+                                score.Add("SPEED", reader["SPEED"]);
+                                score.Add("ACCURACYATT", reader["ACCURACYATT"]);
+                                score.Add("Grade", reader["Grade"]);
+                                score.Add("FCPP", reader["FCPP"]);
+                         
                                 scores.Add(score);
                             }
                         }
@@ -683,8 +746,8 @@ namespace osu1progressbar.Game.Database
             SELECT 
                 strftime('%Y-%m-%d', Date) AS FDate,
                 AVG(Bpm) AS AverageBpm,
-                AVG(StarRating) AS AverageSR,
-                AVG(Accuracy) AS AverageAccuracy,
+                AVG(SR) AS AverageSR,
+                AVG(Acc) AS AverageAccuracy,
                 AVG(Ar) AS AverageAr,
                 AVG(Cs) AS AverageCs,
                 AVG(Hp) AS AverageHp,
@@ -713,7 +776,7 @@ namespace osu1progressbar.Game.Database
                             result["AverageAr"] = Convert.ToDouble(reader["AverageAr"]);
                             result["AverageCs"] = Convert.ToDouble(reader["AverageCs"]);
                             result["AverageHp"] = Convert.ToDouble(reader["AverageHp"]);
-                            result["AverageOd"] = Convert.ToDouble(reader["AverageOd"]);
+                            result["AverageOd"] = Convert.ToDouble(reader["AverageOd"]);    
 
                             scoreAverages.Add(result);
                         }

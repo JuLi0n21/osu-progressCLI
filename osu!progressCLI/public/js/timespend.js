@@ -8,123 +8,192 @@ function getRandomColor() {
 }
 
 function createBanchoTimeChart(data) {
-    // Extract the unique dates
-    var dates = [...new Set(data.map(entry => entry.Date))];
+    // Extract the dates and labels
+    const dates = data.map(item => moment(item.Date).toDate());
+    const labels = Object.keys(data[0]).filter(key => key !== "Date");
 
-    // Extract the labels and values for each date
-    var labels = Object.keys(data[0]).filter(key => key !== "Date");
-
-    var colors = {
-        "Afk": 'rgba(255, 0, 0, 0.6)',     // Red
-        "Playing": 'rgba(0, 255, 0, 0.6)', // Green
-        "Idle": 'rgba(0, 0, 255, 0.6)'    // Blue
+    const numberToName = {
+        '11': 'MultiplayerRooms',
+        '12': 'MultiplayerPlaying',
+        '13': 'Unknown', // Add a default value for unknown keys
+        '4': 'Editing',
+        '5': 'MultiplayerRoom',
+        '8': 'Unknown', // Add a default value for unknown keys
+        'Afk': 'Afk',
+        'Idle': 'Idle',
+        'Playing': 'Playing'
     };
 
-    var datasets = [];
-    labels.forEach(label => {
-        if (label in colors) {
-            datasets.push({
-                label: label,
-                data: [],
-                backgroundColor: colors[label],
-                yAxisID: "sharedAxis", // Specify the same axis ID for "Afk," "Playing," and "Idle"
-                stack: "stack", // Stack the values
-            });
-        } else {
-            datasets.push({
-                label: label,
-                data: [],
-                backgroundColor: getRandomColor(), // Assign random colors for other categories
-                yAxisID: "sharedAxis",
-                stack: "stack",
-            });
-        }
+    const colors = {
+        'MultiplayerRooms': 'blue',
+        'MultiplayerPlaying': 'purple',
+        'Unknown': 'gray',
+        'Editing': 'cyan',
+        'MultiplayerRoom': 'orange',
+        'Afk': 'red',
+        'Idle': 'green',
+        'Playing': 'pink'
+    };
+
+    const datasets = labels.map(label => {
+        const name = numberToName[label] || 'Unknown'; // Use the name from numberToName or 'Unknown' as default
+        return {
+            label: name, // Use the name here
+            data: data.map(item => item[label] || 0), // Map the data for the label
+            backgroundColor: colors[label] || getRandomColor(),
+            stack: "stack",
+        };
     });
 
-    dates.forEach(date => {
-        var values = data.find(entry => entry.Date === date);
-        labels.forEach(label => {
-            datasets.find(dataset => dataset.label === label).data.push(values[label] || 0);
-        });
-    });
 
-    var ctx = document.getElementById('BanchoTimeChart').getContext('2d');
-    var myChart = new Chart(ctx, {
+    const ctx = document.getElementById('BanchoTimeChart').getContext('2d');
+    const myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: dates,
             datasets: datasets
         },
         options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "rgba(255, 102, 171, 1)",
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            },
             scales: {
                 x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                        displayFormats: {
+                            day: 'YYYY-MM-DD'
+                        }
+                    },
                     beginAtZero: true,
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
+                    },
+                    grid: {
+
+                    }
                 },
                 y: {
                     stacked: true,
-                    id: "sharedAxis", // Define the shared axis with the same ID
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
+                    },
+                    grid: {
+
+                    }
                 }
             }
         }
     });
 }
 
+
 function createTimeWastedChart(data) {
     // Extract the unique dates
-    var dates = [...new Set(data.map(entry => entry.Date))];
+
+
+    const numberToScreen = {
+        '0': 'Mainmenu',
+        '1': 'EditingMap',
+        '2': 'Playing',
+        '3': 'GameShutDown',
+        '4': 'SongSelectEdit',
+        '5': 'SongSelect',
+        '7': 'ResultScreen',
+        '11': 'MultiplayerRooms',
+        '12': 'MultiPlayerRoom',
+        '15': 'OsuDirect',
+        '16': 'OffsetAssistent',
+        '19': 'ProcessingBeatmaps',
+    }
+
+    for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+        if (item.Key in numberToScreen && numberToScreen[item.Key] && item.Value >= 10) {
+            labels.push(numberToScreen[item.Key]);
+            item.Value = item.Value / 3600;
+            values.push(item.Value);
+            colors.push('#' + (Math.random() * 0xFFFFFF << 0).toString(16));
+        }
+    }
+
+
+    const dates = [...new Set(data.map(entry => entry.Date))];
 
     // Extract the labels and values for each date
-    var labels = Object.keys(data[0]).filter(key => key !== "Date");
+    const labels = Object.keys(data[0]).filter(key => key !== "Date");
 
-    var colors = {
+    const colors = {
         "Afk": 'rgba(255, 0, 0, 0.6)',     // Red
         "Playing": 'rgba(0, 255, 0, 0.6)', // Green
         "Idle": 'rgba(0, 0, 255, 0.6)'    // Blue
     };
 
-    var datasets = [];
-    labels.forEach(label => {
-        if (label in colors) {
-            datasets.push({
-                label: label,
-                data: [],
-                backgroundColor: colors[label],
-                yAxisID: "sharedAxis", // Specify the same axis ID for "Afk," "Playing," and "Idle"
-                stack: "stack", // Stack the values
-            });
-        } else {
-            datasets.push({
-                label: label,
-                data: [],
-                backgroundColor: getRandomColor(), // Assign random colors for other categories
-                yAxisID: "sharedAxis",
-                stack: "stack",
-            });
-        }
+    const datasets = labels.map(label => {
+        const name = numberToScreen[label] || 'Unknown'; // Use the name from numberToScreen or 'Unknown' as default
+        return {
+            label: name, // Use the name here
+            data: dates.map(date => {
+                const entry = data.find(entry => entry.Date === date);
+                return entry[label] || 0;
+            }),
+            backgroundColor: colors[label] || getRandomColor(),
+            stack: "stack",
+        };
     });
 
-    dates.forEach(date => {
-        var values = data.find(entry => entry.Date === date);
-        labels.forEach(label => {
-            datasets.find(dataset => dataset.label === label).data.push(values[label] || 0);
-        });
-    });
 
-    var ctx = document.getElementById('TimeWastedChart').getContext('2d');
-    var myChart = new Chart(ctx, {
+    const ctx = document.getElementById('TimeWastedChart').getContext('2d');
+    const myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: dates,
             datasets: datasets
         },
         options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "rgba(255, 102, 171, 1)",
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            },
             scales: {
                 x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                        displayFormats: {
+                            day: 'YYYY-MM-DD'
+                        }
+                    },
                     beginAtZero: true,
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
+                    },
+                    grid: {
+                        
+                    }
                 },
                 y: {
                     stacked: true,
-                    id: "sharedAxis", // Define the shared axis with the same ID
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
+                    },
+                    grid: {
+                      
+                    }
                 }
             }
         }

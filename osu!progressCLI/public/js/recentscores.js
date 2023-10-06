@@ -6,14 +6,19 @@ const scoresContainer =  document.getElementById("scorecontainer");
         scoresContainer.innerHTML = "<p>No Score Found!</p>";
     }
   scores.forEach((score) => {
-    const scoreElement = document.createElement("div");
+    const scoreElement = document.createElement("a");
     scoreElement.className = "flex justify-center mb-0";
     
-    score.Accuracy = score.Accuracy.toFixed(2);
+      score.Acc = score.Acc.toFixed(2);
+
+      scoreElement.href = `/scores.html?id=${score.id}`;
+      scoreElement.target = "_blank";
+      scoreElement.rel = "noopener noreferrer";
+
     // Build the HTML structure for each score using the provided data
     scoreElement.innerHTML = 
-        `<div class="flex backdrop--light h-16 rounded justify-between m-4 w-5/6 mb-1 mt-1">
-
+          `
+        <div class="flex backdrop--light h-16 rounded justify-between m-4 w-5/6 mb-1 mt-1">
         <!-- Status and Grade-->
         <div class="flex flex-col grade-rank-container rounded justify-evenly w-1/6">
             <div class="flex justify-center">
@@ -46,7 +51,7 @@ const scoresContainer =  document.getElementById("scorecontainer");
         <div class="flex acc-container">
             <div class="flex flex-col justify-evenly justify-self-end rounded w-1/4 ml-3">
                 <div>
-                    <p class="text--yellow">${score.Accuracy}%</p>
+                    <p class="text--yellow">${score.Acc}%</p>
                 </div>
                 <div class="flex">
                     <p class="text-white">{</p>
@@ -73,7 +78,9 @@ const scoresContainer =  document.getElementById("scorecontainer");
         </div>
     </div>
 </div>
-</div>`;
+</div>
+`;
+    
 
     // Append the score element to the container
     scoresContainer.appendChild(scoreElement);

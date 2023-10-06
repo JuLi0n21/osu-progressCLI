@@ -1,4 +1,11 @@
-﻿function renderChart(data) {
+﻿//     < !--Charts -->
+//    <div class="" border-b rounded-lg backdrop--light"" >
+//      <div style=""height: 0px"" >
+//      <canvas id="" myChart"" ></canvas >
+//      </div >
+//    </div >
+
+function renderChart(data) {
     const date = [];
     const BeatmapSetid = [];
     const Beatmapid = [];

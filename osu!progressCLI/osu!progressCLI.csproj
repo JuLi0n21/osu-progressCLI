@@ -27,10 +27,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="public\css\style.css" />
+	  <None Remove="public\html\scores.html" />
 	  <None Remove="public\js\configmenu.js" />
 	  <None Remove="public\js\jsconfig1.json" />
 	  <None Remove="public\js\savebutton.js" />
 	  <None Remove="public\js\scoreexample.js" />
+	  <None Remove="public\js\sidebar.txt" />
 	</ItemGroup>
 	
 	

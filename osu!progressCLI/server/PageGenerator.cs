@@ -23,7 +23,7 @@ namespace osu_progressCLI.server
 
         public string generatepage(string userid, string mode)
         {
-            Console.WriteLine(userid);
+            //Console.WriteLine(userid);
             JObject user = null;
             var config = Credentials.Instance.GetConfig();
 
@@ -94,146 +94,10 @@ namespace osu_progressCLI.server
     <script src=""https://cdn.jsdelivr.net/npm/moment""></script>
     <script src=""https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1""></script>
     <link href=""https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css"" rel=""stylesheet"" />
+    <link rel=""stylesheet"" href=""style.css"">
     <link rel=""stylesheet"" href=""https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"">
     <style>
-        body {{
-            margin: 0;
-            padding: 0;
-        }}
-
-        .content {{
-            max-width: 1000px;
-            min-width: 1000px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-          
-        }}
-
-
-        @media (max-width: 949px) {{
-
-            .inner-content {{
-                margin: 10px 0;
-            }}
-
-            h2 {{
-                font-size: 24px;
-            }}
-
-            p {{
-                font-size: 14px;
-                line-height: 1.3;
-            }}
-        }}
-
-        /* Reset some default styles */
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
-
-        body {{
-            font-family: Arial, sans-serif;
-            background-color: rgba(28,23,25,255);
-        }}
-
-        /* Header Styles */
-        header {{
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-        }}
-
-
-        .backdrop--light {{
-            background-color: rgba(70,57,63,255);
-        }}
-
-        .backdrop--medium {{
-            background-color: rgba(56,46,50,255)
-        }}
-
-        .backdrop--dark {{
-            background-color: rgba(42,34,38,255);
-        }}
-
-          .backdrop--dark {{
-            background-color: rgba(28, 23, 25, 1);
-        }}
-
-        .backdrop--medium--dark {{
-            background-color: rgba(42, 34, 38, 1);
-        }}
-
-        .backdrop--medium {{
-            background-color: rgba(56, 46, 50, 1);
-        }}
-
-        .backdrop--medium--light {{
-            background-color: rgba(70, 57, 63, 1);
-        }}
-
-        .backdrop--light {{
-            background-color: rgba(84, 69, 76, 1);
-        }}
-
-         .text--dark--yellow {{
-            color: rgba(221, 159, 8, 255);
-        }}
-
-        .text--gray {{
-            color: rgba(162, 142, 151, 255);
-        }}
-
-        .text--yellow {{
-            color: rgba(252, 198, 51, 255);
-        }}
-
-        .text--pink {{
-            color: rgba(255, 102, 171, 255);
-        }}
-
-        .text--orange {{
-            color: #dc8726;
-        }}
-
-        .text--pink--dark {{
-            color: #663e70;
-        }}
-
-        .page-width {{
-            max-width: 1000px;
-            min-width: 1000px;
-        }}
-
-        .grade-rank-container {{
-            max-width: 100px;
-            min-width: 100px;
-        }}
-
-        .icon {{
-            max-width: 64px;
-            min-width: 64px;
-
-        }}
-
-        .scoreinfo-container {{
-            max-width: 400px;
-            min-width: 400px;
-        }}
-
-        .acc-container {{
-            max-width: 120px;
-            min-width: 120px;
-        }}
-
-        .pp-container {{
-            max-width: 100px;
-            min-width: 100px;
-        }}
-        
-
+       
     </style>
 </head>
 <body>
@@ -347,13 +211,22 @@ namespace osu_progressCLI.server
     </div>
 </div>
 
+<!-- Sidebar -->
+ <div class=""sidebar rounded-r-lg backdrop--medium flex flex-col text--pink"">
+        <a href=""#header"" class=""nav-link hover:text-yellow-500"">Header</a>
+        <a href=""#scorecontainer"" class=""nav-link hover:text-yellow-500"">Recent Scores</a>
+        <a href=""#chart1"" class=""nav-link hover:text-yellow-500"">Time by Day</a>
+        <a href=""#chart2"" class=""nav-link hover:text-yellow-500"">Difficulties</a>
+        <a href=""#chart3"" class=""nav-link hover:text-yellow-500"">Time Total</a>
+        <div class=""toggle-rectangle border-t border-b border-r border-pink-600 rounded-r-lg p-4 hover:border-yellow-500"" id=""toggleButton""></div>
+    </div>
 
     <div class=""flex justify-center items-center"">
 
         <div class=""content w-1/2 rounded-lg backdrop--medium--dark text-white"">
 
             <!-- header -->
-            <div class=""backdrop--medium justify-center items-center flex p-4 m-2"">
+            <div id=""header"" class=""backdrop--medium justify-center items-center flex p-4 m-2"">
                 <h1>Play History</h1>
             </div>
 
@@ -368,20 +241,9 @@ namespace osu_progressCLI.server
                 </div>
 
                 <div style=""position: relative;"" class=""mb-7"">
-                      <a href=""https://osu.ppy.sh/users/{userid}"" target=""_blank"" rel=""noopener noreferrer"">
+                      <a href=""https://osu.ppy.sh/users/{userid}"" class="" hover:border-yellow-500  hover:border"" target=""_blank"" rel=""noopener noreferrer"">
                     <img src=""{avatar_url}"" style=""position: absolute; top: -150px; left: 60px; right: 0; height:120px; width:120px"" class=""rounded-lg"" />
                     </a>
-                </div>
-            </div>
-
- <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
-
-                <!-- filter menu -->
-                <div class=""flex justify-evenly text-black
-                    <input type=""text"" id=""from"">
-                    <label for=""to"">Select Date and Time:</label>
-                    <input type=""text"" id=""to"">
-                  
                 </div>
             </div>
 
@@ -398,43 +260,39 @@ namespace osu_progressCLI.server
 
         </div>
 
-    <div id=""scorecontainer"" class=""flex-col overflow-y-scroll backdrop--medium page-width max-h-96 rounded-b-lg"">
+    <div id=""scorecontainer"" class=""flex-col overflow-y-scroll backdrop--medium page-width max-h-96"">
     </div>
-   
+ <div class=""p-2 rounded-b-lg backdrop--medium""><h1></h1></div>
 
-            <!-- Charts -->
-            <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
-                <div style=""height: 460px"">
-                    <canvas id=""myChart""></canvas>
-                </div>
-            </div>
-
-            
-            <div class=""flex backdrop--medium m-4"" style=""height: 460px"">
-                <div class=""w-1/2 rounded-l-lg backdrop--light"">
+            <div id=""chart1"" class=""flex backdrop--medium mt-4 mb-3"" style=""height: 500px"">
+                <div class=""w-1/2 rounded-l-lg backdrop--light flex-col justify-center items-center flex mt-4 m-2"">
                     <h2>BanchoTime</h2>
-                    <canvas id=""BanchoTimeChart"" width=""450""></canvas>
+                    <canvas id=""BanchoTimeChart"" height=""440"" width=""450""></canvas>
                 </div>
-                <div class=""w-1/2 rounded-r-lg backdrop--light"">
+                <div class=""w-1/2 rounded-r-lg backdrop--light flex-col justify-center items-center flex mt-4 m-2"">
                     <h2>TimeWasted</h2>
-                    <canvas id=""TimeWastedChart"" width=""450""></canvas>
+                    <canvas id=""TimeWastedChart"" height=""440"" width=""450""></canvas>
                 </div>
             </div>
 
-            <div class=""border-b rounded-lg backdrop--light mb-4 p-4"">
-                <div style=""height: 460px"">
-                    <canvas id=""averageschart""></canvas>
+            <div id=""chart2"" class=""border-b rounded-lg backdrop--light mb-4 p-4"">
+                <div class=""flex-col justify-center items-center flex"">
+                    <h1>Difficulties</h1>
                 </div>
+                    <div style=""height: 460px"">
+                        <canvas id=""averageschart""></canvas>
+                    </div>
+                
             </div>
 
-            <div class=""flex backdrop--medium m-4"" style=""height: 460px"">
-                <div class=""w-1/2 rounded-l-lg backdrop--light"">
+            <div id=""chart3"" class=""flex backdrop--medium"" style=""height: 280px"">
+                <div class=""w-1/2 rounded-l-lg backdrop--light flex-col justify-center items-center flex m-4"">
                     <h2>BanchoTime</h2>
-                    <canvas id=""pieBanchoTimeChart"" width=""450""></canvas>
+                    <canvas id=""pieBanchoTimeChart"" height=""250"" width=""450""></canvas>
                 </div>
-                <div class=""w-1/2 rounded-r-lg backdrop--light"">
+                <div class=""w-1/2 rounded-r-lg backdrop--light flex-col justify-center items-center flex m-4"">
                     <h2>TimeWasted</h2>
-                    <canvas id=""pieTimeWastedChart"" width=""450""></canvas>
+                    <canvas id=""pieTimeWastedChart"" height=""250"" width=""450""></canvas>
                 </div>
             </div>
 
@@ -442,8 +300,6 @@ namespace osu_progressCLI.server
 
     </div>
 
-
-    <script src=""https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js""></script>
     <script src=""recentscores.js""></script>
     <script src=""configmenu.js""></script>
     <script src=""difficulities.js""></script>
@@ -452,19 +308,8 @@ namespace osu_progressCLI.server
     <script src=""searchbar.js""></script>
     <script src=""timespend.js""></script>
     <script src=""timespendtotal.js""></script>
+    <script src=""sidebar.js""></script>
     <script>
-
-        //datepicker
-        flatpickr(""#from"", {{
-            enableTime: true,
-            dateFormat: ""Y-m-d H:i"",
-        }});
-
-        flatpickr(""#to"", {{
-            enableTime: true,
-            dateFormat: ""Y-m-d H:i"",
-        }});
-
    
 document.getElementById('loadDataButton').addEventListener('click', function () {{
     {{
@@ -479,8 +324,8 @@ document.getElementById('loadDataButton').addEventListener('click', function () 
             fetch('/api/beatmaps')
                 .then(response => response.json())
                 .then(data => {{
-                    console.log(data);
-                    renderChart(data);
+                   // console.log(data);
+                  //  renderChart(data);
                     createScoreElements(data);
                 }})
                 .catch(error => {{
@@ -500,7 +345,7 @@ document.getElementById('loadDataButton').addEventListener('click', function () 
             fetch('/api/timewasted')
                 .then(response => response.json())
                 .then(data => {{
-                    console.log(data);
+                    //console.log(data);
                     renderTimewastedPie(data);
                 }})
                 .catch(error => {{

@@ -21,49 +21,49 @@ function createchart(data) {
             labels: dates,
             datasets: [
                 {
-                    label: 'Average BPM',
+                    label: 'BPM',
                     data: averageBpm,
                     yAxisID: 'bpm',
                     borderColor: 'blue',
                     fill: false,
                 },
                 {
-                    label: 'Average SR',
+                    label: 'SR',
                     data: averageSR,
                     yAxisID: 'sr',
                     borderColor: 'red',
                     fill: false,
                 },
                 {
-                    label: 'Average Accuracy',
+                    label: 'Acc',
                     data: averageAccuracy,
                     yAxisID: 'acc',
                     borderColor: 'green',
                     fill: false,
                 },
                 {
-                    label: 'Average AR',
+                    label: 'AR',
                     data: averageAr,
                     yAxisID: 'arcshpod',
                     borderColor: 'purple',
                     fill: false,
                 },
                 {
-                    label: 'Average CS',
+                    label: 'CS',
                     data: averageCs,
                     yAxisID: 'arcshpod',
                     borderColor: 'orange',
                     fill: false,
                 },
                 {
-                    label: 'Average HP',
+                    label: 'HP',
                     data: averageHp,
                     yAxisID: 'arcshpod',
                     borderColor: 'brown',
                     fill: false,
                 },
                 {
-                    label: 'Average OD',
+                    label: 'OD',
                     data: averageOd,
                     yAxisID: 'arcshpod',
                     borderColor: 'pink',
@@ -72,6 +72,17 @@ function createchart(data) {
             ],
         },
         options: {
+            plugins: {
+                legend: {
+                  //  position: 'right', 
+                    labels: {
+                        color: "rgba(255, 102, 171, 1)",
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            },
             scales: {
                 x: {
                     type: 'time',
@@ -81,14 +92,21 @@ function createchart(data) {
                             day: 'D MMM YYYY',
                         },
                     },
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
+                    },
                 },
                 bpm: {
                     position: 'right',
                     beginAtZero: true,
+                    suggestedMin: 0,
                     title: {
                         display: true,
                         text: 'BPM',
                         color: 'red',
+                    },
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
                     },
                     grid: {
                         drawOnChartArea: false,
@@ -102,6 +120,9 @@ function createchart(data) {
                         text: 'Star Rating',
                         color: 'blue',
                     },
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
+                    },
                     grid: {
                         drawOnChartArea: false,
                     },
@@ -113,6 +134,9 @@ function createchart(data) {
                         display: true,
                         text: 'Accuracy',
                         color: 'green',
+                    },
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
                     },
                     grid: {
                         drawOnChartArea: false,
@@ -132,6 +156,9 @@ function createchart(data) {
                         display: true,
                         text: 'Map Attributes',
                         color: 'white',
+                    },
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
                     },
                     grid: {
                         drawOnChartArea: true,

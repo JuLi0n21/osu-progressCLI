@@ -39,7 +39,6 @@ namespace osu_progressCLI.server
             string beatmapstring = GetBeatmapData(from, to);
 
             WriteResponse(response, beatmapstring, "application/json");
-            Console.WriteLine("beatmaps send?");
         }
         //get all beatmap scores
 
@@ -49,7 +48,6 @@ namespace osu_progressCLI.server
             string beatmapstring = GetBeatmapData(from, to);
 
             WriteResponse(response, beatmapstring, "application/json");
-            Console.WriteLine("all beatmaps send?");
         }
 
         //time wasted 
@@ -105,7 +103,7 @@ namespace osu_progressCLI.server
 
         public void search(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
 
-            Console.WriteLine("searchquery: " + parameters[0].ToString());
+            //Console.WriteLine("searchquery: " + parameters[0].ToString());
             DateTime to = DateTime.Now;
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
@@ -173,25 +171,26 @@ namespace osu_progressCLI.server
             ServeStaticImage(response, "public/img" + filepath);
         }
 
-        public void servejs(HttpListenerRequest request, HttpListenerResponse response, string filepath) { 
-            ServeStaticJavaScript(response, "public/js" + filepath);
+        public void servehtml(HttpListenerRequest request, HttpListenerResponse response, string filepath)
+        {
+            string htmlFilePath = "public/html" + filepath;
+
+            ServeStaticFile(response, htmlFilePath, "text/html");
         }
 
-        static void ServeStaticJavaScript(HttpListenerResponse response, string jsFilePath)
-        {
-            if (File.Exists(jsFilePath))
-            {
-                string contentType = "application/javascript"; // Set the content type for JavaScript
+        public void servejs(HttpListenerRequest request, HttpListenerResponse response, string filepath) { 
+            
+            string jsFilePath = "public/js" + filepath;
+            
+            ServeStaticFile(response, jsFilePath, "text/javascript");
+        }
 
-                string jsContent = File.ReadAllText(jsFilePath);
-                WriteResponse(response, jsContent, contentType);
-            }
-            else
-            {
-                response.StatusCode = 404;
-                string responseString = $"404 - Not Found: JavaScript file not found at {jsFilePath}";
-                WriteResponse(response, responseString, "text/plain");
-            }
+        public void servecss(HttpListenerRequest request, HttpListenerResponse response, string filepath)
+        {
+
+            string jsFilePath = "public/css" + filepath;
+
+            ServeStaticFile(response, jsFilePath, "text/css");
         }
 
         static void ServeStaticFile(HttpListenerResponse response, string filePath, string contentType)

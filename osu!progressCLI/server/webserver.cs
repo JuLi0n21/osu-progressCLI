@@ -70,10 +70,25 @@ namespace osu_progressCLI.server
             if (path.EndsWith(".jpg") || path.EndsWith(".jpeg") || path.EndsWith(".png") || path.EndsWith(".gif") || path.EndsWith(".bmp") || path.EndsWith(".tiff") || path.EndsWith(".ico") || path.EndsWith(".webp") || path.EndsWith(".svg"))
             {
                 helper.serveimage(request, response, path);
+                return;
             }
 
-            if (path.EndsWith(".js")) { 
+            if (path.EndsWith(".html"))
+            {
+                helper.servehtml(request, response, path);
+                return;
+            }
+
+            if (path.EndsWith(".js"))
+            {
                 helper.servejs(request, response, path);
+                return;
+            }
+
+            if (path.EndsWith(".css"))
+            {
+                helper.servecss(request, response, path);
+                return;
             }
 
             //default page
@@ -130,10 +145,8 @@ namespace osu_progressCLI.server
             }
             else
             {
-                Console.WriteLine("Invalid request");
-                // Handle a 404 - Not Found response for unknown routes
-                response.StatusCode = 404; // 302 Found (Temporary Redirect)
-                //response.AddHeader("Location", "/");
+                Console.WriteLine("Not found: " + path);
+                response.StatusCode = 404;
                 response.OutputStream.Close();
             }
 
