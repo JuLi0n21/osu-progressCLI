@@ -4,11 +4,8 @@
 CURRETN DESIGN (SUBJECT TO CHANGE)
 
 ![Imgur](https://i.imgur.com/u575NkG.png)
-
 ![Imgur](https://i.imgur.com/sA7HPQM.png)
-
 ![Imgur](https://i.imgur.com/XUIgJiq.png)
-
 ![Imgur](https://i.imgur.com/HgHABum.png)
 
 This will change!
