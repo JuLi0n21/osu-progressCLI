@@ -22,6 +22,7 @@
 - [ ] make date picker work
 - [x] mod support
 - [ ] add local images in score displat website for mods and rankings (maybe rankedtype)
+- [ ] rename some Colums to enable "better" searching 
 - [ ] importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
 
 ## NOTES
