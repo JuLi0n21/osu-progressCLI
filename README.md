@@ -2,12 +2,12 @@
 ### THIS PROGRAMM IS IN EARLY ACCESS, BREAKING CHANGES ARE TO BE EXPECTED
 
 CURRETN DESIGN (SUBJECT TO CHANGE)
-![Imgur](https://imgur.com/u575NkG)
-![Imgur](https://imgur.com/sA7HPQM)
-![Imgur](https://imgur.com/xstUVex)
-![Imgur](https://imgur.com/HgHABum)
+![Imgur](https://i.imgur.com/u575NkG.png)
+![Imgur](https://i.imgur.com/sA7HPQM.png)
+![Imgur](https://i.imgur.com/xstUVex.png)
+![Imgur](https://i.imgur.com/HgHABum.png)
 This will change!
-![Imgur](https://imgur.com/jmaEjyY)
+![Imgur](https://i.imgur.com/jmaEjyY.png)
 
 ## How to run
 1. Download the zip
