@@ -1,7 +1,13 @@
 # osu!progressCLI  
 ### THIS PROGRAMM IS IN EARLY ACCESS, BREAKING CHANGES ARE TO BE EXPECTED
 
--- add images and descripton here
+CURRETN DESIGN (SUBJECT TO CHANGE)
+[Imgur](https://imgur.com/u575NkG)
+[Imgur](https://imgur.com/sA7HPQM)
+[Imgur](https://imgur.com/xstUVex)
+[Imgur](https://imgur.com/HgHABum)
+This will change!
+[Imgur](https://imgur.com/jmaEjyY)
 
 ## How to run
 1. Download the zip
