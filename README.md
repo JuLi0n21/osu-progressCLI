@@ -11,6 +11,25 @@
 5. CLick the Pen on the Website insert ur Clientid and ClientSecret and ur userid.
 6. Hit save and refresh the Page ur Profile Stats should appear
 
+#EWWW the websites are fuckign ugly i dont like them
+if u dont like the pages U CAN MAKE UR OWN ONE 
+
+put the html/css/js/img files inside the public folders and u can fill them with ur own junk
+### integrated api
+to better enhance ur own webpages u can use the data from the internal api
+
+current endpoints are 
+- api/beatmaps/...
+    - search
+        - parameters searchquery="this is a search" 
+    -  averages
+    -  score
+        - id  
+- api/banchotime
+- api/banchotimebyday
+- api/timewasted
+- api/timewastedbyday
+
 ## TODOs (no prioritys)
 
 - [ ] extract js and css out of the page generation (server side serving needed)
@@ -22,7 +41,8 @@
 - [ ] make date picker work
 - [x] mod support
 - [ ] add local images in score displat website for mods and rankings (maybe rankedtype)
-- [ ] rename some Colums to enable "better" searching 
+- [ ] rename some Colums to enable "better" searching
+- [ ] api and example for costume webpages
 - [ ] importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
 
 ## NOTES
