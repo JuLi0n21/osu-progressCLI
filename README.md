@@ -52,5 +52,5 @@ current endpoints are
 - [ ] add more stuff to the beatmap helper (images maybe) if someone asks or i guess?
 
 ## NOTES
-- rate limite api calls incause i ever make a importer (1 every 2 seconds) 
+- rate limite api calls incause i ever make a importer (1 every 2 seconds) {OFFICAL OSU API/ INTERNAL DOES NOT HAVE LIMIT}
 - change form .net 6.0 to somehting lower (to not have people install dependencys) (could nbot work cause osu tools is net6)
