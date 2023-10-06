@@ -11,6 +11,11 @@
 5. CLick the Pen on the Website insert ur Clientid and ClientSecret and ur userid.
 6. Hit save and refresh the Page ur Profile Stats should appear
 
+## Requirments
+- Only Windows supported currently (depends on OsuMemoryProvider)
+- [NET 6.0.x Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is required to run this programm
+
+  
 #EWWW the websites are fuckign ugly i dont like them
 if u dont like the pages U CAN MAKE UR OWN ONE 
 
