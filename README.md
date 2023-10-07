@@ -1,7 +1,7 @@
 # osu!progressCLI  
 ### THIS PROGRAMM IS IN EARLY ACCESS, BREAKING CHANGES ARE TO BE EXPECTED
 
-CURRETN DESIGN (SUBJECT TO CHANGE)
+CURRETN DESIGN (SUBJECT TO CHANGE) inspiered by osu website
 
 ![Imgur](https://i.imgur.com/u575NkG.png)
 ![Imgur](https://i.imgur.com/sA7HPQM.png)
