@@ -61,6 +61,9 @@ current endpoints are
 - [x] rename some Colums to enable "better" searching
 - [x] example for costume webpages
 - [ ] api documentaion / renaming
+- [ ] api endpoint for custome querys
+- [ ] pp calc for potenial scores on scorepage
+- [ ] charts on score page (performance over time with filters)
 - [ ] importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
 - [ ] add more stuff to the beatmap helper (images maybe) if someone asks or i need it i guess?
 
