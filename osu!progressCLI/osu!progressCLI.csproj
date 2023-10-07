@@ -6,6 +6,7 @@
     <RootNamespace>osu_progressCLI</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +37,10 @@
 	  <None Remove="public\js\scoreexample.js" />
 	  <None Remove="public\js\scoresite.ts" />
 	  <None Remove="public\js\sidebar.txt" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="icon.ico" />
 	</ItemGroup>
 	
 	
