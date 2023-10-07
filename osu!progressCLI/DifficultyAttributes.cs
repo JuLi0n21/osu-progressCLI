@@ -16,7 +16,7 @@ namespace osu_progressCLI
 
 
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
-            string command = $"dotnet run -- simulate osu \"{fullPath}\" --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
+            string command = $"dotnet PerformanceCalculator.dll simulate osu \"{fullPath}\" --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
 
             string output = cmdOutput(command);
             try {
@@ -35,7 +35,7 @@ namespace osu_progressCLI
             double pp = 0;
 
 
-            string command = $"dotnet run -- simulate osu {id} --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
+            string command = $"dotnet PerformanceCalculator.dll simulate osu {id} --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
 
             string output = cmdOutput(command);
             try
@@ -56,7 +56,7 @@ namespace osu_progressCLI
             PerfomanceAttributes perfomanceAttributes = new PerfomanceAttributes();
 
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
-            string command = $"dotnet run -- simulate osu \"{fullPath}\" --combo {combo} --misses {missCount} --mehs {mehCount} --goods {goodCount} {ModParser.PPCalcMods(mods)}";
+            string command = $"dotnet PerformanceCalculator.dll simulate osu \"{fullPath}\" --combo {combo} --misses {missCount} --mehs {mehCount} --goods {goodCount} {ModParser.PPCalcMods(mods)}";
 
             string output = cmdOutput(command);
 
@@ -82,7 +82,7 @@ namespace osu_progressCLI
 
         private static string cmdOutput(string command) {
 
-        const string CalculatorPath = "osu-tools\\PerformanceCalculator";
+        const string CalculatorPath = "osu-tools";
 
         ProcessStartInfo psi = new ProcessStartInfo
             {
