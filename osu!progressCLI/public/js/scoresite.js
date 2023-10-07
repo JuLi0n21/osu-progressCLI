@@ -1,13 +1,14 @@
-﻿let beatmapid;
+﻿let beatmapid, rowid;
 function fetchOsuBeatmap() {
     const urlParams = new URLSearchParams(window.location.search);
     const beatmapId = urlParams.get('id');
-
+    
     if (!beatmapId) {
         document.getElementById('beatmapData').innerHTML = 'Beatmap ID not provided.';
         return;
     }
 
+    rowid = beatmapId;
     const beatmapUrl = `/api/beatmaps/score?id=${beatmapId}`;
 
     fetch(beatmapUrl)
@@ -29,7 +30,7 @@ function fetchOsuBeatmap() {
 
         <div class="relative">
 
-                <button id="playButton" class=" absolute  left-2 top-52 text-white backdrop--medium">
+                <button id="playButton" class=" absolute  left-2 top-52 text-white score-backdrop--medium--dark">
                     <i class="fas fa-play"></i>
                 </button>
                     <audio id="audioPlayer">
@@ -89,7 +90,7 @@ function fetchOsuBeatmap() {
         
     </div>
 
-        <div class="flex flex-col justify-between w-1/3"> 
+        <div class="flex flex-col justify-between w-1/6"> 
 
         <div class="flex flex-col">
             <p>${data.Username}</p> 
@@ -172,6 +173,7 @@ function fetchOsuBeatmap() {
                 .then(data => {
                     console.log(data)
                     createScoreElements(data)
+                    createLineChart('mapprogress', data, rowid);
                 }).catch(error => {
                     console.error('Error fetching recent score data:', error);
                     document.getElementById('scorecontainer').innerHTML = 'An error occurred while fetching data.';
@@ -183,7 +185,142 @@ function fetchOsuBeatmap() {
             document.getElementById('beatmapData').innerHTML = 'An error occurred while fetching data.';
         });
 }
+function createLineChart(canvasId, data, highlightedScoreId) {
+    const filteredData = data.filter(entry => entry.Time > 10);
 
+    filteredData.reverse();
+
+    console.log(highlightedScoreId)
+    const dates = filteredData.map(entry => entry.Date);
+    const accValues = filteredData.map(entry => entry.Acc);
+    const ppValues = filteredData.map(entry => entry.PP);
+    const comboValues = filteredData.map(entry => entry.Combo);
+
+    const highlightedScoreIndex = highlightedScoreId !== undefined
+        ? filteredData.findIndex(entry => entry.id == highlightedScoreId)
+        : -1;
+
+    console.log(filteredData)
+    console.log(highlightedScoreId);
+    console.log(highlightedScoreIndex);
+
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Acc',
+                    data: accValues,
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    fill: false,
+                    yAxisID: 'y', 
+                },
+                {
+                    label: 'PP',
+                    data: ppValues,
+                    borderColor: 'green',
+                    borderWidth: 2,
+                    fill: false,
+                    yAxisID: 'y2',
+                },
+                {
+                    label: 'Combo',
+                    data: comboValues,
+                    borderColor: 'red',
+                    borderWidth: 2,
+                    fill: false,
+                    yAxisID: 'y3',
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                annotation: {
+                    annotations: [{
+                        type: 'line',
+                        mode: 'vertical',
+                        scaleID: 'x',
+                        value: highlightedScoreIndex, 
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 3,
+                        label: {
+                            content: 'Vertical Line',
+                            enabled: true,
+                            position: 'top'
+                        }
+                    }]
+                }
+            },
+            legend: {
+                labels: {
+                    color: "rgba(255, 102, 171, 1)",
+                    font: {
+                        size: 14
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: false,
+                    },
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
+                    },
+                    grid: {
+                        display: true,
+                    }
+                },
+                y: {
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Acc',
+                        color: 'blue',
+                    },
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y2: {
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'PP',
+                        color: 'green',
+                    },
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y3: {
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Combo',
+                        color: 'red',
+                    },
+                    ticks: {
+                        color: 'rgba(255, 102, 171, 1)'
+                    },
+                    grid: {
+                        display: true,
+                    }
+                },
+            },
+        },
+    });
+}
 
 function createScoreElements(scores) {
     const scoresContainer = document.getElementById("scorecontainer");
@@ -204,7 +341,7 @@ function createScoreElements(scores) {
 
         scoreElement.innerHTML =
             `
-        <div class="flex backdrop--light h-16 rounded justify-between m-4 w-5/6 mb-1 mt-1">
+        <div class="flex score-backdrop--light h-16 rounded justify-between m-4 w-5/6 mb-1 mt-1">
         <!-- Status and Grade-->
         <div class="flex flex-col grade-rank-container rounded justify-evenly w-1/6">
             <div class="flex justify-center">

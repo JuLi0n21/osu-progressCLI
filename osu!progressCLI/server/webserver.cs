@@ -25,12 +25,14 @@ namespace osu_progressCLI.server
 
         private reqreshelper helper;
 
+        //private string ip = "::1";
         private string ip = "127.0.0.1";
         private string port = Credentials.Instance.GetConfig().port;
         public Webserver()
         {
             listener = new HttpListener();
             listener.Prefixes.Add($"http://{ip}:{port}/");
+            // listener.Prefixes.Add($"http://[{ip}]:{port}/");
             listener.IgnoreWriteExceptions = true;
             listener.Start();
             Console.WriteLine($"you can view ur Stats on localhost:{port}/");

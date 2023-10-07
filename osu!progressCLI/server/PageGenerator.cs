@@ -87,8 +87,8 @@ namespace osu_progressCLI.server
     <title>osu!progress</title>
     <link href=""https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css"" rel=""stylesheet"">
     <title>osu!progress</title>
-    <script src=""https://cdn.jsdelivr.net/npm/chart.js""></script>
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"">
+    <script src=""https://cdn.jsdelivr.net/npm/chart.js""></script>
     <script src=""https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline""></script>
     <script src=""https://cdn.jsdelivr.net/npm/flatpickr""></script>
     <script src=""https://cdn.jsdelivr.net/npm/moment""></script>
@@ -212,7 +212,7 @@ namespace osu_progressCLI.server
 </div>
 
 <!-- Sidebar -->
- <div class=""sidebar rounded-r-lg backdrop--medium flex flex-col text--pink"">
+ <div class=""sidebar hidebar rounded-r-lg backdrop--medium flex flex-col text--pink"">
         <a href=""#header"" class=""nav-link hover:text-yellow-500"">Header</a>
         <a href=""#scorecontainer"" class=""nav-link hover:text-yellow-500"">Recent Scores</a>
         <a href=""#chart1"" class=""nav-link hover:text-yellow-500"">Time by Day</a>
