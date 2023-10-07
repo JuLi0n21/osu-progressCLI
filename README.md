@@ -54,7 +54,7 @@ current endpoints are
 - [ ] Add possiblity to reload api data incase no internet (or beatmap changed)  (automatic or manual)
 - [x] localbeatmap parser (offline, not submitted maps support) (use osu-tools) (bpm still missing)
 - [ ] highconfigurable website (showing what graphs u want and what not)
-- [ ] page for a single score
+- [x] page for a single score
 - [x] api endpoint for search functionaliy (add date functionaliy)
 - [ ] make date picker work
 - [x] mod support
@@ -64,7 +64,7 @@ current endpoints are
 - [ ] api documentaion / renaming
 - [ ] api endpoint for custome querys
 - [ ] pp calc for potenial scores on scorepage
-- [ ] charts on score page (performance over time with filters)
+- [x] charts on score page (performance over time with filters)
 - [ ] replace modtext with mod icons in recent score
 - [ ] importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
 - [ ] add more stuff to the beatmap helper (images maybe) if someone asks or i need it i guess?
