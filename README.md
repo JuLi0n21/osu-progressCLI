@@ -8,8 +8,9 @@ CURRETN DESIGN (SUBJECT TO CHANGE)
 ![Imgur](https://i.imgur.com/XUIgJiq.png)
 ![Imgur](https://i.imgur.com/HgHABum.png)
 
-This will change!
-![Imgur](https://i.imgur.com/jmaEjyY.png)
+Score Page
+![Imgur](https://i.imgur.com/znPA4W1.png)
+![Imgur](https://i.imgur.com/W8pAYPM.png)
 
 ## How to run
 1. Download the zip
