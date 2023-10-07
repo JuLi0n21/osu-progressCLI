@@ -323,7 +323,7 @@ namespace osu1progressbar.Game.Database
                         if (reader.Read())
                         {
                             // Update variables with the fetched data
-                            starrating = double.Parse(reader["starrating"].ToString());
+                            starrating = double.Parse(reader["sr"].ToString());
                             bpm = double.Parse(reader["bpm"].ToString());
                             creator = reader["creator"].ToString();
                             artist = reader["artist"].ToString();
@@ -375,7 +375,7 @@ namespace osu1progressbar.Game.Database
                                 insertCommand.Parameters.AddWithValue("@cover", cover);
                                 insertCommand.Parameters.AddWithValue("@version", version);
                                 insertCommand.Parameters.AddWithValue("@tags", tags);
-                                insertCommand.Parameters.AddWithValue("@preview", tags);
+                                insertCommand.Parameters.AddWithValue("@preview", preview);
 
                                 int rowsInserted = insertCommand.ExecuteNonQuery();
 
