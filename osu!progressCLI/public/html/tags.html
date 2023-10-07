@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Tags from URL</title>
+</head>
+<body>
+
+    <div id="tag-container">
+        <!-- Tags will be displayed here -->
+    </div>
+
+    <script>
+        function getTagsFromURL() {
+            const url = window.location.href;
+
+            const searchParams = new URLSearchParams(new URL(url).search);
+
+            const tagsValue = searchParams.get("tags");
+
+            // Split the tagsValue into an array of individual tags (assuming they are comma-separated)
+            const tagsArray = tagsValue ? tagsValue.split(",") : [];
+
+            return tagsArray;
+
+        }
+
+        const tags = getTagsFromURL();
+
+        const tagContainer = document.getElementById("tag-container");
+        const tagElement = document.createElement("p");
+        tagElement.textContent = tags;
+        tagContainer.appendChild(tagElement);
+      
+    </script>
+</body>
+</html>

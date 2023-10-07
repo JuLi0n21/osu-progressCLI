@@ -2,6 +2,8 @@ function createScoreElements(scores) {
 const scoresContainer =  document.getElementById("scorecontainer");
     scoresContainer.innerHTML = "";
 
+    console.log(scores);
+
     if (scores.length == 0) {
         scoresContainer.innerHTML = "<p>No Score Found!</p>";
     }
@@ -12,7 +14,7 @@ const scoresContainer =  document.getElementById("scorecontainer");
       score.Acc = score.Acc.toFixed(2);
 
       scoreElement.href = `/score.html?id=${score.id}`;
-      scoreElement.target = "_blank";
+      //scoreElement.target = "_blank";
       scoreElement.rel = "noopener noreferrer";
 
     // Build the HTML structure for each score using the provided data
@@ -39,10 +41,10 @@ const scoresContainer =  document.getElementById("scorecontainer");
                 <p class="text-white whitespace-nowrap overflow-hidden">${score.Osufilename}</p>
             </div>
             <div>
-                <p class="text-white">${score.Score} / ${score.MaxCombo} {${score.MaxCombo}}</p>
+                <p class="text-white whitespace-nowrap overflow-hidden">${score.Score} / ${score.MaxCombo} {${score.MaxCombo}} ${score.ModsString}</p>
             </div>
             <div class="flex">
-                <p class="text--dark--yellow">${score.Version}</p>
+                <p class="text--dark--yellow whitespace-nowrap overflow-hidden">${score.Version}</p>
                 <p class="text--gray ml-4">${score.Date}</p>
             </div>
         </div>

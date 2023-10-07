@@ -100,6 +100,7 @@ namespace osu1progressbar.Game.Database
                     Tags TEXT,
                     CoverList TEXT,
                     Cover TEXT,
+                    Preview TEXT,
                     Time INTEGER,
                     PP REAL,
                     AIM REAL,
@@ -134,7 +135,7 @@ namespace osu1progressbar.Game.Database
             }
 
             string ScoreHelperTableQuery = @"
-                CREATE TABLE IF NOT EXISTS BeatmapHelper (id INTEGER, SR REAL, Artist TEXT, Creator TEXT, Bpm REAL, Version TEXT, Status TEXT, Tags TEXT, CoverList TEXT, Cover TEXT)";
+                CREATE TABLE IF NOT EXISTS BeatmapHelper (id INTEGER, SR REAL, Artist TEXT, Creator TEXT, Bpm REAL, Version TEXT, Status TEXT, Tags TEXT, CoverList TEXT, Cover TEXT, Preview TEXT)";
 
             using (var command = new SQLiteCommand(ScoreHelperTableQuery, connection))
             {
@@ -275,7 +276,7 @@ namespace osu1progressbar.Game.Database
         public async void InsertScore(OsuBaseAddresses baseAddresses, float timeElapsed)
         {
 
-            string creator = "null", artist = "null", status = baseAddresses.Beatmap.Status.ToString(), version = "null", tags = "null", coverlist = "null", cover = "null";
+            string creator = "null", artist = "null", status = baseAddresses.Beatmap.Status.ToString(), version = "null", tags = "null", coverlist = "null", cover = "null", preview ="null";
             double bpm = -1;
             double starrating = -1;
 
@@ -331,6 +332,7 @@ namespace osu1progressbar.Game.Database
                             cover = reader["cover"].ToString();
                             tags = reader["tags"].ToString();
                             version = reader["version"].ToString();
+                            preview = reader["preview"].ToString();
 
                             Console.WriteLine($"Beatmap with id: {baseAddresses.Beatmap.Id} exists");
                         }
@@ -350,16 +352,18 @@ namespace osu1progressbar.Game.Database
                                 cover = beatmap["beatmapset"]["covers"]["list@2x"].ToString();
                                 version = beatmap["version"].ToString();
                                 tags = beatmap["beatmapset"]["tags"].ToString();
-                            }   
+                                preview = beatmap["beatmapset"]["preview_url"].ToString();
+                            }
 
                             // Create a new BeatmapHelper score with "null" values for everything except ID
                             using (SQLiteCommand insertCommand = new SQLiteCommand(connection))
                             {
 
                                 insertCommand.CommandText = @"
-                                 INSERT INTO BeatmapHelper (id, sr, bpm, creator, artist, status, coverlist, cover, version, tags)
-                                 VALUES (@id, @starrating, @bpm, @creator, @artist, @status, @coverlist, @cover, @version, @tags)";
+                                 INSERT INTO BeatmapHelper (id, sr, bpm, creator, artist, status, coverlist, cover, preview, version, tags)
+                                 VALUES (@id, @sr, @bpm, @creator, @artist, @status, @coverlist, @cover, @preview , @version, @tags)";
 
+                                Console.WriteLine(starrating + " " + bpm + " " + creator + " " + artist + " " + status + " " + coverlist + " " + cover + " " + version + " " + tags);
                                 // Providing the beatmap's attributes
                                 insertCommand.Parameters.AddWithValue("@id", baseAddresses.Beatmap.Id);
                                 insertCommand.Parameters.AddWithValue("@sr", starrating);
@@ -371,6 +375,7 @@ namespace osu1progressbar.Game.Database
                                 insertCommand.Parameters.AddWithValue("@cover", cover);
                                 insertCommand.Parameters.AddWithValue("@version", version);
                                 insertCommand.Parameters.AddWithValue("@tags", tags);
+                                insertCommand.Parameters.AddWithValue("@preview", tags);
 
                                 int rowsInserted = insertCommand.ExecuteNonQuery();
 
@@ -424,6 +429,7 @@ namespace osu1progressbar.Game.Database
                     Tags,
                     Cover,
                     Coverlist,
+                    Preview, 
                     Time,
                     pp,
                     fcpp,
@@ -461,6 +467,7 @@ namespace osu1progressbar.Game.Database
                             @Tags,
                             @Cover,
                             @Coverlist,
+                            @Preview,
                             @Time,
                             @pp,
                             @fcpp,
@@ -514,6 +521,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Version", version);
                         command.Parameters.AddWithValue("@Cover", cover);
                         command.Parameters.AddWithValue("@Coverlist", coverlist);
+                        command.Parameters.AddWithValue("@Preview", preview);
                         command.Parameters.AddWithValue("@Tags", tags);
                         command.Parameters.AddWithValue("@Time", timeElapsed);
                         command.Parameters.AddWithValue("@pp", perfomanceAttributes.pp);
@@ -611,10 +619,12 @@ namespace osu1progressbar.Game.Database
                                 score.Add("HitMiss", reader["HitMiss"]);
                                 score.Add("Mode", reader["Mode"]);
                                 score.Add("Mods", reader["Mods"]);
+                                score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
                                 score.Add("Version", reader["Version"]);
                                 score.Add("Tags", reader["Tags"]);
                                 score.Add("CoverList", reader["CoverList"]);
                                 score.Add("Cover", reader["Cover"]);
+                                score.Add("Preview", reader["Preview"]);
                                 score.Add("Time", reader["Time"]);
                                 score.Add("PP", reader["PP"]);
                                 score.Add("AIM", reader["AIM"]);
@@ -705,10 +715,12 @@ namespace osu1progressbar.Game.Database
                                 score.Add("HitMiss", reader["HitMiss"]);
                                 score.Add("Mode", reader["Mode"]);
                                 score.Add("Mods", reader["Mods"]);
+                                score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
                                 score.Add("Version", reader["Version"]);
                                 score.Add("Tags", reader["Tags"]);
                                 score.Add("CoverList", reader["CoverList"]);
                                 score.Add("Cover", reader["Cover"]);
+                                score.Add("Preview", reader["Preview"]);
                                 score.Add("Time", reader["Time"]);
                                 score.Add("PP", reader["PP"]);
                                 score.Add("AIM", reader["AIM"]);
@@ -965,10 +977,12 @@ namespace osu1progressbar.Game.Database
                                 score.Add("HitMiss", reader["HitMiss"]);
                                 score.Add("Mode", reader["Mode"]);
                                 score.Add("Mods", reader["Mods"]);
+                                score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
                                 score.Add("Version", reader["Version"]);
                                 score.Add("Tags", reader["Tags"]);
                                 score.Add("CoverList", reader["CoverList"]);
                                 score.Add("Cover", reader["Cover"]);
+                                score.Add("Preview", reader["Preview"]);
                                 score.Add("Time", reader["Time"]);
                                 score.Add("PP", reader["PP"]);
                                 score.Add("AIM", reader["AIM"]);

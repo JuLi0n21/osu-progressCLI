@@ -17,7 +17,7 @@ public class QueryParser
 
         foreach (string part in parts)
         {
-            Match match = Regex.Match(part, @"^(?<name>[a-zA-Z]+)(?<operator>[<>]=?)(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
+            Match match = Regex.Match(part, @"^(?<name>[a-zA-Z]+)(?<operator>[<=>]=?)(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
 
             if (match.Success)
             {
@@ -31,7 +31,7 @@ public class QueryParser
 
         foreach (string param in parameters)
         {
-            Match match = Regex.Match(param, @"^(?<name>[a-zA-Z]+)(?<operator>[<>]=?)(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
+            Match match = Regex.Match(param, @"^(?<name>[a-zA-Z]+)(?<operator>[<=>]=?)(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
 
             if (match.Success)
             {

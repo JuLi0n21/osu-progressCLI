@@ -133,3 +133,12 @@ header {
 .active-link {
     background-color: #555;
 }
+
+#playButton {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+}

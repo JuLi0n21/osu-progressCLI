@@ -20,7 +20,7 @@ class Program
         
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
-        
+
         Webserver webserver = new Webserver();
         Task listenTask = Task.Run(async () =>
         {
