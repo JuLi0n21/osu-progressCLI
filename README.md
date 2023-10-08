@@ -20,6 +20,17 @@ Score Page
 5. CLick the Pen on the Website insert ur Clientid and ClientSecret and ur userid.
 6. Hit save and refresh the Page ur Profile Stats should appear
 
+### Autorun
+If u dont wanna see a Terminal everytime u run the application
+u can create a visualbasic script like this:
+- autorun.vbs
+```
+Set WshShell = CreateObject("WScript.Shell" ) 
+WshShell.Run chr(34) & "osu!progressCLI.exe" & Chr(34), 0 
+Set WshShell = Nothing 
+```
+- create a shortcut to it and put that into ur autorun folder (accessable via win + r shell:startup or taskmanager)
+- if u wanna close it u can do it via task manager
 ## Requirments
 - Only Windows supported currently (depends on OsuMemoryProvider)
 - [NET 6.0.x Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is required to run this programm
