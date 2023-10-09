@@ -45,6 +45,7 @@
 	
 	
 	<ItemGroup>
+    <PackageReference Include="Fleck" Version="1.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OsuMemoryDataProvider" Version="0.10.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
@@ -53,9 +54,5 @@
 	
 	<ItemGroup>
 	  <Folder Include="public\img\" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="server\" />
 	</ItemGroup>
 </Project>

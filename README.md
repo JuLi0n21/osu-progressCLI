@@ -67,6 +67,8 @@ current endpoints are
 - [ ] replace modtext with mod icons in recent score
 - [ ] importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
 - [ ] add more stuff to the beatmap helper (images maybe) if someone asks or i need it i guess?
+- [ ] score comparision of friends (or leaderboards)
+- [ ] short hand overview of recent activties (played xh this week, so many scores etc...)
 
 ## NOTES
 - rate limite api calls incause i ever make a importer (1 every 2 seconds) {OFFICAL OSU API! INTERNAL API DOES NOT HAVE LIMIT}

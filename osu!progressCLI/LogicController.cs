@@ -28,6 +28,8 @@ namespace osu1progressbar.Game.Logicstuff
         public Stopwatch BanchoTimeStopWatch;
         private Stopwatch stopwatch;
         public Stopwatch timeSinceStartedPlaying;
+
+        public int startime;
         public LogicController()
         {
             db = new DatabaseController();
@@ -42,6 +44,7 @@ namespace osu1progressbar.Game.Logicstuff
             stopwatch = Stopwatch.StartNew();
 
             timeSinceStartedPlaying = new Stopwatch();
+            
         }
 
         //the first time gets currentliy ignored cause it gets restarted after first entry (and is probably not running cause its set to stop in the memoryprovider incase no osu is found

@@ -220,7 +220,9 @@ namespace osu_progressCLI.server
         <a href=""#chart3"" class=""nav-link hover:text-yellow-500"">Time Total</a>
         <div class=""toggle-rectangle border-t border-b border-r border-pink-600 rounded-r-lg p-4 hover:border-yellow-500"" id=""toggleButton""></div>
     </div>
+<!-- Recap -->
 
+    <!-- Main page-->
     <div class=""flex justify-center items-center"">
 
         <div class=""content w-1/2 rounded-lg backdrop--medium--dark text-white"">
@@ -235,16 +237,26 @@ namespace osu_progressCLI.server
 
                 </div>
 
+            <div class=""flex"">
                 <div class=""ml-60 text-left pt-6 pb-6"">
-                    <p class=""usernameplaceholder"">{username}</p>  <p class=""rankplaceholder"">#{rank}</p>
+                    <p class=""usernameplaceholder"">{username}</p>  
+                    <p class=""rankplaceholder"">#{rank}</p>
                     <p class=""countryplaceholder"">{country}</p>
                 </div>
+
+                <div class=""ml-60 text-left pt-6 pb-6"">
+                    <p class=""usernameplaceholder"">⏰ 7H (-6%) [afk]</p>  
+                    <p class=""rankplaceholder"">💻 MainMemu</p>
+                    <p class=""countryplaceholder"">📈200pp 📊232</p>
+                </div>
+            </div>
 
                 <div style=""position: relative;"" class=""mb-7"">
                       <a href=""https://osu.ppy.sh/users/{userid}"" class="" hover:border-yellow-500  hover:border"" target=""_blank"" rel=""noopener noreferrer"">
                     <img src=""{avatar_url}"" style=""position: absolute; top: -150px; left: 60px; right: 0; height:120px; width:120px"" class=""rounded-lg"" />
                     </a>
                 </div>
+
             </div>
 
 <!-- Recent Scores -->
