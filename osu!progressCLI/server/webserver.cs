@@ -157,6 +157,11 @@ namespace osu_progressCLI.server
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/timewastedbyday call");
                 helper.getTimeWastedbyday(request, response);
             }
+            else if (path == "/api/user" && queryparams["userid"] != null && queryparams["mode"] != null && request.HttpMethod == "GET")
+            {
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/user call");
+                helper.user(request, response, queryparams);
+            }
             else if (path == "/api/save" && request.HttpMethod == "POST")
             {
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/save call");
@@ -167,6 +172,7 @@ namespace osu_progressCLI.server
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/run call");
                 helper.run(request, response);
             }
+
             else
             {
                 response.StatusCode = 404;

@@ -114,6 +114,12 @@ namespace osu_progressCLI.server
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(parameters[0].ToString()))) ,"application/json");
         }
 
+        public void user(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
+
+            Logger.Log(Logger.Severity.Error, Logger.Framework.Server, $@"{parameters["userid"]} - {parameters["mode"]}");
+            WriteResponse(response, "shit", "application/json");
+        }
+
         public void run(HttpListenerRequest request, HttpListenerResponse response) 
         {
             try

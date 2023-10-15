@@ -117,8 +117,10 @@ function fetchOsuBeatmap() {
         </div>
 
 
-
-      <img src="${data.CoverList}" class="h-32 rounded-lg">
+        <div id="playerdiv" class="">
+      
+        </div>
+          <img src="${data.CoverList}" class="h-32 rounded-lg">
     </div>
   </div>
   <div class="flex flex-col justify-evenly w-2/5">
@@ -249,6 +251,7 @@ function fetchOsuBeatmap() {
         </div>
     </div>
 `;      
+          
 
             document.getElementById("MissAnalyzer").addEventListener("click", openAnalyzer)
 
@@ -284,7 +287,7 @@ function fetchOsuBeatmap() {
             
 
 
-            const apiUrl = `/api/beatmaps/search?searchquery=Beatmapid==${data.Beatmapid}`;
+            let apiUrl = `/api/beatmaps/search?searchquery=Beatmapid==${data.Beatmapid}`;
 
             fetch(apiUrl)
                 .then(response => response.json())
@@ -296,7 +299,7 @@ function fetchOsuBeatmap() {
                     console.error('Error fetching recent score data:', error);
                     document.getElementById('scorecontainer').innerHTML = 'An error occurred while fetching data.';
                 });
-        
+
         })
         .catch(error => {
             console.error('Error fetching beatmap data:', error);
@@ -334,7 +337,7 @@ function openAnalyzer() {
         .catch(error => {
             console.error('Error making POST request:', error);
         });
-    alert("Starting OsuMissAnalyzer, please wait!");
+    alert("Starting OsuMissAnalyzer, while its running the Website wont Work!");
 
 }
 
