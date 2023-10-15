@@ -1,10 +1,13 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 using static System.Formats.Asn1.AsnWriter;
 
 namespace osu_progressCLI.server
 {
     public sealed class PageGenerator
     {
+        JObject user = null;
+        Stopwatch cachetime;
         private static PageGenerator instance;
 
         private PageGenerator() { }
@@ -24,7 +27,7 @@ namespace osu_progressCLI.server
         public string generatepage(string userid, string mode)
         {
             //Console.WriteLine(userid);
-            JObject user = null;
+
             var config = Credentials.Instance.GetConfig();
 
             Random rdm  = new Random();
@@ -35,7 +38,7 @@ namespace osu_progressCLI.server
             string country = "Unknown";
             string rank = "-";
 
-            if (config.Localconfig == "False") {
+            if (config.Localconfig == "False" || user == null) {
                 user = ApiController.Instance.getuser(userid, mode).Result;
 
                 if (user != null)

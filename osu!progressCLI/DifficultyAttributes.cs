@@ -1,22 +1,24 @@
-﻿using System;
+﻿using OsuMemoryDataProvider.OsuMemoryModels.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace osu_progressCLI
 {
     internal class DifficultyAttributes
     {
 
-        public static double CalculateFcWithAcc(string folderName, string fileName, double Acc = 100, int mods = 0) {
+        public static double CalculateFcWithAcc(string folderName, string fileName, double Acc = 100, int mods = 0, int mode = 0) {
             double pp = 0;
 
 
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
-            string command = $"dotnet PerformanceCalculator.dll simulate osu \"{fullPath}\" --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
+            string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} \"{fullPath}\" --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
 
             string output = cmdOutput(command);
             try {
@@ -30,12 +32,12 @@ namespace osu_progressCLI
             return pp;
         }
 
-        public static double CalculateFcWithAcc(int id, double Acc = 100, int mods = 0)
+        public static double CalculateFcWithAcc(int id, double Acc = 100, int mods = 0, int mode = 0)
         {
             double pp = 0;
 
 
-            string command = $"dotnet PerformanceCalculator.dll simulate osu {id} --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
+            string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} {id} --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
 
             string output = cmdOutput(command);
             try
@@ -51,12 +53,12 @@ namespace osu_progressCLI
         }
 
         //add mods (need to be parsed from bit format to string 
-        public static PerfomanceAttributes CalculatePP(string folderName, string fileName, int mods, int missCount, int mehCount, int goodCount, int perfectcount, int combo)
+        public static PerfomanceAttributes CalculatePP(string folderName, string fileName, int mods, int missCount, int mehCount, int goodCount, int perfectcount, int combo, int mode = 0)
         {
             PerfomanceAttributes perfomanceAttributes = new PerfomanceAttributes();
 
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
-            string command = $"dotnet PerformanceCalculator.dll simulate osu \"{fullPath}\" --combo {combo} --misses {missCount} --mehs {mehCount} --goods {goodCount} {ModParser.PPCalcMods(mods)}";
+            string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} \"{fullPath}\" --combo {combo} --misses {missCount} --mehs {mehCount} --goods {goodCount} {ModParser.PPCalcMods(mods)}";
 
             string output = cmdOutput(command);
 
@@ -247,6 +249,32 @@ namespace osu_progressCLI
             return "D";
             
         }
+
+        public void MissAnalyzer(string filename, string Replay) {
+            //maybe use filewatcher event needs testing etc
+            //example command: OsuMissAnalyzer.exe "G:\Anwendungen\osu!\Data\r\a66dee3a2a6b1e31383dbe967ae7558d-133414404388161758.osr" "G:\Anwendungen\osu!\Songs\542317 Memme - Avalanche"
+        }
+
+        public static string ModeConverter(int mode) { 
+        
+            switch (mode)
+            { 
+                case 0 :
+                    return "osu";
+                
+                case 1 :
+                    return "taiko";
+
+                case 2 :
+                    return "catch";
+
+                case 3 :
+                    return "mania";
+
+                default :
+                    return "osu";
+            }
+        }
     }
 
     public class PerfomanceAttributes {
@@ -258,4 +286,6 @@ namespace osu_progressCLI
         public int Maxcombo { get; set; }
         public string grade { get; set; }
     }
+
+
 }

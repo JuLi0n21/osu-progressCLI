@@ -43,8 +43,6 @@ namespace osu1progressbar.Game.Logicstuff
 
             stopwatch = Stopwatch.StartNew();
 
-            timeSinceStartedPlaying = new Stopwatch();
-            
         }
 
         //the first time gets currentliy ignored cause it gets restarted after first entry (and is probably not running cause its set to stop in the memoryprovider incase no osu is found
@@ -57,7 +55,7 @@ namespace osu1progressbar.Game.Logicstuff
 
                 if (CurrentScreen != "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "Playing") { 
                     timeSinceStartedPlaying = Stopwatch.StartNew();
-
+                    startime = NewValues.GeneralData.AudioTime;
                 }
 
                 if (CurrentScreen != NewValues.GeneralData.OsuStatus.ToString())
@@ -77,16 +75,18 @@ namespace osu1progressbar.Game.Logicstuff
 
                 if (!isReplay && CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() != "Playing")
                 {
+                    
                     Console.WriteLine("Play Detected");
-                    db.InsertScore(NewValues, timeSinceStartedPlaying.ElapsedMilliseconds / 1000);
-                    timeSinceStartedPlaying.Reset();
+                  
+                        db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000);
+                   
+                 
                 }
 
                 //can be buggy with broken game (fix ur game then wat)
                 if ((NewValues.GeneralData.OsuStatus.ToString() == "Playing") && (Audiotime > NewValues.GeneralData.AudioTime) && (timeSinceStartedPlaying.ElapsedMilliseconds > 2500) && (NewValues.Player.Score >= 1000))  {
                     Console.WriteLine("Retry detected");
-                    db.InsertScore(NewValues, timeSinceStartedPlaying.ElapsedMilliseconds / 1000);
-                    timeSinceStartedPlaying.Restart();
+                    db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000);
                 };
                  
                 CurrentScreen = NewValues.GeneralData.OsuStatus.ToString();

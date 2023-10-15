@@ -22,6 +22,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="OsuMissAnalyzer\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Include="public\**\*.*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>

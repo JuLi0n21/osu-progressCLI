@@ -64,11 +64,19 @@ current endpoints are
 - [ ] api endpoint for custome querys
 - [ ] pp calc for potenial scores on scorepage
 - [ ] charts on score page (performance over time with filters)
-- [ ] replace modtext with mod icons in recent score
+- [x] replace modtext with mod icons in recent score
 - [ ] importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
 - [ ] add more stuff to the beatmap helper (images maybe) if someone asks or i need it i guess?
 - [ ] score comparision of friends (or leaderboards)
 - [ ] short hand overview of recent activties (played xh this week, so many scores etc...)
+- [ ] rework beatmap info fetching aswell as supporting non submitted stuff, parse .osu file to get data
+- [ ] player table with changes and maybe merge bancho and wasted time table
+- [ ] properly take time (account for pauses etc)
+- [ ] rework database
+- [ ] use proper front end framework for maybe faster score loading or sometning
+- [ ] use actual score design for score design
+- [ ] cache user data to not call api when page refreshing
+- [ ] add replay name to database, find a way to get failed replays
 
 ## NOTES
 - rate limite api calls incause i ever make a importer (1 every 2 seconds) {OFFICAL OSU API! INTERNAL API DOES NOT HAVE LIMIT}

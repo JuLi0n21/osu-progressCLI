@@ -15,12 +15,6 @@ using System.Runtime.ConstrainedExecution;
 using System.Reflection.PortableExecutable;
 
 
-//Add proper debug messages and levels...
-//make it possible to retrive data 1. prepared stuff like, betweewn dates and or costuem request as a bonus maybe...
-//refactor sometime to make it proper data types instead of text, maybe....
-//FILTER FOREVERY THING THAT IS SAVED
-
-//importer for funoranges tracker
 namespace osu1progressbar.Game.Database
 {
     public class DatabaseController
@@ -292,7 +286,8 @@ namespace osu1progressbar.Game.Database
                                 baseAddresses.Player.Hit50,
                                 baseAddresses.Player.Hit100,
                                 baseAddresses.Player.Hit300,
-                                baseAddresses.Player.MaxCombo);
+                                baseAddresses.Player.MaxCombo,
+                                baseAddresses.Player.Mode);
 
             if(baseAddresses.Player.HP == 0)
             {
@@ -306,7 +301,8 @@ namespace osu1progressbar.Game.Database
                                 baseAddresses.Beatmap.FolderName,
                                 baseAddresses.Beatmap.OsuFileName,
                                 baseAddresses.Player.Accuracy,
-                                baseAddresses.Player.Mods.Value);
+                                baseAddresses.Player.Mods.Value,
+                                baseAddresses.Player.Mode);
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -339,7 +335,7 @@ namespace osu1progressbar.Game.Database
                         else
                         {
                             JObject beatmap = await ApiController.Instance.getExpandedBeatmapinfo(baseAddresses.Beatmap.Id.ToString());
-                            //Console.WriteLine(beatmap);
+                            Console.WriteLine(beatmap);
                             if (beatmap != null)
                             {
                                 starrating = double.Parse(beatmap["difficulty_rating"].ToString());
@@ -347,7 +343,6 @@ namespace osu1progressbar.Game.Database
                                 creator = beatmap["beatmapset"]["creator"].ToString();
                                 artist = beatmap["beatmapset"]["artist"].ToString();
                                 status = beatmap["beatmapset"]["status"].ToString();
-                                Console.WriteLine(status);
                                 coverlist = beatmap["beatmapset"]["covers"]["cover@2x"].ToString();
                                 cover = beatmap["beatmapset"]["covers"]["list@2x"].ToString();
                                 version = beatmap["version"].ToString();
