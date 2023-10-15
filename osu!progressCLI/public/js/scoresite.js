@@ -25,13 +25,13 @@ function fetchOsuBeatmap() {
 
             </div>
          
-<a href="https://osu.ppy.sh/beatmapsets/${data.BeatmapSetid}#${data.mode}/${data.Beatmapid}" target="_blank">
+<div>
   <div id="image-container" style="min-height: 280px; position: relative;">
     <img class="absolute top-0 left-0 w-40" src="${data.Grade}.png" alt="${data.Grade}">
-    <a href="https://osu.ppy.sh/users/${data.Creator}" class="absolute bottom-10 right-0 score-backdrop--dark rounded-lg m-3 p-1">${data.Version} by ${data.Creator}</a>
+    <a href="https://osu.ppy.sh/users/${data.Creator}" class="absolute bottom-10 right-0 score-backdrop--dark rounded-lg m-3 p-1 text--pink hover:text-white">${data.Version} by ${data.Creator}</a>
     <p class="absolute bottom-0 right-0 score-backdrop--dark rounded-lg m-3 p-1">${data.Username} at ${data.Date}</p>
     <div class="relative">
-      <button id="playButton" class="absolute left-2 top-52 text-white score-backdrop--medium--dark">
+      <button id="playButton" class="absolute left-2 top-52 score-backdrop--dark text--pink hover:text-white">
         <i class="fas fa-play"></i>
       </button>
       <audio id="audioPlayer">
@@ -48,11 +48,12 @@ function fetchOsuBeatmap() {
     </div>
   
     <div>
+    <a href="https://osu.ppy.sh/beatmapsets/${data.BeatmapSetid}#${data.Mode}/${data.Beatmapid}" target="_blank">
         <img src="${data.CoverList}">
-        
+        </a>
     </div>
   </div>
-</a>
+</div>
 
        
 <div class="flex justify-evenly h-64 text-base">
@@ -225,7 +226,7 @@ function fetchOsuBeatmap() {
             MISS
           </div>
           <div class="flex justify-evenly">
-               <button id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600">${data.HitMiss}↩</pre> </button>
+               <button id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600 hover:text-white">${data.HitMiss}↩</pre> </button>
           </div>
         </div>
       </div>
@@ -304,7 +305,6 @@ function fetchOsuBeatmap() {
 }
 
 function openAnalyzer() {
-
     console.log("MissAnalyzer Request");
     const apiUrl = "/api/run";
 
@@ -334,6 +334,8 @@ function openAnalyzer() {
         .catch(error => {
             console.error('Error making POST request:', error);
         });
+    alert("Starting OsuMissAnalyzer, please wait!");
+
 }
 
 function createLineChart(canvasId, data, highlightedScoreId) {
@@ -513,11 +515,11 @@ function createScoreElements(scores) {
                 <p class="text-white whitespace-nowrap overflow-hidden">${score.Osufilename}</p>
             </div>
             <div>
-                <p class="text-white whitespace-nowrap overflow-hidden">${score.Score} / ${score.MaxCombo} {${score.MaxCombo}} ${score.ModsString}</p>
+                <p class="text-white whitespace-nowrap overflow-hidden">${score.Score} / ${score.Combo} {${score.MaxCombo}} ${score.ModsString}</p>
             </div>
             <div class="flex">
                 <p class="text--dark--yellow whitespace-nowrap overflow-hidden">${score.Version}</p>
-                <p class="text--gray ml-4">${score.Date}</p>
+                <p class="text--gray ml-4">${score.Date} (${score.Playtype})</p>
             </div>
         </div>
 

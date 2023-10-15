@@ -11,7 +11,7 @@ class Program
     static async Task Main(string[] args)
     {
 
-        Logger.SetConsoleLogLevel(Logger.Severity.Warning);
+        Logger.SetConsoleLogLevel(Logger.Severity.Debug);
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
         Console.WriteLine("Keep this Terminal Open or the Progamm will stop if u want it to be invisible follow the guide on the github!");

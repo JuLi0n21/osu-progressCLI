@@ -17,6 +17,9 @@ namespace osu_progressCLI
 
         private string clientid;
         private string clientsecret;
+
+        private JObject usercache = null;
+        private DateTime userTimestamp;
         private ApiController() {
 
             clientid = Credentials.Instance.GetClientId();
@@ -167,39 +170,41 @@ namespace osu_progressCLI
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting User info for: {userid}");
 
-            JObject userJson = null;
-
-            string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{userid}/{mode}";
-
-            var client = new HttpClient();
-
-            client.BaseAddress = new Uri(searchEndpoint);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Credentials.Instance.GetAccessToken());
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-
-            HttpResponseMessage reponse = await client.GetAsync(searchEndpoint);
-
-            if (reponse.IsSuccessStatusCode)
+            if (usercache == null || userTimestamp <= DateTime.Now.AddMinutes(-1))
             {
-                Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Recieved User info for: {userid}");
+                userTimestamp = DateTime.Now;
+                string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{userid}/{mode}";
 
-                string responseBody = await reponse.Content.ReadAsStringAsync();
-                //Console.WriteLine(responseBody);
+                var client = new HttpClient();
 
-                userJson = JObject.Parse(responseBody);
+                client.BaseAddress = new Uri(searchEndpoint);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Credentials.Instance.GetAccessToken());
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+
+                HttpResponseMessage reponse = await client.GetAsync(searchEndpoint);
+
+                if (reponse.IsSuccessStatusCode)
+                {
+                    Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Recieved User info for: {userid}");
+
+                    string responseBody = await reponse.Content.ReadAsStringAsync();
+                    //Console.WriteLine(responseBody);
+
+                    usercache = JObject.Parse(responseBody);
+                }
+                else
+                {
+                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Request failed with status code {reponse.StatusCode}");
+
+                    client.Dispose();
+                    return usercache;
+                }
+
+                client.Dispose();
             }
-            else
-            {
-                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Request failed with status code {reponse.StatusCode}");
-
-                return userJson;
-            }
-
-            client.Dispose();
-
-            return userJson;
+            return usercache;
         }
 
         public static ApiController Instance
