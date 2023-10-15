@@ -27,7 +27,6 @@ namespace osu1progressbar.Game.Database
         {
             //  configJson = File.ReadAllText(configJson);
             // JObject config = JObject.Parse(configJson);
-            
         }
 
         public bool Init()
@@ -69,6 +68,9 @@ namespace osu1progressbar.Game.Database
                     BeatmapSetid INTEGER,
                     Beatmapid INTEGER,
                     Osufilename TEXT,
+                    Foldername TEXT,
+                    Replay TEXT,
+                    Playtype TEXT,
                     Ar REAL,
                     Cs REAL,
                     Hp REAL,
@@ -110,7 +112,7 @@ namespace osu1progressbar.Game.Database
                 command.ExecuteNonQuery();
             }
 
-            Console.WriteLine("Database Created if it doesnt exist: " + dbname);
+            Console.WriteLine(DateTime.Now + "| " + "Creating Database if it doesnt exist: " + dbname);
 
             string timeSpendTableQuery = @"
                 CREATE TABLE IF NOT EXISTS TimeWasted (Date TEXT ,RawStatus INTEGER, Time REAL)";
@@ -134,17 +136,6 @@ namespace osu1progressbar.Game.Database
             using (var command = new SQLiteCommand(ScoreHelperTableQuery, connection))
             {
                 command.ExecuteNonQuery();
-            }
-
-            string query = "SELECT name FROM sqlite_master WHERE type='table';";
-            using (var command = new SQLiteCommand(query, connection))
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    string tableName = reader.GetString(0);
-                    Console.WriteLine(tableName);
-                }
             }
 
         }
@@ -194,12 +185,12 @@ namespace osu1progressbar.Game.Database
                             insertCommand.Parameters.AddWithValue("@Time", timeElapsed);
 
                             insertCommand.ExecuteNonQuery();
-                            Console.WriteLine("New TimeWasted Added for this hour");
+                            Console.WriteLine(DateTime.Now + "| " + "New TimeWasted Added for this hour");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Updated TimeWasted in: " + OldStatus + " time: " + timeElapsed);
+                        Console.WriteLine(DateTime.Now + "| " + "Updated TimeWasted in: " + OldStatus + " time: " + timeElapsed);
                     }
                 }
 
@@ -253,12 +244,12 @@ namespace osu1progressbar.Game.Database
                             insertCommand.Parameters.AddWithValue("@Time", timeElapsed);
 
                             insertCommand.ExecuteNonQuery();
-                            Console.WriteLine("New BanchoTime Added for this hour");
+                            Console.WriteLine(DateTime.Now + "| " + "New BanchoTime Added for this hour");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Updated BanchoTime in: " + BanchoStatus + " time: " + timeElapsed);
+                        Console.WriteLine(DateTime.Now + "| " + "Updated BanchoTime in: " + BanchoStatus + " time: " + timeElapsed);
                     }
                 }
 
@@ -267,7 +258,7 @@ namespace osu1progressbar.Game.Database
         }
 
         //maybe consider passed or failed/canceld retires// more beatmap attributes
-        public async void InsertScore(OsuBaseAddresses baseAddresses, float timeElapsed)
+        public async void InsertScore(OsuBaseAddresses baseAddresses, float timeElapsed, string playtype, string replay = null)
         {
 
             string creator = "null", artist = "null", status = baseAddresses.Beatmap.Status.ToString(), version = "null", tags = "null", coverlist = "null", cover = "null", preview ="null";
@@ -289,13 +280,7 @@ namespace osu1progressbar.Game.Database
                                 baseAddresses.Player.MaxCombo,
                                 baseAddresses.Player.Mode);
 
-            if(baseAddresses.Player.HP == 0)
-            {
-                perfomanceAttributes.grade = "F";
-            }
-
             starrating = perfomanceAttributes.starrating;
-            Console.WriteLine(perfomanceAttributes.Maxcombo);
 
             double fcpp = DifficultyAttributes.CalculateFcWithAcc(
                                 baseAddresses.Beatmap.FolderName,
@@ -330,12 +315,12 @@ namespace osu1progressbar.Game.Database
                             version = reader["version"].ToString();
                             preview = reader["preview"].ToString();
 
-                            Console.WriteLine($"Beatmap with id: {baseAddresses.Beatmap.Id} exists");
+                            Console.WriteLine(DateTime.Now + "| " + $"Beatmap with id: {baseAddresses.Beatmap.Id} exists");
                         }
                         else
                         {
                             JObject beatmap = await ApiController.Instance.getExpandedBeatmapinfo(baseAddresses.Beatmap.Id.ToString());
-                            Console.WriteLine(beatmap);
+                          //  Console.WriteLine(beatmap);
                             if (beatmap != null)
                             {
                                 starrating = double.Parse(beatmap["difficulty_rating"].ToString());
@@ -358,7 +343,7 @@ namespace osu1progressbar.Game.Database
                                  INSERT INTO BeatmapHelper (id, sr, bpm, creator, artist, status, coverlist, cover, preview, version, tags)
                                  VALUES (@id, @sr, @bpm, @creator, @artist, @status, @coverlist, @cover, @preview , @version, @tags)";
 
-                                Console.WriteLine(starrating + " " + bpm + " " + creator + " " + artist + " " + status + " " + coverlist + " " + cover + " " + version + " " + tags);
+                                //Console.WriteLine(starrating + " " + bpm + " " + creator + " " + artist + " " + status + " " + coverlist + " " + cover + " " + version + " " + tags);
                                 // Providing the beatmap's attributes
                                 insertCommand.Parameters.AddWithValue("@id", baseAddresses.Beatmap.Id);
                                 insertCommand.Parameters.AddWithValue("@sr", starrating);
@@ -376,7 +361,7 @@ namespace osu1progressbar.Game.Database
 
                                 if (rowsInserted > 0)
                                 {
-                                    Console.WriteLine($"New BeatmapHelper score with id: {baseAddresses.Beatmap.Id} created.");
+                                    Console.WriteLine(DateTime.Now + "| " + $"New BeatmapHelper score with id: {baseAddresses.Beatmap.Id} created.");
                                 }
 
                             }
@@ -399,6 +384,9 @@ namespace osu1progressbar.Game.Database
                     BeatmapSetid,
                     Beatmapid,
                     Osufilename,
+                    Foldername,
+                    Replay,
+                    Playtype,
                     Ar,
                     Cs,
                     Hp,
@@ -437,6 +425,9 @@ namespace osu1progressbar.Game.Database
                             @BeatmapSetid,
                             @Beatmapid,
                             @Osufilename,
+                            @Foldername,
+                            @Replay,
+                            @Playtype,
                             @Ar,
                             @Cs,
                             @Hp,
@@ -492,6 +483,9 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@BeatmapSetid", baseAddresses.Beatmap.SetId);
                         command.Parameters.AddWithValue("@Beatmapid", baseAddresses.Beatmap.Id);
                         command.Parameters.AddWithValue("@Osufilename", baseAddresses.Beatmap.OsuFileName);
+                        command.Parameters.AddWithValue("@Foldername", baseAddresses.Beatmap.FolderName);
+                        command.Parameters.AddWithValue("@Replay", replay);
+                        command.Parameters.AddWithValue("@Playtype", playtype);
                         command.Parameters.AddWithValue("@Ar", baseAddresses.Beatmap.Ar);
                         command.Parameters.AddWithValue("@Cs", baseAddresses.Beatmap.Cs);
                         command.Parameters.AddWithValue("@Hp", baseAddresses.Beatmap.Hp);
@@ -526,11 +520,10 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@accuracyatt", perfomanceAttributes.accuracy);
                         command.Parameters.AddWithValue("@grade", perfomanceAttributes.grade);
 
-
                         command.ExecuteNonQuery();
                     }
 
-                    Console.WriteLine($"Saved Score: {baseAddresses.Beatmap.OsuFileName}");
+                    Console.WriteLine(DateTime.Now + "| " + $"Saved Score: {baseAddresses.Beatmap.OsuFileName}");
 
                 }
                 catch (Exception e)
@@ -593,6 +586,9 @@ namespace osu1progressbar.Game.Database
                                 score.Add("BeatmapSetid", reader["BeatmapSetid"]);
                                 score.Add("Beatmapid", reader["Beatmapid"]);
                                 score.Add("Osufilename", reader["Osufilename"]);
+                                score.Add("Foldername", reader["Foldername"]);
+                                score.Add("Replay", reader["Replay"]);
+                                score.Add("Playtype", reader["Playtype"]);
                                 score.Add("Ar", reader["Ar"]);
                                 score.Add("Cs", reader["Cs"]);
                                 score.Add("Hp", reader["Hp"]);
@@ -672,7 +668,7 @@ namespace osu1progressbar.Game.Database
                     command.CommandText = queryBuilder.ToString();
                     DateTime dateString = DateTime.Now;
 
-                    Console.WriteLine(queryBuilder.ToString());
+                    //Console.WriteLine(queryBuilder.ToString());
 
                     try
                     {
@@ -689,6 +685,9 @@ namespace osu1progressbar.Game.Database
                                 score.Add("BeatmapSetid", reader["BeatmapSetid"]);
                                 score.Add("Beatmapid", reader["Beatmapid"]);
                                 score.Add("Osufilename", reader["Osufilename"]);
+                                score.Add("Foldername", reader["Foldername"]);
+                                score.Add("Replay", reader["Replay"]);
+                                score.Add("Playtype", reader["Playtype"]);
                                 score.Add("Ar", reader["Ar"]);
                                 score.Add("Cs", reader["Cs"]);
                                 score.Add("Hp", reader["Hp"]);
@@ -849,7 +848,7 @@ namespace osu1progressbar.Game.Database
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
 
-                    Console.WriteLine(rows.ToString());
+                    //Console.WriteLine(rows.ToString());
 
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
@@ -951,6 +950,9 @@ namespace osu1progressbar.Game.Database
                                 score.Add("BeatmapSetid", reader["BeatmapSetid"]);
                                 score.Add("Beatmapid", reader["Beatmapid"]);
                                 score.Add("Osufilename", reader["Osufilename"]);
+                                score.Add("Foldername", reader["Foldername"]);
+                                score.Add("Replay", reader["Replay"]);
+                                score.Add("Playtype", reader["Playtype"]);
                                 score.Add("Ar", reader["Ar"]);
                                 score.Add("Cs", reader["Cs"]);
                                 score.Add("Hp", reader["Hp"]);
@@ -1016,7 +1018,7 @@ namespace osu1progressbar.Game.Database
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
 
-                    Console.WriteLine(rows.ToString());
+                    //Console.WriteLine(rows.ToString());
 
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
@@ -1087,7 +1089,7 @@ namespace osu1progressbar.Game.Database
             return result;
         }
 
-        }
+    }
 }
 
 

@@ -104,7 +104,7 @@ namespace osu_progressCLI
             sw.WriteLine("exit");
 
             string output = process.StandardOutput.ReadToEnd();
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
             process.WaitForExit();
 
             return output;

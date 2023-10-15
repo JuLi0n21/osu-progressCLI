@@ -55,14 +55,14 @@ namespace osu_progressCLI
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"HTTP Request Exception: {ex.Message}");
+                Console.WriteLine(DateTime.Now + "| " + $"HTTP Request Exception: {ex.Message}");
                 return;
             }
 
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Recieved Accesstoken, expanded Beatmap data should be availabe now.");
+                Console.WriteLine(DateTime.Now + "| " + "Recieved Accesstoken, expanded Beatmap data should be availabe now.");
 
                 TokenResponse tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
 
@@ -71,7 +71,7 @@ namespace osu_progressCLI
             }
             else
             {
-                Console.WriteLine($"HTTP Error: {response.StatusCode}, beatmap info will only be limited available");
+                Console.WriteLine(DateTime.Now + "| " + $"HTTP Error: {response.StatusCode}, beatmap info will only be limited available");
             }
 
             httpClient.Dispose();
@@ -86,7 +86,7 @@ namespace osu_progressCLI
 
         public async Task<JObject> getExpandedBeatmapinfo(string id)
         {
-            Console.WriteLine($"Requesting Beatmap info for: {id}");
+            Console.WriteLine(DateTime.Now + "| " + $"Requesting Beatmap info for: {id}");
             JObject beatmap = null;
             string beatmapEndpoint = $"https://osu.ppy.sh/api/v2/beatmaps/lookup?id={id}";
 
@@ -103,13 +103,13 @@ namespace osu_progressCLI
             if (reponse.IsSuccessStatusCode)
             {
                 string responseBody = await reponse.Content.ReadAsStringAsync();
-                Console.WriteLine($"Rechieved Beatmap info for: {id}");
-                Console.WriteLine(responseBody);
+                Console.WriteLine(DateTime.Now + "| " + $"Rechieved Beatmap info for: {id}");
+                //Console.WriteLine(responseBody);
                 beatmap = JObject.Parse(responseBody);
             }
             else
             {
-                Console.WriteLine($"Request failed with status code {reponse.StatusCode}");
+                Console.WriteLine(DateTime.Now + "| " + $"Request failed with status code {reponse.StatusCode}");
                 return beatmap;
             }
 
@@ -136,14 +136,14 @@ namespace osu_progressCLI
             if (reponse.IsSuccessStatusCode)
             {
                 string responseBody = await reponse.Content.ReadAsStringAsync();
-                Console.WriteLine("search Recieved.");
+                Console.WriteLine(DateTime.Now + "| " + "Search Recieved for: " + query);
                 //Console.WriteLine(responseBody);
 
                 search = JObject.Parse(responseBody);
             }
             else
             {
-                Console.WriteLine($"Request failed with status code {reponse.StatusCode}");
+                Console.WriteLine(DateTime.Now + "| " + $"Request failed with status code {reponse.StatusCode}");
                 return search;
             }
 
@@ -155,7 +155,7 @@ namespace osu_progressCLI
         public async Task<JObject> getuser(string userid, string mode)
         {
 
-            Console.WriteLine($"Requesting User info for: {userid}");
+            Console.WriteLine(DateTime.Now + "| " + $"Requesting User info for: {userid}");
             JObject userJson = null;
 
             string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{userid}/{mode}";
@@ -172,7 +172,7 @@ namespace osu_progressCLI
 
             if (reponse.IsSuccessStatusCode)
             {
-                Console.WriteLine($"Recieved User info for: {userid}");
+                Console.WriteLine(DateTime.Now + "| " + $"Recieved User info for: {userid}");
                 string responseBody = await reponse.Content.ReadAsStringAsync();
                 //Console.WriteLine(responseBody);
 
@@ -180,7 +180,7 @@ namespace osu_progressCLI
             }
             else
             {
-                Console.WriteLine($"Request failed with status code {reponse.StatusCode}");
+                Console.WriteLine(DateTime.Now + "| " + $"Request failed with status code {reponse.StatusCode}");
                 return userJson;
             }
 

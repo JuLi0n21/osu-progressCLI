@@ -23,11 +23,18 @@ namespace osu1progressbar.Game.Logicstuff
         private string BanchoUserStatus = null;
         private int Audiotime;
         private bool isReplay = false;
+        private static string replayname;
 
         public Stopwatch screenTimeStopWatch;
         public Stopwatch BanchoTimeStopWatch;
         private Stopwatch stopwatch;
         public Stopwatch timeSinceStartedPlaying;
+
+
+        FileSystemWatcher watcher = null;
+        static string folderPath = @"G:\Anwendungen\osu!\Data\r"; // Replace with your folder path
+        static string newestFile;
+        static DateTime newestFileTime = DateTime.MinValue;
 
         public int startime;
         public LogicController()
@@ -41,16 +48,40 @@ namespace osu1progressbar.Game.Logicstuff
             BanchoTimeStopWatch = new Stopwatch();
             BanchoTimeStopWatch.Start();
 
+            timeSinceStartedPlaying = new Stopwatch();
+
             stopwatch = Stopwatch.StartNew();
 
+            Thread watcherThread = new Thread(new ThreadStart(StartFileSystemWatcher));
+            watcherThread.Start();
         }
+
+        private void StartFileSystemWatcher()
+        {
+            watcher = new FileSystemWatcher(folderPath);
+            watcher.Created += OnFileCreated;
+            watcher.EnableRaisingEvents = true;
+        }
+
+        private static void OnFileCreated(object sender, FileSystemEventArgs e)
+        {
+            DateTime fileCreationTime = File.GetCreationTime(e.FullPath);
+            if (fileCreationTime > newestFileTime)
+            {
+                newestFile = e.Name;
+                newestFileTime = fileCreationTime;
+                if (newestFile.EndsWith(".osr")) { 
+                    replayname = newestFile;
+                }
+            }
+        }
+
 
         //the first time gets currentliy ignored cause it gets restarted after first entry (and is probably not running cause its set to stop in the memoryprovider incase no osu is found
         public bool Logiccheck(OsuBaseAddresses NewValues)
         {
             try
             {
-               
                 string oldvalue = NewValues.ToString();
 
                 if (CurrentScreen != "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "Playing") { 
@@ -72,21 +103,36 @@ namespace osu1progressbar.Game.Logicstuff
                     BanchoTimeStopWatch.Restart();
                 }
 
-
-                if (!isReplay && CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() != "Playing")
+                if (!isReplay && CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "ResultsScreen") {
+                    Console.WriteLine(DateTime.Now + "| " + "Pass Detected Waiting for Replay");
+                    Task.Run(() =>
+                    {
+                        watcher.WaitForChanged(WatcherChangeTypes.Created);
+                        Console.WriteLine(DateTime.Now + "| " + "Replay found");
+                        db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass", replayname);
+                        replayname = null;
+                    });
+                } 
+                else if (!isReplay && CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() != "Playing")
                 {
-                    
-                    Console.WriteLine("Play Detected");
-                  
-                        db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000);
-                   
-                 
+                    Console.WriteLine(DateTime.Now + "| " + "Play Detected");
+                    Task.Run(() =>
+                    {
+                        if (NewValues.Player.HP == 0)
+                        {
+                            db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Fail");
+                        }
+                        else {
+                            db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass");
+                        }
+                      
+                    });
                 }
 
                 //can be buggy with broken game (fix ur game then wat)
                 if ((NewValues.GeneralData.OsuStatus.ToString() == "Playing") && (Audiotime > NewValues.GeneralData.AudioTime) && (timeSinceStartedPlaying.ElapsedMilliseconds > 2500) && (NewValues.Player.Score >= 1000))  {
-                    Console.WriteLine("Retry detected");
-                    db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000);
+                    Console.WriteLine(DateTime.Now + "| " + "Retry detected");
+                    db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Retry");
                 };
                  
                 CurrentScreen = NewValues.GeneralData.OsuStatus.ToString();

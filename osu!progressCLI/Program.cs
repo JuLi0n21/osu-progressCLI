@@ -16,8 +16,8 @@ class Program
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");
 
         Credentials crendtials = Credentials.Instance; 
-        ApiController apiController = ApiController.Instance; 
-        
+        ApiController apiController = ApiController.Instance;
+
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
 
@@ -29,11 +29,12 @@ class Program
                 await webserver.listen(); 
             }
         });
-
         await listenTask;
 
         memoryProvider.Stop();
     }
+
+    
 }
 
  

@@ -35,7 +35,7 @@ namespace osu_progressCLI.server
             // listener.Prefixes.Add($"http://[{ip}]:{port}/");
             listener.IgnoreWriteExceptions = true;
             listener.Start();
-            Console.WriteLine($"you can view ur Stats on localhost:{port}/");
+            Console.WriteLine(DateTime.Now + "| " +$"you can view ur Stats on localhost:{port}/");
             databaseController = new DatabaseController();
             helper = new reqreshelper();
         }
