@@ -44,7 +44,8 @@ namespace osu1progressbar.Game.MemoryProvider
             baseAddresses = new OsuBaseAddresses();
             
             logic = new LogicController();
-            Console.WriteLine(DateTime.Now + "| " + "Instancated OsuMemoryProvider");
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Instanciated OsuMemoryProvider");
+
 
         }
 
@@ -84,13 +85,14 @@ namespace osu1progressbar.Game.MemoryProvider
 
         public async void Run()
         {
-            Console.WriteLine(DateTime.Now + "| " + "OsuMemoryProvider Run call");
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, "OsuMemoryProvider Run call");
+
             sreader.InvalidRead += SreaderOnInvalidRead;
             
             await Task.Run(async () =>
             {
              
-                //Console.WriteLine("Starting memoryReader");
+                
                 Stopwatch stopwatch;
                 double readTimeMs, readTimeMsMin, readTimeMsMax;
                 sreader.WithTimes = true;
@@ -103,10 +105,6 @@ namespace osu1progressbar.Game.MemoryProvider
 
                     if (!sreader.CanRead)
                     {
-                        
-                        Console.WriteLine("Waiting for Osu! Process");
-                        Console.CursorLeft = 0;
-                        Console.CursorTop = Console.CursorTop - 1;
 
                         logic.BanchoTimeStopWatch.Reset();
                         logic.screenTimeStopWatch.Reset();
@@ -207,6 +205,7 @@ namespace osu1progressbar.Game.MemoryProvider
         }
         private void SreaderOnInvalidRead(object sender, (object readObject, string propPath) e)
         {
+            Logger.Log(Logger.Severity.Error, Logger.Framework.Logic, $"Error reading {e.propPath}{Environment.NewLine}");
             try
             {
                 //Console.WriteLine($"{DateTime.Now:T} Error reading {e.propPath}{Environment.NewLine}");

@@ -13,6 +13,7 @@ using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using System.Runtime.ConstrainedExecution;
 using System.Reflection.PortableExecutable;
+using static System.Data.Entity.Infrastructure.Design.Executor;
 
 
 namespace osu1progressbar.Game.Database
@@ -32,7 +33,6 @@ namespace osu1progressbar.Game.Database
         public bool Init()
         {
 
-
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 try
@@ -43,7 +43,9 @@ namespace osu1progressbar.Game.Database
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.ToString());
+
+                    Logger.Log(Logger.Severity.Error, Logger.Framework.Database, $"{e.Message}");
+
                     return false;
                 }
                 finally
@@ -107,12 +109,12 @@ namespace osu1progressbar.Game.Database
                 );
             ";
 
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Creating Database if it dont exists: {dbname}");
+
             using (var command = new SQLiteCommand(createScoreTableQuery, connection))
             {
                 command.ExecuteNonQuery();
             }
-
-            Console.WriteLine(DateTime.Now + "| " + "Creating Database if it doesnt exist: " + dbname);
 
             string timeSpendTableQuery = @"
                 CREATE TABLE IF NOT EXISTS TimeWasted (Date TEXT ,RawStatus INTEGER, Time REAL)";
@@ -142,6 +144,8 @@ namespace osu1progressbar.Game.Database
 
         public void UpdateTimeWasted(int OldStatus, float timeElapsed)
         {
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Database, $"Updating Timewasted: {OldStatus} : {timeElapsed}s");
+
             DateTime time = DateTime.UtcNow;
             string date = time.ToString("yyyy-MM-dd HH:00");
 
@@ -185,12 +189,14 @@ namespace osu1progressbar.Game.Database
                             insertCommand.Parameters.AddWithValue("@Time", timeElapsed);
 
                             insertCommand.ExecuteNonQuery();
-                            Console.WriteLine(DateTime.Now + "| " + "New TimeWasted Added for this hour");
+
+                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"New Timewasted for this Hour: {OldStatus} : {timeElapsed}s");
+
                         }
                     }
                     else
                     {
-                        Console.WriteLine(DateTime.Now + "| " + "Updated TimeWasted in: " + OldStatus + " time: " + timeElapsed);
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Updated TimeWasted in: {OldStatus} time: {timeElapsed}s");
                     }
                 }
 
@@ -200,6 +206,8 @@ namespace osu1progressbar.Game.Database
 
         public void UpdateBanchoTime(string BanchoStatus, float timeElapsed)
         {
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Database, $"Updating BanchoTime: {BanchoStatus} : {timeElapsed}s");
+
             DateTime time = DateTime.UtcNow;
             string date = time.ToString("yyyy-MM-dd HH:00");
 
@@ -244,12 +252,13 @@ namespace osu1progressbar.Game.Database
                             insertCommand.Parameters.AddWithValue("@Time", timeElapsed);
 
                             insertCommand.ExecuteNonQuery();
-                            Console.WriteLine(DateTime.Now + "| " + "New BanchoTime Added for this hour");
+                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Updating BanchoStatus {BanchoStatus} : {timeElapsed}s");
+
                         }
                     }
                     else
                     {
-                        Console.WriteLine(DateTime.Now + "| " + "Updated BanchoTime in: " + BanchoStatus + " time: " + timeElapsed);
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Updating BanchoStatus: {BanchoStatus} : {timeElapsed}s");
                     }
                 }
 
@@ -260,6 +269,7 @@ namespace osu1progressbar.Game.Database
         //maybe consider passed or failed/canceld retires// more beatmap attributes
         public async void InsertScore(OsuBaseAddresses baseAddresses, float timeElapsed, string playtype, string replay = null)
         {
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Database, $"Inserting Score on: {baseAddresses.Beatmap.OsuFileName}");
 
             string creator = "null", artist = "null", status = baseAddresses.Beatmap.Status.ToString(), version = "null", tags = "null", coverlist = "null", cover = "null", preview ="null";
             double bpm = -1;
@@ -315,7 +325,8 @@ namespace osu1progressbar.Game.Database
                             version = reader["version"].ToString();
                             preview = reader["preview"].ToString();
 
-                            Console.WriteLine(DateTime.Now + "| " + $"Beatmap with id: {baseAddresses.Beatmap.Id} exists");
+                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Beatmap with id: {baseAddresses.Beatmap.Id} exists");
+
                         }
                         else
                         {
@@ -361,7 +372,8 @@ namespace osu1progressbar.Game.Database
 
                                 if (rowsInserted > 0)
                                 {
-                                    Console.WriteLine(DateTime.Now + "| " + $"New BeatmapHelper score with id: {baseAddresses.Beatmap.Id} created.");
+                                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"New BeatmapHelper score with id: {baseAddresses.Beatmap.Id} created.");
+
                                 }
 
                             }
@@ -371,6 +383,7 @@ namespace osu1progressbar.Game.Database
                 }
                 connection.Close();
             }
+
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -523,11 +536,14 @@ namespace osu1progressbar.Game.Database
                         command.ExecuteNonQuery();
                     }
 
-                    Console.WriteLine(DateTime.Now + "| " + $"Saved Score: {baseAddresses.Beatmap.OsuFileName}");
+                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Saved Score: {baseAddresses.Beatmap.OsuFileName}");
+
 
                 }
                 catch (Exception e)
                 {
+                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"{e.Message}");
+
                     Console.WriteLine(e.ToString());
 
                 }

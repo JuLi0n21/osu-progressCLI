@@ -54,6 +54,8 @@ namespace osu1progressbar.Game.Logicstuff
 
             Thread watcherThread = new Thread(new ThreadStart(StartFileSystemWatcher));
             watcherThread.Start();
+
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Instanciated LogicController");
         }
 
         private void StartFileSystemWatcher()
@@ -91,31 +93,33 @@ namespace osu1progressbar.Game.Logicstuff
 
                 if (CurrentScreen != NewValues.GeneralData.OsuStatus.ToString())
                 {
-                    Console.WriteLine(DateTime.Now + "| " + "Screentime: "  + screenTimeStopWatch.ElapsedMilliseconds / 1000 + "s : " + CurrentScreen);
+                    Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, $"Screentime: {screenTimeStopWatch.ElapsedMilliseconds / 1000}s {CurrentScreen}");
                     db.UpdateTimeWasted(oldRawStatus, screenTimeStopWatch.ElapsedMilliseconds / 1000);
                     screenTimeStopWatch.Restart();
                 }
 
                 if (BanchoUserStatus != NewValues.BanchoUser.BanchoStatus.ToString())
                 {
-                    Console.WriteLine(DateTime.Now + "| " + "Banchotime: "+ BanchoTimeStopWatch.ElapsedMilliseconds / 1000 + "s : " + BanchoUserStatus);
+                    Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, $"Banchotime: {BanchoTimeStopWatch.ElapsedMilliseconds / 1000}s {BanchoUserStatus}");
                     db.UpdateBanchoTime(BanchoUserStatus, BanchoTimeStopWatch.ElapsedMilliseconds / 1000);
                     BanchoTimeStopWatch.Restart();
                 }
 
                 if (!isReplay && CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "ResultsScreen") {
-                    Console.WriteLine(DateTime.Now + "| " + "Pass Detected Waiting for Replay");
+                    Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Pass Detected Waiting for Replay");
+
                     Task.Run(() =>
                     {
                         watcher.WaitForChanged(WatcherChangeTypes.Created);
-                        Console.WriteLine(DateTime.Now + "| " + "Replay found");
+                        Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Replay found");
                         db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass", replayname);
                         replayname = null;
                     });
                 } 
                 else if (!isReplay && CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() != "Playing")
                 {
-                    Console.WriteLine(DateTime.Now + "| " + "Play Detected");
+                    Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Play Detected");
+
                     Task.Run(() =>
                     {
                         if (NewValues.Player.HP == 0)
@@ -131,7 +135,8 @@ namespace osu1progressbar.Game.Logicstuff
 
                 //can be buggy with broken game (fix ur game then wat)
                 if ((NewValues.GeneralData.OsuStatus.ToString() == "Playing") && (Audiotime > NewValues.GeneralData.AudioTime) && (timeSinceStartedPlaying.ElapsedMilliseconds > 2500) && (NewValues.Player.Score >= 1000))  {
-                    Console.WriteLine(DateTime.Now + "| " + "Retry detected");
+                    
+                    Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Retry Detected");
                     db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Retry");
                 };
                  
@@ -146,7 +151,7 @@ namespace osu1progressbar.Game.Logicstuff
            
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Logic, $"{ex.Message}");
                 return false;
             }
         }

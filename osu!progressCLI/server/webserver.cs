@@ -35,7 +35,9 @@ namespace osu_progressCLI.server
             // listener.Prefixes.Add($"http://[{ip}]:{port}/");
             listener.IgnoreWriteExceptions = true;
             listener.Start();
-            Console.WriteLine(DateTime.Now + "| " +$"you can view ur Stats on localhost:{port}/");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"Starting Weberver on localhost:{port}/");
+
+            Console.WriteLine($"You can view ur Stats on localhost:{port}/");
             databaseController = new DatabaseController();
             helper = new reqreshelper();
         }
@@ -119,7 +121,7 @@ namespace osu_progressCLI.server
             }
             else if (path == "/api/beatmaps/score" && queryparams["id"] != null)
             {
-                Console.WriteLine("score requested: " + queryparams[0]);
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Server, $"Score Requested {queryparams[0]}");
                 helper.getScore(request, response, queryparams);
             }
             else if (path == "/api/beatmaps/search" && queryparams["searchquery"] != null)
@@ -152,9 +154,12 @@ namespace osu_progressCLI.server
             }
             else
             {
+
                 Console.WriteLine("Not found: " + path);
                 response.StatusCode = 404;
                 response.OutputStream.Close();
+
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Server, $"Not found: {path}. (Can be Ignored if everything works fine!)");
             }
 
         }

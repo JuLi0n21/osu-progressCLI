@@ -56,9 +56,9 @@ namespace osu_progressCLI
                     }
                 }
             }
-            catch (Exception exception)
+            catch (Exception e)
             {
-                Console.WriteLine(exception.Message);
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, $"{e.Message}");
             }
         }
 
@@ -111,9 +111,10 @@ namespace osu_progressCLI
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine(ex);
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, $"{e.Message}");
+
                 return false;
             }
 
@@ -158,9 +159,10 @@ namespace osu_progressCLI
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine(ex);
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, $"{e.Message}");
+
                 return false;
             }
         }
@@ -195,6 +197,6 @@ namespace osu_progressCLI
         public string? cover_url { get; set; } = String.Empty;
         public string? avatar_url { get; set; } = String.Empty;
         public string? userid { get;set; } = "2";   
-        public string? songfolder { get; set; } = "C:\\users\\<pc username>\\AppData\\Songs";
+        public string? songfolder { get; set; } = @$"C:\users\<pc username>\AppData\Songs";
     }
 }

@@ -10,9 +10,12 @@ class Program
 
     static async Task Main(string[] args)
     {
-         
+
+        Logger.SetConsoleLogLevel(Logger.Severity.Debug);
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
+        Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, "Initialzing Components");
+
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");
 
         Credentials crendtials = Credentials.Instance; 

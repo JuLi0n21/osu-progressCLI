@@ -32,6 +32,8 @@ namespace osu_progressCLI
 
         private async void getAccessToken()
         {
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Getting AccessToken");
+
             string access_token = null;
 
             string oauthTokenEndpoint = "https://osu.ppy.sh/oauth/token";
@@ -55,14 +57,16 @@ namespace osu_progressCLI
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine(DateTime.Now + "| " + $"HTTP Request Exception: {ex.Message}");
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Network, $"HTTP Request Exception: {ex.Message}");
+
                 return;
             }
 
             if (response.IsSuccessStatusCode)
             {
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Network, "Recieved Accesstoken, expanded Beatmap data should be availabe now.");
+
                 var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(DateTime.Now + "| " + "Recieved Accesstoken, expanded Beatmap data should be availabe now.");
 
                 TokenResponse tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
 
@@ -71,7 +75,8 @@ namespace osu_progressCLI
             }
             else
             {
-                Console.WriteLine(DateTime.Now + "| " + $"HTTP Error: {response.StatusCode}, beatmap info will only be limited available");
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"HTTP Error: {response.StatusCode}, beatmap info will only be limited available");
+
             }
 
             httpClient.Dispose();
@@ -86,7 +91,8 @@ namespace osu_progressCLI
 
         public async Task<JObject> getExpandedBeatmapinfo(string id)
         {
-            Console.WriteLine(DateTime.Now + "| " + $"Requesting Beatmap info for: {id}");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Requesting Beatmap info for: {id}");
+
             JObject beatmap = null;
             string beatmapEndpoint = $"https://osu.ppy.sh/api/v2/beatmaps/lookup?id={id}";
 
@@ -103,13 +109,15 @@ namespace osu_progressCLI
             if (reponse.IsSuccessStatusCode)
             {
                 string responseBody = await reponse.Content.ReadAsStringAsync();
-                Console.WriteLine(DateTime.Now + "| " + $"Rechieved Beatmap info for: {id}");
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Rechieved Beatmap info for: {id}");
+
                 //Console.WriteLine(responseBody);
                 beatmap = JObject.Parse(responseBody);
             }
             else
             {
-                Console.WriteLine(DateTime.Now + "| " + $"Request failed with status code {reponse.StatusCode}");
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Request failed with status code {reponse.StatusCode}");
+
                 return beatmap;
             }
 
@@ -118,6 +126,7 @@ namespace osu_progressCLI
         }
 
         public async Task<JObject> getSearch(string mode, string query) {
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Api Search Request");
 
             JObject search = null;
 
@@ -135,15 +144,17 @@ namespace osu_progressCLI
 
             if (reponse.IsSuccessStatusCode)
             {
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, $"Search Recieved for: {query}");
+
                 string responseBody = await reponse.Content.ReadAsStringAsync();
-                Console.WriteLine(DateTime.Now + "| " + "Search Recieved for: " + query);
                 //Console.WriteLine(responseBody);
 
                 search = JObject.Parse(responseBody);
             }
             else
             {
-                Console.WriteLine(DateTime.Now + "| " + $"Request failed with status code {reponse.StatusCode}");
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Misc, $"Request failed with status code {reponse.StatusCode}");
+
                 return search;
             }
 
@@ -154,8 +165,8 @@ namespace osu_progressCLI
 
         public async Task<JObject> getuser(string userid, string mode)
         {
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting User info for: {userid}");
 
-            Console.WriteLine(DateTime.Now + "| " + $"Requesting User info for: {userid}");
             JObject userJson = null;
 
             string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{userid}/{mode}";
@@ -172,7 +183,8 @@ namespace osu_progressCLI
 
             if (reponse.IsSuccessStatusCode)
             {
-                Console.WriteLine(DateTime.Now + "| " + $"Recieved User info for: {userid}");
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Recieved User info for: {userid}");
+
                 string responseBody = await reponse.Content.ReadAsStringAsync();
                 //Console.WriteLine(responseBody);
 
@@ -180,7 +192,8 @@ namespace osu_progressCLI
             }
             else
             {
-                Console.WriteLine(DateTime.Now + "| " + $"Request failed with status code {reponse.StatusCode}");
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Request failed with status code {reponse.StatusCode}");
+
                 return userJson;
             }
 
