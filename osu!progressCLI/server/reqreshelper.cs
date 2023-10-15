@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json.Bson;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using Newtonsoft.Json.Linq;
 using osu1progressbar.Game.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.Metrics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -112,6 +114,43 @@ namespace osu_progressCLI.server
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(parameters[0].ToString()))) ,"application/json");
         }
 
+        public void run(HttpListenerRequest request, HttpListenerResponse response) 
+        {
+            try
+            {
+                string requestData = null;
+                using (Stream body = request.InputStream)
+                {
+                    StreamReader reader = new StreamReader(body);
+                    requestData = reader.ReadToEnd();
+                }
+
+                JObject parameters = JObject.Parse(requestData);
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Server, $"{parameters}");
+
+
+                if (parameters == null)
+                {
+                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Server, $"No Parameters for MissAnalyzer Request");
+
+                    return;
+                }
+
+                if (parameters["programm"].ToString() == "OsuMissAnalyzer" && parameters["id"] != null)
+                {
+
+                    DifficultyAttributes.StartMissAnalyzer(int.Parse(parameters["id"].ToString()));
+
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Server, $@"{e.Message}");
+            }
+
+        }
+        
+
         public void getScore(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
 
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScore(int.Parse(parameters[0]))), "application/json");
@@ -138,6 +177,9 @@ namespace osu_progressCLI.server
             Credentials.Instance.UpdateApiCredentials(parameters["clientId"].ToString(), parameters["clientSecret"].ToString());
 
             Credentials.Instance.UpdateConfig(parameters["localsettings"].ToString(), parameters["username"].ToString(), parameters["rank"].ToString(), parameters["country"].ToString(), parameters["coverUrl"].ToString(), parameters["avatarUrl"].ToString(), parameters["port"].ToString(), parameters["userid"].ToString());
+
+            string message = "Saved";
+            WriteResponse(response, message, "application/json");
         }
 
         private string GetBeatmapData(DateTime from, DateTime to)

@@ -25,7 +25,7 @@ function fetchOsuBeatmap() {
 
             </div>
          
-<a href="https://osu.ppy.sh/beatmapsets/${data.BeatmapSetid}#osu/${data.Beatmapid}" target="_blank">
+<a href="https://osu.ppy.sh/beatmapsets/${data.BeatmapSetid}#${data.mode}/${data.Beatmapid}" target="_blank">
   <div id="image-container" style="min-height: 280px; position: relative;">
     <img class="absolute top-0 left-0 w-40" src="${data.Grade}.png" alt="${data.Grade}">
     <a href="https://osu.ppy.sh/users/${data.Creator}" class="absolute bottom-10 right-0 score-backdrop--dark rounded-lg m-3 p-1">${data.Version} by ${data.Creator}</a>
@@ -138,7 +138,7 @@ function fetchOsuBeatmap() {
               MAXCOMBO
             </div>
             <div class="flex justify-evenly">
-                 <p>${data.Combo}/${data.MaxCombo}</p>
+                 <p>${data.Combo} {${data.MaxCombo}}</p>
             </div>
           </div>
             <div class="flex-col flex-1">
@@ -146,7 +146,7 @@ function fetchOsuBeatmap() {
               Playtime
             </div>
             <div class="flex justify-evenly">
-              ${data.Time}s
+              ${data.Time}s  <p class="text--gray"> (${data.Playtype}) </p> 
             </div>
           </div>
         </div>
@@ -225,7 +225,7 @@ function fetchOsuBeatmap() {
             MISS
           </div>
           <div class="flex justify-evenly">
-                 <pre class="text-red-600">${data.HitMiss}</pre>
+               <button id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600">${data.HitMiss}↩</pre> </button>
           </div>
         </div>
       </div>
@@ -249,7 +249,7 @@ function fetchOsuBeatmap() {
     </div>
 `;      
 
-            
+            document.getElementById("MissAnalyzer").addEventListener("click", openAnalyzer)
 
             const playButton = document.getElementById("playButton");
             const audioPlayer = document.getElementById("audioPlayer");
@@ -300,6 +300,39 @@ function fetchOsuBeatmap() {
         .catch(error => {
             console.error('Error fetching beatmap data:', error);
             document.getElementById('beatmapData').innerHTML = 'An error occurred while fetching data.';
+        });
+}
+
+function openAnalyzer() {
+
+    console.log("MissAnalyzer Request");
+    const apiUrl = "/api/run";
+
+    const postData = {
+        programm : "OsuMissAnalyzer",
+        id : rowid
+    };
+
+    const requestOptions = {
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(postData) 
+    };
+
+    fetch(apiUrl, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); 
+        })
+        .then(data => {
+            console.log('POST request successful. Response data:', data);
+        })
+        .catch(error => {
+            console.error('Error making POST request:', error);
         });
 }
 

@@ -65,8 +65,8 @@ namespace osu_progressCLI.server
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
 
-
-            // Console.WriteLine($"queryparams: {request.Url.Query}");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, @$"{request.Url.Query}");
+            //Console.WriteLine($"queryparams: {request.Url.Query}");
 
             string path = request.Url.AbsolutePath;
             NameValueCollection queryparams = HttpUtility.ParseQueryString(request.Url.Query);
@@ -151,6 +151,10 @@ namespace osu_progressCLI.server
             else if (path == "/api/save" && request.HttpMethod == "POST")
             {
                 helper.save(request, response);
+            }
+            else if (path == "/api/run" && request.HttpMethod == "POST")
+            {
+                helper.run(request, response);
             }
             else
             {

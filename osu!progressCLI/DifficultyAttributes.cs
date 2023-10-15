@@ -1,4 +1,5 @@
-﻿using OsuMemoryDataProvider.OsuMemoryModels.Abstract;
+﻿using osu1progressbar.Game.Database;
+using OsuMemoryDataProvider.OsuMemoryModels.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,7 +21,7 @@ namespace osu_progressCLI
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
             string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} \"{fullPath}\" --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
 
-            string output = cmdOutput(command);
+            string output = cmdOutput("osu-tools", command);
             try {
                 pp = ParsePPFromOutput(output);
             }
@@ -39,7 +40,7 @@ namespace osu_progressCLI
 
             string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} {id} --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
 
-            string output = cmdOutput(command);
+            string output = cmdOutput("osu-tools", command);
             try
             {
                 pp = ParsePPFromOutput(output);
@@ -60,7 +61,7 @@ namespace osu_progressCLI
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
             string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} \"{fullPath}\" --combo {combo} --misses {missCount} --mehs {mehCount} --goods {goodCount} {ModParser.PPCalcMods(mods)}";
 
-            string output = cmdOutput(command);
+            string output = cmdOutput("osu-tools",command);
 
             try
             {
@@ -82,14 +83,12 @@ namespace osu_progressCLI
 
 
 
-        private static string cmdOutput(string command) {
-
-        const string CalculatorPath = "osu-tools";
+        private static string cmdOutput(string path,string command) {
 
         ProcessStartInfo psi = new ProcessStartInfo
             {
                 FileName = "cmd.exe",
-                WorkingDirectory = CalculatorPath,
+                WorkingDirectory = path,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -250,9 +249,19 @@ namespace osu_progressCLI
             
         }
 
-        public void MissAnalyzer(string filename, string Replay) {
-            //maybe use filewatcher event needs testing etc
-            //example command: OsuMissAnalyzer.exe "G:\Anwendungen\osu!\Data\r\a66dee3a2a6b1e31383dbe967ae7558d-133414404388161758.osr" "G:\Anwendungen\osu!\Songs\542317 Memme - Avalanche"
+        public static void StartMissAnalyzer(int id) {
+
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, $"Starting OsuMissAnalyzer for scoreid: {id}");
+            DatabaseController database = new DatabaseController();
+
+            Dictionary<string, object> score = database.GetScore(id);
+
+            string command = $"OsuMissAnalyzer.exe \"{Credentials.Instance.GetConfig().osufolder}\\Data\\r\\{score["Replay"]}\" \"{Credentials.Instance.GetConfig().songfolder}\\{score["Foldername"]}\"";
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"MissAnalyzer Command: {command}");
+
+            string output = cmdOutput("OsuMissAnalyzer", command);
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"MissAnalyzer Output: {output}");
+
         }
 
         public static string ModeConverter(int mode) { 
