@@ -131,7 +131,7 @@ namespace osu_progressCLI.server
         <label for=""ClientId"" class=""flex items-center m-0"" title=""This is your Client ID, which is used for authentication. Hover for more info."">
             ClientId
         </label>
-        <a href=""https://osu.ppy.sh/home/account/edit#oauth"" target=""_blank"" rel=""noopener noreferrer"">
+        <a href=""https://osu.ppy.sh/home/account/edit#new-oauth-application"" target=""_blank"" rel=""noopener noreferrer"">
             <i class=""fas fa-external-link-alt ml-2 text-blue-500 cursor-pointer hover:text-blue-700"" title=""You can get your OAuth credentials here!""></i>
         </a>
     </div>
