@@ -22,7 +22,13 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --configuration Release
+      run: dotnet build --configuration Release --output ${{ runner.workspace }}/app
 
     - name: Test
       run: dotnet test
+
+    - name: Archive Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: app
+        path: ${{ runner.workspace }}/app
