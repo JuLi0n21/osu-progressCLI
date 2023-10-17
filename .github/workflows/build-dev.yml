@@ -1,4 +1,4 @@
-name: Build and Test for Main Branch
+name: Dev Branch
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --configuration Release --output ${{ runner.workspace }}/app
+      run: dotnet build --configuration Release --output ${{ runner.workspace }}/osu!progress
 
     - name: Test
       run: dotnet test
@@ -31,4 +31,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: app
-        path: ${{ runner.workspace }}/app
+        path: ${{ runner.workspace }}/osu!progress
