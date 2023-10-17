@@ -223,7 +223,7 @@ namespace osu_progressCLI
        public double pp { get; set; }
         public double starrating { get; set; }
         public int Maxcombo { get; set; }
-        public string grade { get; set; }
+        public string grade { get; set; } = "E";
     }
 
 
