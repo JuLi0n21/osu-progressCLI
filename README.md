@@ -1,4 +1,5 @@
-# osu!progressCLI  
+# osu!progressCLI [![CodeFactor](https://www.codefactor.io/repository/github/juli0n21/osu-progresscli/badge)](https://www.codefactor.io/repository/github/juli0n21/osu-progresscli) [![GitHub release](https://img.shields.io/github/release/juli0n21/osu-progresscli.svg)](https://GitHub.com/juli0n21/osu-progresscli/releases/) [![Github all releases](https://img.shields.io/github/downloads/JuLi0n21/osu-progresscli/total.svg)](https://GitHub.com/JuLi0n21/osu-progresscli/releases/) [![Discord](https://badgen.net/discord/members/9rUMkHJEvv)](https://discord.gg/9rUMkHJEvv)
+
 ### THIS PROGRAMM IS IN EARLY ACCESS, BREAKING CHANGES ARE TO BE EXPECTED
 
 CURRETN DESIGN (SUBJECT TO CHANGE) inspiered by osu website
@@ -35,16 +36,19 @@ Set WshShell = Nothing
 - Only Windows supported currently (depends on OsuMemoryProvider)
 - [NET 6.0.x Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is required to run this programm
 
+## I wanna test the Application before release / use beta versions
+check out the latest builds from the dev branch
+ [![Github all actions](https://github.com/Juli0n21/osu-progresscli/actions/workflows/build-dev.yml/badge.svg)](https://GitHub.com/JuLi0n21/osu-progresscli/actions/)
 ## Feedback / Problems
-- Ask in the [Discord](https://discord.gg/FtF2HNSJNC)
+- Ask in the [Discord](https://discord.gg/9rUMkHJEvv)
 - Open An Issue 
 - I got some changes/ features -> Make a pull request and maybe ill merge it
   
-#EWWW the websites are fuckign ugly i dont like them
+## EWWW the websites are fuckign ugly i dont like them
 if u dont like the pages U CAN MAKE UR OWN ONE 
 
 put the html/css/js/img files inside the public folders and u can fill them with ur own junk
-### integrated api
+## integrated api
 to better enhance ur own webpages u can use the data from the internal api
 
 current endpoints are 
