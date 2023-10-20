@@ -16,7 +16,7 @@ function fetchOsuBeatmap() {
         .then(data => {
             console.log(data)
             beatmapid = data.Beatmapid;
-
+            document.title = (data.Osufilename);
             let missanalyzerdiv;
             if (Object.keys(data.Replay).length != 0) {
                 missanalyzerdiv = `<div class="flex justify-evenly">
