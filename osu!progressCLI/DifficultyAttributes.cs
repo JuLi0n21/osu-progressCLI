@@ -214,6 +214,43 @@ namespace osu_progressCLI
                     return "osu";
             }
         }
+
+        public static string ScreenConverter(int RawStatus)
+        {
+            switch (RawStatus)
+            {
+                case 0:
+                    return "Mainmenu";
+                case 1:
+                    return "EditingMap";
+                case 2:
+                    return "Playing";
+                case 3:
+                    return "GameShutDown";
+                case 4:
+                    return "SongSelectEdit";
+                case 5:
+                    return "SongSelect";
+                case 6:
+                    return "Unknown";
+                case 7:
+                    return "ResultScreen";
+                case 11:
+                    return "MultiplayerRooms";
+                case 12:
+                    return "MultiPlayerRoom";
+                case 15:
+                    return "OsuDirect";
+                case 16:
+                    return "OffsetAssistent";
+                case 19:
+                    return "ProcessingBeatmaps";
+                default:
+                    return "Unknown"; 
+            }
+        }
+
+
     }
 
     public class PerfomanceAttributes {
