@@ -123,11 +123,11 @@ namespace osu_progressCLI.server
             
         }        
 
-        public void user(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
+        public async void user(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
 
             //why does this shit take so long pls help
-            Logger.Log(Logger.Severity.Error, Logger.Framework.Server, $@"{parameters["userid"]} - {parameters["mode"]}");
-            WriteResponse(response, "shit", "application/json");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $@"{parameters["userid"]} - {DifficultyAttributes.ModeConverter(int.Parse(parameters["mode"]))}");
+            WriteResponse(response, JsonConvert.SerializeObject(await ApiController.Instance.getuser(parameters["userid"], DifficultyAttributes.ModeConverter(int.Parse(parameters["mode"])))), "application/json");
         }
 
         public void run(HttpListenerRequest request, HttpListenerResponse response) 
@@ -147,7 +147,7 @@ namespace osu_progressCLI.server
 
                 if (parameters == null)
                 {
-                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Server, $"No Parameters for MissAnalyzer Request");
+                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Server, $"No Parameters for Programm Request");
 
                     return;
                 }

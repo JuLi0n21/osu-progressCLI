@@ -14,7 +14,7 @@ class Program
         Logger.SetConsoleLogLevel(Logger.Severity.Debug);
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
-        Console.WriteLine("Keep this Terminal Open or the Progamm will stop if u want it to be invisible follow the guide on the github!");
+        Console.WriteLine("Keep this Terminal Open or the Progamm will stop if u want it run in the background follow the guide on the github!");
         Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, "Initialzing Components");
 
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");

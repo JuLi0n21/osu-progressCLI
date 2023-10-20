@@ -1,12 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
-using static Program;
+
 
 namespace osu_progressCLI
 {
@@ -78,7 +73,7 @@ namespace osu_progressCLI
             }
             else
             {
-                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"HTTP Error: {response.StatusCode}, beatmap info will only be limited available");
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"HTTP Error: {response.StatusCode}, beatmap info will only be limited available, Check if ur Clientcredentials are correct and u have a working Internet Connection!");
 
             }
 
@@ -119,7 +114,7 @@ namespace osu_progressCLI
             }
             else
             {
-                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Request failed with status code {reponse.StatusCode}");
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Beatmap Request failed with status code {reponse.StatusCode}");
 
                 return beatmap;
             }
@@ -156,7 +151,7 @@ namespace osu_progressCLI
             }
             else
             {
-                Logger.Log(Logger.Severity.Warning, Logger.Framework.Misc, $"Request failed with status code {reponse.StatusCode}");
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Misc, $"Search Request failed with status code {reponse.StatusCode}");
 
                 return search;
             }
@@ -166,7 +161,7 @@ namespace osu_progressCLI
             return search;
         }
 
-        public async Task<JObject> getuser(string userid, string mode)
+        public async Task<JObject> getuser(string userid , string mode)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting User info for: {userid}, {mode}");
 
@@ -174,12 +169,13 @@ namespace osu_progressCLI
             {
                 userTimestamp = DateTime.Now;
                 string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{userid}/{mode}";
-
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Request {searchEndpoint}");
                 var client = new HttpClient();
 
                 client.BaseAddress = new Uri(searchEndpoint);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Credentials.Instance.GetAccessToken());
                 client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("key", "username");
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
 
@@ -196,13 +192,17 @@ namespace osu_progressCLI
                 }
                 else
                 {
-                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Request failed with status code {reponse.StatusCode}");
+                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"User Request failed with status code {reponse.StatusCode}");
 
                     client.Dispose();
                     return usercache;
                 }
 
                 client.Dispose();
+            }
+            else {
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Serving Cached user: {usercache["username"]} | Refresh in {(userTimestamp - DateTime.Now.AddMinutes(-5)).TotalSeconds.ToString().Substring(0,3)} Seconds");
+                return usercache;
             }
             return usercache;
         }

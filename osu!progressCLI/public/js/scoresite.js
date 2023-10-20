@@ -118,9 +118,9 @@ function fetchOsuBeatmap() {
 
 
         <div id="playerdiv" class="">
-      
+             <img src="${data.CoverList}" class="h-32 rounded-lg">
         </div>
-          <img src="${data.CoverList}" class="h-32 rounded-lg">
+         
     </div>
   </div>
   <div class="flex flex-col justify-evenly w-2/5">
@@ -298,6 +298,66 @@ function fetchOsuBeatmap() {
                 }).catch(error => {
                     console.error('Error fetching recent score data:', error);
                     document.getElementById('scorecontainer').innerHTML = 'An error occurred while fetching data.';
+                });
+
+            apiUrl = `/api/user?userid=${data.Username}&mode=${data.Mode}`;
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(player => {
+                    console.log(player)
+
+                    let supporterlevel = "";
+                    for (let i = 0; i < player.support_level; i++) {
+                        supporterlevel += "♡";
+                    }
+
+                    let onlinediv = "";
+                    let status = "";
+                    if (player.is_online) {
+                        onlinediv = `
+                        <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Create an outer gray circle -->
+                            <circle cx="15" cy="15" r="7" fill="transparent" />
+
+                            <!-- Create an inner transparent circle -->
+                            <circle cx="15" cy="15" r="10" fill="transparent" stroke="green" stroke-width="4" />
+                        </svg> `
+                        status = "online";
+                    } else {
+                        onlinediv = `
+                        <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Create an outer gray circle -->
+                            <circle cx="15" cy="15" r="7" fill="transparent" />
+
+                            <!-- Create an inner transparent circle -->
+                            <circle cx="15" cy="15" r="10" fill="transparent" stroke="black" stroke-width="4" />
+                        </svg> `
+                        status = "offline";
+
+                    }
+
+                    document.getElementById('playerdiv').innerHTML = `
+                    <div class="relative">
+                    <div class="h-28 bg-cover rounded-lg relative" style="background-image: url(${player.cover_url})">
+                        <div class="absolute inset-0 bg-black opacity-50 rounded-lg">
+                        </div>
+
+                        <img src="${player.avatar_url}" class="h-16 absolute rounded-lg top-2 left-2">
+                        </div>
+                            <div class=" absolute rounded-lg top-2 left-24">   
+                                <span class="fi fi-${player.country_code.toLowerCase()} "></span>
+                            </div>
+                            <div class=" absolute rounded-lg top-2 left-32">${supporterlevel}</div>
+                            <div class=" absolute rounded-lg top-10 left-24">${player.username} </div>
+                            <div class=" absolute rounded-lg top-20 left-6">${onlinediv} </div>
+                              <div class=" absolute rounded-lg top-20 left-24">${status} </div>
+                        </div>
+                    </div>
+
+                    `;
+                }).catch(error => {
+                    console.error('Error fetching recent score data:', error);
+                    document.getElementById('playerdiv').innerHTML = 'An error occurred while fetching data.';
                 });
 
         })
