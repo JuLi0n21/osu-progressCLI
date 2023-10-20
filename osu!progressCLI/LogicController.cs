@@ -80,11 +80,12 @@ namespace osu1progressbar.Game.Logicstuff
 
 
         //the first time gets currentliy ignored cause it gets restarted after first entry (and is probably not running cause its set to stop in the memoryprovider incase no osu is found
-        public bool Logiccheck(OsuBaseAddresses NewValues)
+        public bool Logiccheck(OsuBaseAddresses Values)
         {
+            OsuBaseAddresses NewValues = new OsuBaseAddresses();
+            NewValues = Copy.DeepCopy(Values);   
             try
             {
-                string oldvalue = NewValues.ToString();
 
                 if (CurrentScreen != "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "Playing") { 
                     timeSinceStartedPlaying = Stopwatch.StartNew();
@@ -111,14 +112,16 @@ namespace osu1progressbar.Game.Logicstuff
                     Task.Run(() =>
                     {
                         watcher.WaitForChanged(WatcherChangeTypes.Created);
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"old values: {NewValues.Player.Hit300} new values: {Values.Player.Hit300}");
                         Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Replay found");
                         db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass", replayname);
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"old values: {NewValues.Player.Hit300} new values: {Values.Player.Hit300}");
                         replayname = null;
                     });
                 } 
                 else if (!isReplay && CurrentScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() != "Playing")
                 {
-                    Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Play Detected");
+                    Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Cancel Detected");
 
                     Task.Run(() =>
                     {
@@ -127,7 +130,7 @@ namespace osu1progressbar.Game.Logicstuff
                             db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Fail");
                         }
                         else {
-                            db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass");
+                            db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Cancel");
                         }
                       
                     });
