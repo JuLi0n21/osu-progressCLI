@@ -22,13 +22,16 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --configuration Release --output ${{ runner.workspace }}/osu!progress
-
+      run: dotnet build --configuration Release 
+      
     - name: Test
       run: dotnet test
 
+    - name: Publish Artifact
+      run: dotnet publish --configuration Release --output ${{ runner.workspace }}/osu!progress
+      
     - name: Archive Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: app
+        name: osu!progress_${{ github.sha }}
         path: ${{ runner.workspace }}/osu!progress
