@@ -17,8 +17,19 @@ function fetchOsuBeatmap() {
             console.log(data)
             beatmapid = data.Beatmapid;
 
+            let missanalyzerdiv;
+            if (Object.keys(data.Replay).length != 0) {
+                missanalyzerdiv = `<div class="flex justify-evenly">
+                                   <button id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600 hover:text-white">${data.HitMiss}↩</pre> </button>
+                                   </div>`;
+            } else {
+                missanalyzerdiv = `<div class="flex justify-evenly">
+                                   <button id="">  <pre title="No Replay Saved!" class="text-red-600">${data.HitMiss}⚠️</pre> </button>
+                                   </div>`;
+            }
+
             document.getElementById('beatmapData').innerHTML = `
-           <p class="relative top-4 left-4">${data.Status}</p>
+           <p class="relative top-6 left-4">${data.Status}</p>
             <div class="flex justify-center ml-4 mb-4 mr-4 text-xl">
               
         <h2>${data.Osufilename}</h2>
@@ -118,7 +129,7 @@ function fetchOsuBeatmap() {
 
 
         <div id="playerdiv" class="">
-             <img src="${data.CoverList}" class="h-32 rounded-lg">
+        Loading Player...
         </div>
          
     </div>
@@ -227,34 +238,17 @@ function fetchOsuBeatmap() {
           <div class="flex justify-evenly rounded-full score-backdrop--dark text-white">
             MISS
           </div>
-          <div class="flex justify-evenly">
-               <button id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600 hover:text-white">${data.HitMiss}↩</pre> </button>
-          </div>
+         ${missanalyzerdiv}
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<div class="flex">
-            <a class="text--pink--dark" href="tags.html?tags=${data.Tags}" title="Tags">Tags</a>
-
-                <a  class="text--pink" href="${data.CoverList}" target="_blank">
-                    <pre> CoverList </pre>
-                </a>
-
-                <a class="text--pink" href="${data.Cover}" target="_blank">
-                    <pre>Cover</pre>
-                </a>
-            </div>
-
-        </div>
-    </div>
 `;      
           
-
-            document.getElementById("MissAnalyzer").addEventListener("click", openAnalyzer)
-
+            if (document.getElementById("MissAnalyzer")) {
+                document.getElementById("MissAnalyzer").addEventListener("click", openAnalyzer)
+            }
             const playButton = document.getElementById("playButton");
             const audioPlayer = document.getElementById("audioPlayer");
 
@@ -297,7 +291,7 @@ function fetchOsuBeatmap() {
                     createLineChart('mapprogress', data, rowid);
                 }).catch(error => {
                     console.error('Error fetching recent score data:', error);
-                    document.getElementById('scorecontainer').innerHTML = 'An error occurred while fetching data.';
+                    document.getElementById('scorecontainer').innerHTML = 'An error occurred while fetching Beatmap Data.';
                 });
 
             apiUrl = `/api/user?userid=${data.Username}&mode=${data.Mode}`;
@@ -306,38 +300,38 @@ function fetchOsuBeatmap() {
                 .then(player => {
                     console.log(player)
 
-                    let supporterlevel = "";
+                    let supporterlevel = `<div class="text--pink">`;
                     for (let i = 0; i < player.support_level; i++) {
-                        supporterlevel += "♡";
+                        supporterlevel += `<i class="fas fa-heart"></i>`;
                     }
-
+                    supporterlevel += `</div>`
                     let onlinediv = "";
                     let status = "";
-                    if (player.is_online) {
+                    if (player.is_active) {
                         onlinediv = `
                         <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Create an outer gray circle -->
-                            <circle cx="15" cy="15" r="7" fill="transparent" />
-
-                            <!-- Create an inner transparent circle -->
+                       
+                            <circle cx="15" cy="15" r="13" fill="transparent" stroke="white" stroke-width="1"/>
+                            <circle cx="15" cy="15" r="8" fill="transparent" stroke="white" stroke-width="1"/>
                             <circle cx="15" cy="15" r="10" fill="transparent" stroke="green" stroke-width="4" />
+
                         </svg> `
-                        status = "online";
+                        status = "Online";
                     } else {
                         onlinediv = `
-                        <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Create an outer gray circle -->
-                            <circle cx="15" cy="15" r="7" fill="transparent" />
-
-                            <!-- Create an inner transparent circle -->
+                            <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+                            
+                            <circle cx="15" cy="15" r="13" fill="transparent" stroke="white" stroke-width="1"/>
+                            <circle cx="15" cy="15" r="8" fill="transparent" stroke="white" stroke-width="1"/>
                             <circle cx="15" cy="15" r="10" fill="transparent" stroke="black" stroke-width="4" />
+
                         </svg> `
-                        status = "offline";
+                        status = "Offline";
 
                     }
 
                     document.getElementById('playerdiv').innerHTML = `
-                    <div class="relative">
+                    <a href="https://osu.ppy.sh/users/${player.id}" class="relative">
                     <div class="h-28 bg-cover rounded-lg relative" style="background-image: url(${player.cover_url})">
                         <div class="absolute inset-0 bg-black opacity-50 rounded-lg">
                         </div>
@@ -347,12 +341,13 @@ function fetchOsuBeatmap() {
                             <div class=" absolute rounded-lg top-2 left-24">   
                                 <span class="fi fi-${player.country_code.toLowerCase()} "></span>
                             </div>
-                            <div class=" absolute rounded-lg top-2 left-32">${supporterlevel}</div>
+                            <div class=" absolute rounded-lg top-2 left-32">
+                            <p class="text-red-600"> ${supporterlevel} </p></div>
                             <div class=" absolute rounded-lg top-10 left-24">${player.username} </div>
                             <div class=" absolute rounded-lg top-20 left-6">${onlinediv} </div>
                               <div class=" absolute rounded-lg top-20 left-24">${status} </div>
                         </div>
-                    </div>
+                    </a>
 
                     `;
                 }).catch(error => {
@@ -363,7 +358,7 @@ function fetchOsuBeatmap() {
         })
         .catch(error => {
             console.error('Error fetching beatmap data:', error);
-            document.getElementById('beatmapData').innerHTML = 'An error occurred while fetching data.';
+            document.getElementById('beatmapData').innerHTML = 'An error occurred while fetching Player data.';
         });
 }
 
