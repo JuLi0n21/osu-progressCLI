@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using osu1progressbar.Game.Database;
 using System.Diagnostics;
 using static System.Formats.Asn1.AsnWriter;
 
@@ -24,7 +25,7 @@ namespace osu_progressCLI.server
             }
         }
 
-        public string generatepage(string userid, string mode)
+        public string generatepage(string userid, string mode, WeekCompare week)
         {
             //Console.WriteLine(userid);
 
@@ -36,8 +37,14 @@ namespace osu_progressCLI.server
             string avatar_url = "https://osu.ppy.sh/images/layout/avatar-guest.png";
             string cover_url = "https://osu.ppy.sh/images/headers/profile-covers/c" + rdm.Next(1,9).ToString() + ".jpg";
             string country = "Unknown";
+            string countrycode ="USA";
             string rank = "-";
+            string countryrank = "-";
 
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $@" Screen: {week.Status} Lastweek: {week.LastWeek} ThisWeek: {week.ThisWeek}");
+            string BanchoStatus = week.Status;
+            string playtimethisweek = (week.ThisWeek / 3600).ToString().PadRight(5).Substring(0,5);
+            string diffrencetolastweek = ((week.ThisWeek - week.LastWeek) / week.LastWeek * 100).ToString().PadRight(6).Substring(0,6);
             if (config.Localconfig == "False" || user == null) {
                 user = ApiController.Instance.getuser(userid, mode).Result;
 
@@ -47,7 +54,9 @@ namespace osu_progressCLI.server
                     avatar_url = user["avatar_url"]?.ToString();
                     cover_url = user["cover_url"]?.ToString();
                     country = user["country"]["name"]?.ToString();
+                    countrycode = user["country"]["code"]?.ToString().ToLower();
                     rank = user["statistics"]["global_rank"]?.ToString();
+                    countryrank = user["statistics"]["country_rank"]?.ToString();
                 }
             }
             else {
@@ -97,6 +106,7 @@ namespace osu_progressCLI.server
     <script src=""https://cdn.jsdelivr.net/npm/moment""></script>
     <script src=""https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1""></script>
     <link href=""https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css"" rel=""stylesheet"" />
+    <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.11.0/css/flag-icons.min.css"" /> 
     <link rel=""stylesheet"" href=""style.css"">
     <link rel=""stylesheet"" href=""https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"">
     <style>
@@ -243,13 +253,13 @@ namespace osu_progressCLI.server
             <div class=""flex"">
                 <div class=""ml-60 text-left pt-6 pb-6"">
                     <p class=""usernameplaceholder"">{username}</p>  
-                    <p class=""rankplaceholder"">#{rank}</p>
-                    <p class=""countryplaceholder"">{country}</p>
+                    <p class=""rankplaceholder"">#{rank} (#{countryrank})</p>
+                    <p class=""countryplaceholder"">  <span class=""fi fi-{countrycode}""></span>{country}</p>
                 </div>
 
                 <div class=""ml-60 text-left pt-6 pb-6"">
-                    <p class=""usernameplaceholder"">⏰ 7H (-6%) [afk]</p>  
-                    <p class=""rankplaceholder"">💻 MainMemu</p>
+                    <p class=""usernameplaceholder"">⏰ {playtimethisweek}H ({diffrencetolastweek}%) [{BanchoStatus}]</p>  
+                    <p class=""rankplaceholder"">💻 {week.Screen}</p>
                     <p class=""countryplaceholder"">📈200pp 📊232</p>
                 </div>
             </div>

@@ -29,7 +29,7 @@ namespace osu_progressCLI.server
         //defautl page
         public void defaultpage(HttpListenerRequest request, HttpListenerResponse response) {
 
-            WriteResponse(response, PageGenerator.Instance.generatepage(Credentials.Instance.GetConfig().userid, "osu"), "text/html");
+            WriteResponse(response, PageGenerator.Instance.generatepage(Credentials.Instance.GetConfig().userid, "osu",controller.GetWeekCompare()), "text/html");
             //ServeStaticFile(response, "server/html/index.html", "text/html");
         }
 

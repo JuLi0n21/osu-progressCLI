@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using System.Data.SQLite;
 using OsuMemoryDataProvider.OsuMemoryModels;
 using Newtonsoft.Json.Linq;
 using osu_progressCLI;
-using OsuMemoryDataProvider.OsuMemoryModels.Abstract;
-using static System.Formats.Asn1.AsnWriter;
-using System.Diagnostics.Metrics;
-using System.Diagnostics;
-using System.Runtime.ConstrainedExecution;
-using System.Reflection.PortableExecutable;
-using static System.Data.Entity.Infrastructure.Design.Executor;
+
 
 
 namespace osu1progressbar.Game.Database
@@ -811,10 +801,83 @@ namespace osu1progressbar.Game.Database
             return scoreAverages;
         }
 
+        public WeekCompare GetWeekCompare()
+        {
+            
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                WeekCompare week = new WeekCompare();
+                
+                connection.Open();
+
+                string sqlQuery = @"
+                         WITH StatusTime AS (
+                            SELECT
+                                BanchoStatus AS Status,
+                                SUM(CASE
+                                    WHEN julianday('now') - julianday(Date) BETWEEN 0 AND 7 THEN Time
+                                    ELSE 0
+                                END) AS Last7DaysTime,
+                                SUM(CASE
+                                    WHEN julianday('now') - julianday(Date) BETWEEN 8 AND 15 THEN Time
+                                    ELSE 0
+                                END) AS EightTo15DaysTime
+                            FROM BanchoTime
+                            GROUP BY Status
+                        )
+
+                        SELECT
+                            Status,
+                            TotalLast7DaysTime,
+                            TotalEightTo15DaysTime
+                        FROM StatusTime,
+                            (SELECT
+                                SUM(Last7DaysTime) AS TotalLast7DaysTime,
+                                SUM(EightTo15DaysTime) AS TotalEightTo15DaysTime
+                            FROM StatusTime) AS Totals
+                        WHERE Last7DaysTime = (SELECT MAX(Last7DaysTime) FROM StatusTime);
+                        ";
+
+                using (SQLiteCommand cmd = new SQLiteCommand(sqlQuery, connection))
+                {
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            week.Status = reader["Status"].ToString();
+                            week.LastWeek = Convert.ToDouble(reader["TotalEightTo15DaysTime"]);
+                            week.ThisWeek = Convert.ToDouble(reader["TotalLast7DaysTime"]);
+
+                        }
+                    }
+                }
+
+                sqlQuery = @"SELECT SUM(Time) AS TotalTimeWasted, RawStatus
+                            FROM TimeWasted
+                            WHERE Date >= date('now', '-7 days')
+                            GROUP BY RawStatus
+                            ORDER BY TotalTimeWasted DESC;
+                            ";
+
+                using (SQLiteCommand cmd = new SQLiteCommand(sqlQuery, connection))
+                {
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            week.Screen = DifficultyAttributes.ScreenConverter(int.Parse(reader["RawStatus"].ToString()));
+                        }
+                    }
+                }
+                return week;
+            }
+            return new WeekCompare();
+        }
+
         public int GetScoreAmounts(DateTime from, DateTime to)
         {
             int rows = -1;
-            string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
+            string fromFormatted = from.ToString("yyyy -MM-dd HH:mm:ss");
             string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -1105,6 +1168,14 @@ namespace osu1progressbar.Game.Database
             return result;
         }
 
+    }
+
+    public class WeekCompare
+    {
+        public string Status { get; set; }
+        public string Screen { get; set; }
+        public double LastWeek { get; set; }
+        public double ThisWeek { get; set; }
     }
 }
 
