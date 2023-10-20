@@ -41,15 +41,22 @@ public static class Logger
 
         string logFileName = $"{framework}_Log.txt";
 
-        File.AppendAllText(logFileName, logEntry + Environment.NewLine);
+        try
+        {
+            File.AppendAllText(logFileName, logEntry + Environment.NewLine);
 
-        if (severity >= Severity.Error)
-        {
-            Console.Error.WriteLine(logEntry);
+            if (severity >= Severity.Error)
+            {
+                Console.Error.WriteLine(logEntry);
+            }
+            else if (severity >= currentLogLevel)
+            {
+                Console.WriteLine(logEntry);
+            }
         }
-        else if (severity >= currentLogLevel)
-        {
-            Console.WriteLine(logEntry);
+        catch(Exception e){
+        
+            Logger.Log(Severity.Error,Framework.Misc,e.Message);
         }
     }
 }
