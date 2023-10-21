@@ -4,6 +4,7 @@ const audioTimeElement = document.getElementById('audio-time');
 const audioBarElement = document.getElementById('audio-bar');
 const audioTextElement = document.getElementById('audio-text');
 let lastAudioTime = 0;
+let lastMessageReceivedTime = Date.now();
 
 socket.addEventListener('open', (event) => {
     socket.send('Hello, server!');
@@ -30,27 +31,60 @@ socket.addEventListener('message', (event) => {
 
             //rewirte 
             if (audioTime === lastAudioTime) {
-                playstats = "Paused"
-                if (jsonData.Data.GeneralData.RawStatus == 2) {
-                    content = `${songName}, AR: ${ar}, CS: ${cs}, HP: ${hp}, OD: ${od}`;
-                    //colors and shit make divs (p)
-                    content = `${songName} --- ACC:${jsonData.Data.Player.Accuracy.toFixed(2)} ${jsonData.Data.Player.Hit100} ${jsonData.Data.Player.Hit50} ${jsonData.Data.Player.HitMiss.toFixed(2)} | CS: ${cs}, HP: ${hp}, OD: ${od}`;
-                } else {
-                    content = `${songName}, AR: ${ar}, CS: ${cs}, HP: ${hp}, OD: ${od}`;
-                }
+                playstats = `Paused ${songName}`
+            content = `<div class="flex justify-center"> 
+                        AR: ${ar}, CS: ${cs}, HP: ${hp}, OD: ${od}
+                    </div>
+                    <div class="flex justify-evenly">
+                        <div>
+                            Screen: ${jsonData.Data.GeneralData.RawStatus}
+                        </div>
+                      
+                       <div>
+                       </div>
+                       
+                       <div>
+                              Status: ${jsonData.Data.BanchoUser.BanchoStatus}
+                        </div>
+                    </div>`;
+                
 
             } else if (jsonData.Data.GeneralData.RawStatus != 2) {
-                playstats = "Listening to"
-                content = `${songName}`
+                playstats = `Listening to ${songName}`
+                content = `<div class="flex justify-center"> 
+                        AR: ${ar}, CS: ${cs}, HP: ${hp}, OD: ${od}
+                    </div>
+                    <div class="flex justify-evenly">
+                        <div>
+                            Screen: ${jsonData.Data.GeneralData.RawStatus}
+                        </div>
+                      
+                       <div>
+                       </div>
+                       
+                       <div>
+                              Status: ${jsonData.Data.BanchoUser.BanchoStatus}
+                        </div>
+                    </div>`;
+              
             } else if (jsonData.Data.GeneralData.RawStatus == 2) {
-                playstats = "Playing"
-                content = `${songName}, AR: ${ar}, CS: ${cs}, HP: ${hp}, OD: ${od}`;
-                //colors and shit make divs (p)
-                content = `${songName} --- ACC:${jsonData.Data.Player.Accuracy.toFixed(2)} ${jsonData.Data.Player.Hit100} ${jsonData.Data.Player.Hit50} ${jsonData.Data.Player.HitMiss.toFixed(2)} | CS: ${cs}, HP: ${hp}, OD: ${od}`;
+                playstats = `Playing ${songName}`;
+                content =
+                    `<div class="flex justify-center"> 
+                    <div class="flex">
+                        <div class="flex">
+                            <pre class="text--yellow"> ${jsonData.Data.Player.Accuracy.toFixed(2)}%</pre>
+                            <pre class="text-green-500"> ${jsonData.Data.Player.Hit100} </pre>
+                            <pre class="text--orange"> ${jsonData.Data.Player.Hit50} </pre>
+                            <pre class="text-red-500"> ${jsonData.Data.Player.HitMiss} </pre>
+                            <pre class="text--ping"> ${jsonData.Data.Player.Score} </pre>
+                       </div>
+                    </div>
+                </div>`
             }
-            statusText.textContent = `${playstats} ${content}`;
+            statusText.innerHTML = `${playstats} ${content}`;
 
-            //ingame
+            //INGAME
 
 
             lastAudioTime = audioTime;
@@ -64,6 +98,8 @@ socket.addEventListener('message', (event) => {
                 <div class="justify-self-end">${Math.floor((totalAudioTime / 1000) / 60)}:${Math.floor((totalAudioTime / 1000) % 60).toString().padStart(2,'0').slice(0,3) }  </div>
             </div>`;
 
+            lastMessageReceivedTime = Date.now();
+            checkForInactivity();
         }
     } catch (error) {
         console.error('Error parsing JSON:', error);
@@ -89,24 +125,24 @@ function showStatusBar(text) {
     statusBar.classList.remove('hidden');
 }
 
-function hideStatusBar() {
-    statusBar.classList.add('hidden');
-}
+function checkForInactivity() {
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - lastMessageReceivedTime;
 
-let isPlaying = true; // You can change this to control the song state
-let songProgress = "300";
-let songVolume = "100";
-let songTempo = "50";
-let songKey = "X";
-
-function updateStatusBar() {
-    if (isPlaying) {
-        showStatusBar(`Playing (song ${songProgress} ${songVolume} ${songTempo} ${songKey})`);
+    if (elapsedTime >= 5000) {
+        yourFunctionToCall();
     } else {
-        showStatusBar("Paused");
+        setTimeout(checkForInactivity, 5000);
     }
 }
 
-updateStatusBar();
+checkForInactivity();
+
+function yourFunctionToCall() {
+    //Reset Status BAr
+    audioTimeElement.style.width = 0 + '%';
+    audioTextElement.innerHTML = ``;
+    statusText.textContent = `Live Statusbar!`;
+}
 
 
