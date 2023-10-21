@@ -1,53 +1,105 @@
 ﻿using System;
 using System.Collections.Generic;
-using Fleck;
+using System.Net;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace osu_progressCLI.server
 {
-    internal class WebSocketServer
+    internal class OsuWebSocket
     {
-        private static WebSocketServer instance;
-        private readonly List<IWebSocketConnection> connections;
-        private Fleck.WebSocketServer server;
+        private static OsuWebSocket instance;
+        private readonly List<WebSocket> connections;
+        private HttpListener listener;
 
-        private WebSocketServer()
+        private OsuWebSocket()
         {
-            connections = new List<IWebSocketConnection>();
-            server = new Fleck.WebSocketServer($"ws://localhost:{Credentials.Instance.GetConfig().port}");
+            connections = new List<WebSocket>();
 
-            server.Start(socket =>
-            {
-                socket.OnOpen = () =>
-                {
-                    Console.WriteLine($"WebSocket connection open: {socket.ConnectionInfo.Id}");
-                    connections.Add(socket);
-                };
-
-                socket.OnClose = () =>
-                {
-                    Console.WriteLine($"WebSocket connection closed: {socket.ConnectionInfo.Id}");
-                    connections.Remove(socket);
-                };
-            });
+            Task.Run(() => StartWebSocketServer());
         }
 
-        public static WebSocketServer Instance
+        private async Task StartWebSocketServer()
+        {
+            HttpListener listener = new HttpListener();
+            listener.Prefixes.Add($"http://127.0.0.1:{Credentials.Instance.GetConfig().port}/");
+            listener.Start();
+
+            while (true)
+            {
+                try
+                {
+                    var context = await listener.GetContextAsync();
+                    if (context.Request.IsWebSocketRequest)
+                    {
+                        WebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
+                        WebSocket webSocket = webSocketContext.WebSocket;
+                        Console.WriteLine($"WebSocket connection open: {webSocket.GetHashCode()}");
+                        connections.Add(webSocket);
+
+                        await HandleWebSocket(webSocket);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error accepting WebSocket client: {ex.Message}");
+                }
+            }
+        }
+
+        private async Task HandleWebSocket(WebSocket webSocket)
+        {
+            byte[] buffer = new byte[1024];
+
+            while (webSocket.State == WebSocketState.Open)
+            {
+                try
+                {
+                    WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        Console.WriteLine($"WebSocket connection closed: {webSocket.GetHashCode()}");
+                        connections.Remove(webSocket);
+                        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by the server", CancellationToken.None);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error receiving WebSocket message: {ex.Message}");
+                }
+            }
+        }
+
+        public static OsuWebSocket Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = new WebSocketServer();
+                    instance = new OsuWebSocket();
                 }
                 return instance;
             }
         }
 
-        public void SendDataToClients(string data)
+        public async Task SendData(object data)
         {
-            foreach (var socket in connections)
+            var dataJson = JsonConvert.SerializeObject(data);
+            var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(dataJson));
+
+            foreach (var webSocket in connections)
             {
-                socket.Send(data);
+                try
+                {
+                    await webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error sending WebSocket data: {ex.Message}");
+                }
             }
         }
     }

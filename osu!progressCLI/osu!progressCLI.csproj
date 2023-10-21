@@ -52,6 +52,7 @@
 	  <None Remove="public\js\scoreexample.js" />
 	  <None Remove="public\js\scoresite.ts" />
 	  <None Remove="public\js\sidebar.txt" />
+	  <None Remove="public\js\TextFile1.txt" />
 	</ItemGroup>
 
 	<ItemGroup>

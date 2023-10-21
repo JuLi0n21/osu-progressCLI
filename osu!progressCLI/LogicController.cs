@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+using Fleck;
+using osu_progressCLI;
+using osu_progressCLI.server;
 using osu1progressbar.Game.Database;
 using osu1progressbar.Game.MemoryProvider;
 using OsuMemoryDataProvider.OsuMemoryModels;
@@ -29,6 +33,8 @@ namespace osu1progressbar.Game.Logicstuff
         public Stopwatch BanchoTimeStopWatch;
         private Stopwatch stopwatch;
         public Stopwatch timeSinceStartedPlaying;
+
+        private Webserver webserver;
 
 
         FileSystemWatcher watcher = null;
@@ -99,7 +105,8 @@ namespace osu1progressbar.Game.Logicstuff
                     screenTimeStopWatch.Restart();
                 }
 
-                if (BanchoUserStatus != NewValues.BanchoUser.BanchoStatus.ToString())
+                //DOESNT WORK WITH THE COPYED DATA (IDK WHY)
+                if (BanchoUserStatus != Values.BanchoUser.BanchoStatus.ToString())
                 {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, $"Banchotime: {BanchoTimeStopWatch.ElapsedMilliseconds / 1000}s {BanchoUserStatus}");
                     db.UpdateBanchoTime(BanchoUserStatus, BanchoTimeStopWatch.ElapsedMilliseconds / 1000);
@@ -142,12 +149,17 @@ namespace osu1progressbar.Game.Logicstuff
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Retry Detected");
                     db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Retry");
                 };
-                 
+
+               
+
                 CurrentScreen = NewValues.GeneralData.OsuStatus.ToString();
-                BanchoUserStatus = NewValues.BanchoUser.BanchoStatus.ToString();
+               // Console.WriteLine($"{CurrentScreen}, {NewValues.GeneralData.OsuStatus}");
+                BanchoUserStatus = Values.BanchoUser.BanchoStatus.ToString();
                 oldRawStatus = NewValues.GeneralData.RawStatus;
                 Audiotime = NewValues.GeneralData.AudioTime;
                 isReplay = NewValues.Player.IsReplay;
+
+                Task.Run(async () => await Webserver.Instance().SendData("baseaddresses", Values));
 
                 return true;
             }

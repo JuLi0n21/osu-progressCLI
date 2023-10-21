@@ -27,70 +27,99 @@ namespace osu_progressCLI.server
 
         public string generatepage(string userid, string mode, WeekCompare week)
         {
-            //Console.WriteLine(userid);
+            try {
 
-            var config = Credentials.Instance.GetConfig();
+                var config = Credentials.Instance.GetConfig();
 
-            Random rdm  = new Random();
+                Random rdm = new Random();
 
-            string username = "Guest";
-            string avatar_url = "https://osu.ppy.sh/images/layout/avatar-guest.png";
-            string cover_url = "https://osu.ppy.sh/images/headers/profile-covers/c" + rdm.Next(1,9).ToString() + ".jpg";
-            string country = "Unknown";
-            string countrycode ="USA";
-            string rank = "-";
-            string countryrank = "-";
+                string username = "Guest";
+                string avatar_url = "https://osu.ppy.sh/images/layout/avatar-guest.png";
+                string cover_url = "https://osu.ppy.sh/images/headers/profile-covers/c" + rdm.Next(1, 9).ToString() + ".jpg";
+                string country = "Unknown";
+                string countrycode = "USA";
+                string rank = "-";
+                string countryrank = "-";
 
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $@" Screen: {week.Status} Lastweek: {week.LastWeek} ThisWeek: {week.ThisWeek}");
-            string BanchoStatus = week.Status;
-            string playtimethisweek = (week.ThisWeek / 3600).ToString().PadRight(5).Substring(0,5);
-            string diffrencetolastweek = ((week.ThisWeek - week.LastWeek) / week.LastWeek * 100).ToString().PadRight(6).Substring(0,6);
-            if (config.Localconfig == "False" || user == null) {
-                user = ApiController.Instance.getuser(userid, mode).Result;
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $@" Screen: {week.Status} Lastweek: {week.LastWeek} ThisWeek: {week.ThisWeek}");
+                string BanchoStatus = week.Status;
+                string playtimethisweek = (week.ThisWeek / 3600).ToString().PadRight(5).Substring(0, 5);
+                string diffrencetolastweek = ((week.ThisWeek - week.LastWeek) / week.LastWeek * 100).ToString().PadRight(6).Substring(0, 6);
+                if (config.Localconfig == "False" || user == null) {
+                  try
+                    {
+                        user = ApiController.Instance.getuser(userid, mode).Result;
 
-                if (user != null)
-                {
-                    username = user["username"]?.ToString();
-                    avatar_url = user["avatar_url"]?.ToString();
-                    cover_url = user["cover_url"]?.ToString();
-                    country = user["country"]["name"]?.ToString();
-                    countrycode = user["country"]["code"]?.ToString().ToLower();
-                    rank = user["statistics"]["global_rank"]?.ToString();
-                    countryrank = user["statistics"]["country_rank"]?.ToString();
+                    } catch {
+                        if (!string.IsNullOrEmpty(config.username))
+                        {
+                            username = config.username;
+                        }
+
+                        if (!string.IsNullOrEmpty(config.avatar_url))
+                        {
+                            avatar_url = config.avatar_url;
+                        }
+
+                        if (!string.IsNullOrEmpty(config.cover_url))
+                        {
+                            cover_url = config.cover_url;
+                        }
+
+                        if (!string.IsNullOrEmpty(config.country))
+                        {
+                            country = config.country;
+                        }
+
+                        if (!string.IsNullOrEmpty(config.rank))
+                        {
+                            rank = config.rank;
+                        }
+                    }
+
+                    if (user != null)
+                    {
+                        username = user["username"]?.ToString();
+                        avatar_url = user["avatar_url"]?.ToString();
+                        cover_url = user["cover_url"]?.ToString();
+                        country = user["country"]["name"]?.ToString();
+                        countrycode = user["country"]["code"]?.ToString().ToLower();
+                        rank = user["statistics"]["global_rank"]?.ToString();
+                        countryrank = user["statistics"]["country_rank"]?.ToString();
+                    }
                 }
-            }
-            else {
+                else {
 
-                if (!string.IsNullOrEmpty(config.username))
-                {
-                    username = config.username;
+                    if (!string.IsNullOrEmpty(config.username))
+                    {
+                        username = config.username;
+                    }
+
+                    if (!string.IsNullOrEmpty(config.avatar_url))
+                    {
+                        avatar_url = config.avatar_url;
+                    }
+
+                    if (!string.IsNullOrEmpty(config.cover_url))
+                    {
+                        cover_url = config.cover_url;
+                    }
+
+                    if (!string.IsNullOrEmpty(config.country))
+                    {
+                        country = config.country;
+                    }
+
+                    if (!string.IsNullOrEmpty(config.rank))
+                    {
+                        rank = config.rank;
+                    }
                 }
 
-                if (!string.IsNullOrEmpty(config.avatar_url))
-                {
-                    avatar_url = config.avatar_url;
-                }
-
-                if (!string.IsNullOrEmpty(config.cover_url))
-                {
-                    cover_url = config.cover_url;
-                }
-
-                if (!string.IsNullOrEmpty(config.country))
-                {
-                    country = config.country;
-                }
-
-                if (!string.IsNullOrEmpty(config.rank))
-                {
-                    rank = config.rank;
-                }
-            }
 
 
 
-
-            string html = $@"
+                string html = $@"
 <!DOCTYPE html>
 <html lang=""en"">
 <head>
@@ -117,21 +146,21 @@ namespace osu_progressCLI.server
 
 
     <!-- Reload button -->
-    <div class=""fixed top-0 right-20"">
+    <div class=""fixed top-10 right-20 z-40"">
         <button id=""loadDataButton"" class=""text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 backdrop--medium"">
             <img src=""https://upload.wikimedia.org/wikipedia/commons/9/9a/Refresh_font_awesome.svg"" alt=""Refresh"" style=""width: 24px; height: 24px; filter: invert(100%);"" />
         </button>
     </div>
 
     <!-- Settings button -->
-    <div class=""fixed top-0 right-0"">
-        <button id=""settingsButton"" class=""text-white rounded-full p-3 shadow-lg mr-4 mt-4 backdrop--medium"">
+    <div class=""fixed top-10 right-0 z-40"">
+        <button id=""settingsButton"" class=""text-white rounded-full p-3 z-30 shadow-lg mr-4 mt-4 backdrop--medium"">
             <i class=""fa-solid fa-pen"" style=""color: #ffffff;""></i>
         </button>
     </div>
 
 <!-- Settings panel (initially hidden) -->
-<div id=""settingsPanel"" class=""fixed top-20 right-5 transform rounded-lg scale-0 transition-transform duration-300 ease-in-out text-white text backdrop--dark"">
+<div id=""settingsPanel"" class=""fixed top-0 right-5 transform z-30 rounded-lg scale-0 transition-transform duration-300 ease-in-out text-white text backdrop--dark"">
     <i class=""fas fa-info-circle ml-2 text-blue-500 cursor-pointer hover:text-blue-700 top-0 right-0"" title=""Add informative text!""></i>
 
     <h2 class=""text-xl text-center font-semibold mb-4"">Settings</h2>
@@ -234,7 +263,16 @@ namespace osu_progressCLI.server
         <div class=""toggle-rectangle border-t border-b border-r border-pink-600 rounded-r-lg p-4 hover:border-yellow-500"" id=""toggleButton""></div>
     </div>
 <!-- Recap -->
+<!-- Live Status-->
+    <div id=""status-bar"" class=""sticky top-0 w-full h-20 backdrop--medium text-white text-center p-2"">
+        <span id=""status-text""></span>
+<div id=""audio-bar"">
+    <div id=""audio-time""></div>
+    <div id=""audio-text""></div>
 
+</div>
+
+    </div>
     <!-- Main page-->
     <div class=""flex justify-center items-center"">
 
@@ -334,6 +372,10 @@ namespace osu_progressCLI.server
     <script src=""timespend.js""></script>
     <script src=""timespendtotal.js""></script>
     <script src=""sidebar.js""></script>
+<script>     
+    const socket = new WebSocket('ws://localhost:{Credentials.Instance.GetConfig().port}');
+</script>
+    <script src=""websocket.js""></script>
     <script>
    
 document.getElementById('loadDataButton').addEventListener('click', function () {{
@@ -422,7 +464,7 @@ document.getElementById('loadDataButton').addEventListener('click', function () 
         }});
 
     
-
+    
 
     </script>
 
@@ -431,7 +473,12 @@ document.getElementById('loadDataButton').addEventListener('click', function () 
 
             ";
 
-            return html;
-        }
-    }
+                return html;
+            } catch (Exception e)
+            {
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Network, e.Message);
+                return "Please make sure ur internet is working";
+            }
+        }  
+    } 
 }
