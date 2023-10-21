@@ -38,7 +38,7 @@ namespace osu1progressbar.Game.Logicstuff
 
 
         FileSystemWatcher watcher = null;
-        static string folderPath = @"G:\Anwendungen\osu!\Data\r"; // Replace with your folder path
+        static string folderPath = @$"{Credentials.Instance.GetConfig().osufolder}\Data\r"; // Replace with your folder path
         static string newestFile;
         static DateTime newestFileTime = DateTime.MinValue;
 
