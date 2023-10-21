@@ -63,6 +63,7 @@ current endpoints are
 - [ ] api documentaion / renaming
 - [ ] api endpoint for custome querys
 - [ ] pp calc for potenial scores on scorepage
+- [ ] change chart value from seconds to minutes
 - [ ] charts on score page (performance over time with filters)
 - [x] replace modtext with mod icons in recent score
 - [ ] importer for [circle-tracker](https://github.com/FunOrange/circle-tracker)
