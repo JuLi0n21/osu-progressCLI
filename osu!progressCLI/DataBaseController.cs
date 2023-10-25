@@ -477,14 +477,6 @@ namespace osu1progressbar.Game.Database
                     ";
 
                     DateTime dateTime = DateTime.Now;
-                    float ur = 0; // calculate ur here.
-                    int urcount = 0;
-
-                    baseAddresses.Player.HitErrors.ForEach(error =>
-                    {
-                        ur += error;
-                        urcount++;
-                    });
 
                     //Console.WriteLine(((ur / urcount) * 100).ToString());
 
@@ -498,12 +490,12 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Foldername", baseAddresses.Beatmap.FolderName);
                         command.Parameters.AddWithValue("@Replay", replay);
                         command.Parameters.AddWithValue("@Playtype", playtype);
-                        command.Parameters.AddWithValue("@Ar", baseAddresses.Beatmap.Ar);
-                        command.Parameters.AddWithValue("@Cs", baseAddresses.Beatmap.Cs);
-                        command.Parameters.AddWithValue("@Hp", baseAddresses.Beatmap.Hp);
-                        command.Parameters.AddWithValue("@Od", baseAddresses.Beatmap.Od);
+                        command.Parameters.AddWithValue("@Ar", perfomanceAttributes.ar);
+                        command.Parameters.AddWithValue("@Cs", baseAddresses.Beatmap.Cs); //needs mod recalculation
+                        command.Parameters.AddWithValue("@Hp", baseAddresses.Beatmap.Hp); //needs mod recalculation
+                        command.Parameters.AddWithValue("@Od", perfomanceAttributes.od);
                         command.Parameters.AddWithValue("@Status", status);
-                        command.Parameters.AddWithValue("@SR", starrating);
+                        command.Parameters.AddWithValue("@SR", perfomanceAttributes.starrating);
                         command.Parameters.AddWithValue("@Bpm", bpm);
                         command.Parameters.AddWithValue("@Creator", creator);
                         command.Parameters.AddWithValue("@Artist", artist);

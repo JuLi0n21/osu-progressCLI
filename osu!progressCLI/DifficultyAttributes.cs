@@ -121,7 +121,7 @@ namespace osu_progressCLI
 
         private static PerfomanceAttributes ParseOutput(string output)
         {
-            string pattern = @"star rating\s+:\s+(?<starrating>[\d.]+)|pp\s+:\s+(?<pp>[\d.,]+)|max combo\s+:\s+(?<maxcombo>[\d.,]+)|accuracy\s+:\s+(?<accuracy>[\d.]+)|speed\s+:\s+(?<speed>[\d.]+)|aim\s+:\s+(?<aim>[\d.]+)";
+            string pattern = @"star rating\s+:\s+(?<starrating>[\d.]+)|pp\s+:\s+(?<pp>[\d.,]+)|max combo\s+:\s+(?<maxcombo>[\d.,]+)|accuracy\s+:\s+(?<accuracy>[\d.]+)|speed\s+:\s+(?<speed>[\d.]+)|aim\s+:\s+(?<aim>[\d.]+)|overall difficulty\s+:\s+(?<overalldifficulty>[\d.]+)|approach rate\s+:\s+(?<appraochrate>[\d.]+)";
 
             Regex regex = new Regex(pattern);
 
@@ -162,6 +162,18 @@ namespace osu_progressCLI
                     {
                         attributes.aim = aim / 100;
                         Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"aim: {attributes.aim}");
+                    }
+
+                    if (match.Groups["appraochrate"].Success && double.TryParse(match.Groups["appraochrate"].Value.Replace(".", "").Replace(",", ""), out double ar))
+                    {
+                        attributes.ar = ar / 100;
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"appraochrate: {attributes.ar}");
+                    }
+
+                    if (match.Groups["overalldifficulty"].Success && double.TryParse(match.Groups["overalldifficulty"].Value.Replace(".", "").Replace(",", ""), out double od))
+                    {
+                        attributes.od = od/ 100;
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"overalldifficulty: {attributes.od}");
                     }
 
                 }
@@ -318,6 +330,8 @@ namespace osu_progressCLI
        public double accuracy { get; set; }
        public double pp { get; set; }
        public double starrating { get; set; }
+       public double ar { get; set; }
+       public double od { get; set; }
        public int Maxcombo { get; set; }
        public string grade { get; set; } = "E";
     }
