@@ -1,45 +1,21 @@
 ﻿using osu1progressbar.Game.Database;
 using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace osu_progressCLI
 {
     internal class DifficultyAttributes
     {
 
-        public static double CalculateFcWithAcc(string folderName, string fileName, double Acc = 100, int mods = 0, int mode = 0) {
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Calculating PP: {Acc}, {mods}, {mode}");
-
-            string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
-
-            string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} \"{fullPath}\" --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
-
-            string output = cmdOutput("osu-tools", command);
-            
-            PerfomanceAttributes attributes = ParseOutput(output);
-
-            return attributes.pp;
-        }
-
-        public static double CalculateFcWithAcc(int id, double Acc = 100, int mods = 0, int mode = 0)
-        {
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Calculating PP from ID:{id}, Acc: {Acc}, Mods: {mods}, Mode: {ModeConverter(mode)}({mode})");
-            string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} {id} --accuracy {Acc} --percent-combo 100 {ModParser.PPCalcMods(mods)}";
-
-            string output = cmdOutput("osu-tools", command);
-
-            PerfomanceAttributes attributes = ParseOutput(output);
-
-            return attributes.pp;
-        }
-
-        public static PerfomanceAttributes CalculatePP(string folderName, string fileName, int mods, int missCount, int mehCount, int goodCount, int perfectcount, int combo, int mode = 0)
+        public static PerfomanceAttributes CalculatePP(string folderName, string fileName, int score, int mods, int missCount, int mehCount, int goodCount, int perfectcount, double accuracy = 0, int combo = 0, int mode = 0)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Calculating PP: Miss:{missCount}, Meh:{mehCount}, Good:{goodCount}, Perfect:{perfectcount}, Combo:{combo} Mods: {mods}, Mode: {ModeConverter(mode)}({mode})");
             PerfomanceAttributes perfomanceAttributes = new PerfomanceAttributes();
 
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
-            string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} \"{fullPath}\" --combo {combo} --misses {missCount} --mehs {mehCount} --goods {goodCount} {ModParser.PPCalcMods(mods)}";
+            string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} \"{fullPath}\" {cmdmodehelper(accuracy, score, mods, missCount, mehCount, goodCount, perfectcount, combo, mode)}";
 
             string output = cmdOutput("osu-tools",command);
 
@@ -49,13 +25,13 @@ namespace osu_progressCLI
             return perfomanceAttributes;
         }
 
-        public static PerfomanceAttributes CalculatePP(int Beatmapid, int mods, int missCount, int mehCount, int goodCount, int perfectcount, int combo, int mode = 0)
+        public static PerfomanceAttributes CalculatePP(int Beatmapid, int score, int mods, int missCount, int mehCount, int goodCount, int perfectcount, double accuracy = 0, int combo = 0, int mode = 0)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Calculating PP from id: ID:{Beatmapid} Miss:{missCount}, Meh:{mehCount}, Good:{goodCount}, Perfect:{perfectcount}, Combo:{combo} Mods: {mods}, Mode: {ModeConverter(mode)}({mode})");
 
             PerfomanceAttributes perfomanceAttributes = new PerfomanceAttributes();
 
-            string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} {Beatmapid} --combo {combo} --misses {missCount} --mehs {mehCount} --goods {goodCount} {ModParser.PPCalcMods(mods)}";
+            string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} {Beatmapid} {cmdmodehelper(accuracy, score, mods, missCount, mehCount, goodCount, perfectcount, combo, mode)}";
 
             string output = cmdOutput("osu-tools", command);
             
@@ -65,9 +41,87 @@ namespace osu_progressCLI
             return perfomanceAttributes;
         }
 
+        private static string cmdmodehelper(double accuracy, int score, int mods, int missCount, int mehCount, int goodCount, int perfectcount, int combo, int mode = 0) {
+
+            StringBuilder command = new StringBuilder();
+            switch (mode) { 
+                case 0: {
+                        if(accuracy != 0) {
+                            command.Append($" --accuracy {accuracy}");
+                        }
+
+                        if (combo != 0)
+                        {
+                            command.Append($" --combo {combo}");
+                        }
+                        else {
+                            command.Append($" --percent-combo 100");
+                        }
+                        if (missCount != 0)
+                        {
+                            command.Append($" --misses {missCount}");
+                        }
+                        if (mehCount != 0)
+                        {
+                            command.Append($" --mehs {mehCount}");
+                        }
+                        if (goodCount != 0)
+                        {
+                            command.Append($" --goods {goodCount}");
+                        }
+
+                        command.Append($" {ModParser.PPCalcMods(mods)}");
+                        return command.ToString();
+                    }
+                case 1: //taiko
+                    if (accuracy != 0)
+                    {
+                        command.Append($" --accuracy {accuracy}");
+                    }
+
+                    if (combo != 0)
+                    {
+                        command.Append($" --combo {combo}");
+                    }
+                    if (missCount != 0)
+                    {
+                        command.Append($" --misses {missCount}");
+                    }
+                    if (goodCount != 0)
+                    {
+                        command.Append($" --goods {goodCount}");
+                    }
+
+                    command.Append($" {ModParser.PPCalcMods(mods)}");
+                    return command.ToString();
+                case 2: //catch
+                    if (accuracy != 0)
+                    {
+                        command.Append($" --accuracy {accuracy}");
+                    }
+
+                    if (combo != 0)
+                    {
+                        command.Append($" --combo {combo}");
+                    }
+                    if (missCount != 0)
+                    {
+                        command.Append($" --misses {missCount}");
+                    }
+                    
+                    command.Append($" {ModParser.PPCalcMods(mods)}");
+                    return command.ToString();
+                case 3: //mania
+                    return $" --score {score} {ModParser.PPCalcMods(mods)}";
+            }
+
+            Logger.Log(Logger.Severity.Warning, Logger.Framework.Misc, $"Mode: {mode} not Supported!");
+        return null;
+        }
+
         private static PerfomanceAttributes ParseOutput(string output)
         {
-            string pattern = @"star rating\s+:\s+(?<starrating>[\d.]+)|pp\s+:\s+(?<pp>[\d.]+)|max combo\s+:\s+(?<maxcombo>[\d.]+)|accuracy\s+:\s+(?<accuracy>[\d.]+)|speed\s+:\s+(?<speed>[\d.]+)|aim\s+:\s+(?<aim>[\d.]+)";
+            string pattern = @"star rating\s+:\s+(?<starrating>[\d.]+)|pp\s+:\s+(?<pp>[\d.,]+)|max combo\s+:\s+(?<maxcombo>[\d.,]+)|accuracy\s+:\s+(?<accuracy>[\d.]+)|speed\s+:\s+(?<speed>[\d.]+)|aim\s+:\s+(?<aim>[\d.]+)";
 
             Regex regex = new Regex(pattern);
 
@@ -80,31 +134,36 @@ namespace osu_progressCLI
                 if (match.Success)
                 {
 
-                    if (match.Groups["speed"].Success)
+                    if (match.Groups["speed"].Success && double.TryParse(match.Groups["speed"].Value.Replace(".", "").Replace(",", ""), out double speed))
                     {
-                        attributes.speed = double.Parse(match.Groups["speed"].Value) / 100;
+                        attributes.speed = speed / 100;
                         Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"speed {attributes.speed}");
                     }
-                    if (match.Groups["maxcombo"].Success)
+
+                    if (match.Groups["maxcombo"].Success && int.TryParse(match.Groups["maxcombo"].Value.Replace(".", "").Replace(",", ""), out int maxCombo))
                     {
-                        attributes.Maxcombo = int.Parse(double.Parse(match.Groups["maxcombo"].Value).ToString()) / 100;
+                        attributes.Maxcombo = maxCombo / 100;
                         Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"maxcombo: {attributes.Maxcombo}");
                     }
-                    if (match.Groups["pp"].Success)
+
+                    if (match.Groups["pp"].Success && double.TryParse(match.Groups["pp"].Value.Replace(".", "").Replace(",", ""), out double pp))
                     {
-                        attributes.pp = double.Parse(match.Groups["pp"].Value) / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"pp: {attributes.pp}") ;
+                        attributes.pp = pp / 100;
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"pp: {attributes.pp}");
                     }
-                    if (match.Groups["accuracy"].Success)
+
+                    if (match.Groups["accuracy"].Success && double.TryParse(match.Groups["accuracy"].Value.Replace(".", "").Replace(",", ""), out double accuracy))
                     {
-                        attributes.accuracy = double.Parse(match.Groups["accuracy"].Value) / 100;
+                        attributes.accuracy = accuracy / 100;
                         Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"accuracy: {attributes.accuracy}");
                     }
-                    if (match.Groups["aim"].Success)
+
+                    if (match.Groups["aim"].Success && double.TryParse(match.Groups["aim"].Value.Replace(".", "").Replace(",", ""), out double aim))
                     {
-                        attributes.aim = double.Parse(match.Groups["aim"].Value) / 100;
+                        attributes.aim = aim / 100;
                         Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"aim: {attributes.aim}");
                     }
+
                 }
             }
             return attributes;
@@ -258,9 +317,9 @@ namespace osu_progressCLI
        public double speed { get;set; }
        public double accuracy { get; set; }
        public double pp { get; set; }
-        public double starrating { get; set; }
-        public int Maxcombo { get; set; }
-        public string grade { get; set; } = "E";
+       public double starrating { get; set; }
+       public int Maxcombo { get; set; }
+       public string grade { get; set; } = "E";
     }
 
 

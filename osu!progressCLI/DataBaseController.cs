@@ -272,22 +272,31 @@ namespace osu1progressbar.Game.Database
             perfomanceAttributes = DifficultyAttributes.CalculatePP(
                                 baseAddresses.Beatmap.FolderName,
                                 baseAddresses.Beatmap.OsuFileName,
+                                baseAddresses.Player.Score,
                                 baseAddresses.Player.Mods.Value,
                                 baseAddresses.Player.HitMiss,
                                 baseAddresses.Player.Hit50,
                                 baseAddresses.Player.Hit100,
                                 baseAddresses.Player.Hit300,
+                                0,
                                 baseAddresses.Player.MaxCombo,
                                 baseAddresses.Player.Mode);
 
             starrating = perfomanceAttributes.starrating;
 
-            double fcpp = DifficultyAttributes.CalculateFcWithAcc(
+            PerfomanceAttributes fcPerformanceAttributes = DifficultyAttributes.CalculatePP(
                                 baseAddresses.Beatmap.FolderName,
                                 baseAddresses.Beatmap.OsuFileName,
-                                baseAddresses.Player.Accuracy,
+                                baseAddresses.Player.Score,
                                 baseAddresses.Player.Mods.Value,
+                                0,  //force no Misses
+                                baseAddresses.Player.Hit50,
+                                baseAddresses.Player.Hit100,
+                                baseAddresses.Player.Hit300,
+                                0, 
+                                0,
                                 baseAddresses.Player.Mode);
+
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -517,7 +526,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Tags", tags);
                         command.Parameters.AddWithValue("@Time", timeElapsed);
                         command.Parameters.AddWithValue("@pp", perfomanceAttributes.pp);
-                        command.Parameters.AddWithValue("@fcpp", fcpp);
+                        command.Parameters.AddWithValue("@fcpp", fcPerformanceAttributes.pp);
                         command.Parameters.AddWithValue("@aim", perfomanceAttributes.aim);
                         command.Parameters.AddWithValue("@speed", perfomanceAttributes.speed);
                         command.Parameters.AddWithValue("@accuracyatt", perfomanceAttributes.accuracy);
