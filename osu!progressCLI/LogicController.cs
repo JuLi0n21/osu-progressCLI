@@ -141,6 +141,10 @@ namespace osu1progressbar.Game.Logicstuff
 
                         });
                     }
+                    else
+                    {
+                        Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Score Threshhold of 1000 not Reached");
+                    }
                 }
                 else if (!isReplay && PreviousScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() != "Playing")
                 {
@@ -160,6 +164,9 @@ namespace osu1progressbar.Game.Logicstuff
                             }
 
                         });
+                    }
+                    else { 
+                                Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Score Threshhold of 1000 not Reached");
                     }
                 }
 
