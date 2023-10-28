@@ -26,8 +26,8 @@ namespace osu1progressbar.Game.MemoryProvider
         public int ReadDelay { get; set; } = 200;
         private readonly object minMaxLock = new object();
         private readonly int throttledDelay = 1000;
-        private double memoryReadTimeMin = double.PositiveInfinity;
-        private double memoryReadTimeMax = double.NegativeInfinity;
+        private double memoryReadTimeMin = float.PositiveInfinity;
+        private double memoryReadTimeMax = float.NegativeInfinity;
         public string access_token { get; set; }
 
         LogicController logic;
