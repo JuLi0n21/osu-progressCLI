@@ -28,6 +28,14 @@ function fetchOsuBeatmap() {
                                    </div>`;
             }
 
+            let bg = data.CoverList;
+            if (data.CoverList == "null") {
+                console.log(data.Background, data.CoverList)
+
+                bg = `/${data.Foldername}/${data.Background}`;
+                console.log(bg);
+            }
+
             document.getElementById('beatmapData').innerHTML = `
            <p class="relative top-6 left-4">${data.Status}</p>
             <div class="flex justify-center ml-4 mb-4 mr-4 text-xl">
@@ -60,7 +68,7 @@ function fetchOsuBeatmap() {
   
     <div>
     <a href="https://osu.ppy.sh/beatmapsets/${data.BeatmapSetid}#${data.Mode}/${data.Beatmapid}" target="_blank">
-        <img src="${data.CoverList}">
+        <img src="${bg}">
         </a>
     </div>
   </div>
@@ -546,6 +554,14 @@ function createScoreElements(scores) {
 
         score.Acc = score.Acc.toFixed(2);
 
+        let bg = score.Cover;
+        if (score.Cover == "null") {
+            console.log(score.Background, score.Cover)
+
+            bg = `/${score.Foldername}/${score.Background}`;
+            console.log(bg);
+        }
+
         scoreElement.href = `/score.html?id=${score.id}`;
         scoreElement.target = "_blank";
         scoreElement.rel = "noopener noreferrer";
@@ -564,7 +580,7 @@ function createScoreElements(scores) {
             </div>
         </div>
         <div class="backdrop--dark icon rounded-lg flex-nowrap">
-            <img src="${score.Cover}" class="w-16 h-16" alt="?">
+            <img src="${bg}" class="w-16 h-16" alt="?">
         </div>
 
         <!-- Name, Score/Combo, Grade Date -->

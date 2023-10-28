@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -235,15 +236,14 @@ namespace osu_progressCLI.server
 
         public void serveimage(HttpListenerRequest request, HttpListenerResponse response, string filepath) {
 
-            //testign needed
-            //Console.WriteLine("image/" + filepath.Split(".")[1]);
+            Console.WriteLine(WebUtility.UrlDecode($"{Credentials.Instance.GetConfig().songfolder}{filepath}"));
             if (File.Exists("public/img" + filepath))
             {
                 ServeStaticImage(response, "public/img" + filepath);
             }
-            else if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}/{filepath}"));
+            else if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}{filepath}"));
             {
-                ServeStaticImage(response, $"{Credentials.Instance.GetConfig().songfolder}/{filepath}");
+                ServeStaticImage(response, WebUtility.UrlDecode($@"{Credentials.Instance.GetConfig().songfolder}{filepath}"));
             }
 
 
