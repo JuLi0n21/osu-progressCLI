@@ -17,6 +17,8 @@ public static class Logger
         Database,
         Server,
         Network,
+        MemoryProvider,
+        Calculator,
         Misc
     }
 

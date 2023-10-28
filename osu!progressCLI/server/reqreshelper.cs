@@ -237,7 +237,16 @@ namespace osu_progressCLI.server
 
             //testign needed
             //Console.WriteLine("image/" + filepath.Split(".")[1]);
-            ServeStaticImage(response, "public/img" + filepath);
+            if (File.Exists("public/img" + filepath))
+            {
+                ServeStaticImage(response, "public/img" + filepath);
+            }
+            else if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}/{filepath}"));
+            {
+                ServeStaticImage(response, $"{Credentials.Instance.GetConfig().songfolder}/{filepath}");
+            }
+
+
         }
 
         public void servehtml(HttpListenerRequest request, HttpListenerResponse response, string filepath)

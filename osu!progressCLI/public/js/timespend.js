@@ -12,6 +12,16 @@ function createBanchoTimeChart(data) {
     const dates = data.map(item => moment(item.Date).toDate());
     const labels = Object.keys(data[0]).filter(key => key !== "Date");
 
+    for (let i = 0; i < data.length; i++) {
+        let item = data[i];
+        for (let key in item) {
+            if (key !== 'Date' && typeof item[key] === 'number') {
+                item[key] = item[key] / 3600;
+            }
+        }
+    }
+
+
     const numberToName = {
         '11': 'MultiplayerRooms',
         '12': 'MultiplayerPlaying',
@@ -124,11 +134,11 @@ function createTimeWastedChart(data) {
     }
 
     for (let i = 0; i < data.length; i++) {
-        const item = data[i];
-        if (item.Key in numberToScreen && numberToScreen[item.Key] && item.Value >= 10) {
-            labels.push(numberToScreen[item.Key]);
-            values.push(item.Value);
-            colors.push('#' + (Math.random() * 0xFFFFFF << 0).toString(16));
+        let item = data[i];
+        for (let key in item) {
+            if (key !== 'Date' && typeof item[key] === 'number') {
+                item[key] = item[key] / 3600;
+            }
         }
     }
 

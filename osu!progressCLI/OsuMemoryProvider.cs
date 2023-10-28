@@ -44,7 +44,7 @@ namespace osu1progressbar.Game.MemoryProvider
             baseAddresses = new OsuBaseAddresses();
             
             logic = new LogicController();
-            Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Instanciated OsuMemoryProvider");
+            Logger.Log(Logger.Severity.Info, Logger.Framework.MemoryProvider, "Instanciated OsuMemoryProvider");
 
 
         }
@@ -205,7 +205,7 @@ namespace osu1progressbar.Game.MemoryProvider
         }
         private void SreaderOnInvalidRead(object sender, (object readObject, string propPath) e)
         {
-            Logger.Log(Logger.Severity.Error, Logger.Framework.Logic, $"Error reading {e.propPath}{Environment.NewLine}");
+            Logger.Log(Logger.Severity.Error, Logger.Framework.MemoryProvider, $"Error reading {e.propPath}{Environment.NewLine}");
             try
             {
                 //Console.WriteLine($"{DateTime.Now:T} Error reading {e.propPath}{Environment.NewLine}");

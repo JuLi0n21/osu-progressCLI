@@ -86,6 +86,7 @@ namespace osu1progressbar.Game.Database
                     Mods INTEGER,
                     Version TEXT,
                     Tags TEXT,
+                    Background TEXT,
                     CoverList TEXT,
                     Cover TEXT,
                     Preview TEXT,
@@ -282,7 +283,10 @@ namespace osu1progressbar.Game.Database
                                 baseAddresses.Player.MaxCombo,
                                 baseAddresses.Player.Mode);
 
-            starrating = perfomanceAttributes.starrating;
+            //Override Grade incase Play was not passed
+            if (playtype == "Cancel" || playtype == "Fail" || playtype == "Retry") {
+                perfomanceAttributes.grade = "F";
+            }
 
             PerfomanceAttributes fcPerformanceAttributes = DifficultyAttributes.CalculatePP(
                                 baseAddresses.Beatmap.FolderName,
@@ -422,6 +426,7 @@ namespace osu1progressbar.Game.Database
                     Mods,
                     Version,
                     Tags,
+                    Background,
                     Cover,
                     Coverlist,
                     Preview, 
@@ -463,6 +468,7 @@ namespace osu1progressbar.Game.Database
                             @Mods,
                             @Version,
                             @Tags,
+                            @Background,
                             @Cover,
                             @Coverlist,
                             @Preview,
@@ -476,14 +482,12 @@ namespace osu1progressbar.Game.Database
                         );
                     ";
 
-                    DateTime dateTime = DateTime.Now;
 
-                    //Console.WriteLine(((ur / urcount) * 100).ToString());
 
                     //YYYY-MM-DD HH:MM THIS FORMAT IS SUPPOSED TO BE USED 
                     using (var command = new SQLiteCommand(insertQuery, connection))
                     {
-                        command.Parameters.AddWithValue("@Date", dateTime.ToString("yyyy-MM-dd HH:mm"));
+                        command.Parameters.AddWithValue("@Date", DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
                         command.Parameters.AddWithValue("@BeatmapSetid", baseAddresses.Beatmap.SetId);
                         command.Parameters.AddWithValue("@Beatmapid", baseAddresses.Beatmap.Id);
                         command.Parameters.AddWithValue("@Osufilename", baseAddresses.Beatmap.OsuFileName);
@@ -512,6 +516,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Mode", baseAddresses.Player.Mode);
                         command.Parameters.AddWithValue("@Mods", baseAddresses.Player.Mods.Value);
                         command.Parameters.AddWithValue("@Version", version);
+                        command.Parameters.AddWithValue("@Background", Util.getBackground($"{baseAddresses.Beatmap.FolderName}/{baseAddresses.Beatmap.OsuFileName}"));
                         command.Parameters.AddWithValue("@Cover", cover);
                         command.Parameters.AddWithValue("@Coverlist", coverlist);
                         command.Parameters.AddWithValue("@Preview", preview);
@@ -620,6 +625,7 @@ namespace osu1progressbar.Game.Database
                                 score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
                                 score.Add("Version", reader["Version"]);
                                 score.Add("Tags", reader["Tags"]);
+                                score.Add("Background", reader["Background"]);
                                 score.Add("CoverList", reader["CoverList"]);
                                 score.Add("Cover", reader["Cover"]);
                                 score.Add("Preview", reader["Preview"]);
@@ -719,6 +725,7 @@ namespace osu1progressbar.Game.Database
                                 score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
                                 score.Add("Version", reader["Version"]);
                                 score.Add("Tags", reader["Tags"]);
+                                score.Add("Background", reader["Background"]);
                                 score.Add("CoverList", reader["CoverList"]);
                                 score.Add("Cover", reader["Cover"]);
                                 score.Add("Preview", reader["Preview"]);
@@ -1057,6 +1064,7 @@ namespace osu1progressbar.Game.Database
                                 score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
                                 score.Add("Version", reader["Version"]);
                                 score.Add("Tags", reader["Tags"]);
+                                score.Add("Background", reader["Background"]);
                                 score.Add("CoverList", reader["CoverList"]);
                                 score.Add("Cover", reader["Cover"]);
                                 score.Add("Preview", reader["Preview"]);

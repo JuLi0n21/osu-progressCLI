@@ -147,14 +147,14 @@ namespace osu_progressCLI.server
 
     <!-- Reload button -->
     <div class=""fixed top-10 right-20 z-40"">
-        <button id=""loadDataButton"" class=""text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 backdrop--medium"">
+        <button id=""loadDataButton"" class=""text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 backdrop--light"">
             <img src=""https://upload.wikimedia.org/wikipedia/commons/9/9a/Refresh_font_awesome.svg"" alt=""Refresh"" style=""width: 24px; height: 24px; filter: invert(100%);"" />
         </button>
     </div>
 
     <!-- Settings button -->
     <div class=""fixed top-10 right-0 z-40"">
-        <button id=""settingsButton"" class=""text-white rounded-full p-3 z-30 shadow-lg mr-4 mt-4 backdrop--medium"">
+        <button id=""settingsButton"" class=""text-white rounded-full p-3 z-30 shadow-lg mr-4 mt-4 backdrop--light"">
             <i class=""fa-solid fa-pen"" style=""color: #ffffff;""></i>
         </button>
     </div>
@@ -264,7 +264,7 @@ namespace osu_progressCLI.server
     </div>
 <!-- Recap -->
 <!-- Live Status-->
-    <div id=""status-bar"" class=""sticky top-0 w-full h-20 backdrop--medium text-white text-center p-2"">
+    <div id=""status-bar"" class=""z-10 sticky top-0 w-full h-20 backdrop--medium text-white text-center p-2"">
         <span id=""status-text""></span>
 <div id=""audio-bar"">
     <div id=""audio-time""></div>

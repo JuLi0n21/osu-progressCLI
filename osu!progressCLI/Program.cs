@@ -12,7 +12,7 @@ class Program
     {
 
         //Set Log Level
-        Logger.SetConsoleLogLevel(Logger.Severity.Debug);
+        Logger.SetConsoleLogLevel(Logger.Severity.Info);
        
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
@@ -20,7 +20,6 @@ class Program
         Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, "Initialzing Components");
 
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");
-
         Credentials crendtials = Credentials.Instance; 
         ApiController apiController = ApiController.Instance;
 

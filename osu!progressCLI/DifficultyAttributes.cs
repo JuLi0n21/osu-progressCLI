@@ -11,7 +11,7 @@ namespace osu_progressCLI
 
         public static PerfomanceAttributes CalculatePP(string folderName, string fileName, int score, int mods, int missCount, int mehCount, int goodCount, int perfectcount, double accuracy = 0, int combo = 0, int mode = 0)
         {
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Calculating PP: Miss:{missCount}, Meh:{mehCount}, Good:{goodCount}, Perfect:{perfectcount}, Combo:{combo} Mods: {mods}, Mode: {ModeConverter(mode)}({mode})");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"Calculating PP: Miss:{missCount}, Meh:{mehCount}, Good:{goodCount}, Perfect:{perfectcount}, Combo:{combo} Mods: {mods}, Mode: {ModeConverter(mode)}({mode})");
             PerfomanceAttributes perfomanceAttributes = new PerfomanceAttributes();
 
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
@@ -27,7 +27,7 @@ namespace osu_progressCLI
 
         public static PerfomanceAttributes CalculatePP(int Beatmapid, int score, int mods, int missCount, int mehCount, int goodCount, int perfectcount, double accuracy = 0, int combo = 0, int mode = 0)
         {
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Calculating PP from id: ID:{Beatmapid} Miss:{missCount}, Meh:{mehCount}, Good:{goodCount}, Perfect:{perfectcount}, Combo:{combo} Mods: {mods}, Mode: {ModeConverter(mode)}({mode})");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"Calculating PP from id: ID:{Beatmapid} Miss:{missCount}, Meh:{mehCount}, Good:{goodCount}, Perfect:{perfectcount}, Combo:{combo} Mods: {mods}, Mode: {ModeConverter(mode)}({mode})");
 
             PerfomanceAttributes perfomanceAttributes = new PerfomanceAttributes();
 
@@ -115,7 +115,7 @@ namespace osu_progressCLI
                     return $" --score {score} {ModParser.PPCalcMods(mods)}";
             }
 
-            Logger.Log(Logger.Severity.Warning, Logger.Framework.Misc, $"Mode: {mode} not Supported!");
+            Logger.Log(Logger.Severity.Warning, Logger.Framework.Calculator, $"Mode: {mode} not Supported!");
         return null;
         }
 
@@ -137,43 +137,49 @@ namespace osu_progressCLI
                     if (match.Groups["speed"].Success && double.TryParse(match.Groups["speed"].Value.Replace(".", "").Replace(",", ""), out double speed))
                     {
                         attributes.speed = speed / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"speed {attributes.speed}");
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"speed {attributes.speed}");
                     }
 
                     if (match.Groups["maxcombo"].Success && int.TryParse(match.Groups["maxcombo"].Value.Replace(".", "").Replace(",", ""), out int maxCombo))
                     {
                         attributes.Maxcombo = maxCombo / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"maxcombo: {attributes.Maxcombo}");
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"maxcombo: {attributes.Maxcombo}");
                     }
 
                     if (match.Groups["pp"].Success && double.TryParse(match.Groups["pp"].Value.Replace(".", "").Replace(",", ""), out double pp))
                     {
                         attributes.pp = pp / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"pp: {attributes.pp}");
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"pp: {attributes.pp}");
                     }
 
                     if (match.Groups["accuracy"].Success && double.TryParse(match.Groups["accuracy"].Value.Replace(".", "").Replace(",", ""), out double accuracy))
                     {
                         attributes.accuracy = accuracy / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"accuracy: {attributes.accuracy}");
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"accuracy: {attributes.accuracy}");
                     }
 
                     if (match.Groups["aim"].Success && double.TryParse(match.Groups["aim"].Value.Replace(".", "").Replace(",", ""), out double aim))
                     {
                         attributes.aim = aim / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"aim: {attributes.aim}");
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"aim: {attributes.aim}");
                     }
 
                     if (match.Groups["appraochrate"].Success && double.TryParse(match.Groups["appraochrate"].Value.Replace(".", "").Replace(",", ""), out double ar))
                     {
                         attributes.ar = ar / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"appraochrate: {attributes.ar}");
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"appraochrate: {attributes.ar}");
                     }
 
                     if (match.Groups["overalldifficulty"].Success && double.TryParse(match.Groups["overalldifficulty"].Value.Replace(".", "").Replace(",", ""), out double od))
                     {
                         attributes.od = od/ 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"overalldifficulty: {attributes.od}");
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"overalldifficulty: {attributes.od}");
+                    }
+
+                    if (match.Groups["starrating"].Success && double.TryParse(match.Groups["starrating"].Value.Replace(".", "").Replace(",", ""), out double sr))
+                    {
+                        attributes.starrating = sr / 100;
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"starrating: {attributes.starrating}");
                     }
 
                 }
@@ -183,7 +189,7 @@ namespace osu_progressCLI
 
         private static string cmdOutput(string path,string command) {
 
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Starting Shell: path:{path} cmd:{command}");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"Starting Shell: path:{path} cmd:{command}");
 
             ProcessStartInfo psi = new ProcessStartInfo
             {
@@ -211,7 +217,7 @@ namespace osu_progressCLI
 
         private static string CalculateGrade(int total300s, int total100s, int total50s, int misses)
         {
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Calculating Grade: 300:{total300s} 100:{total100s} 50:{total50s} X:{misses}");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"Calculating Grade: 300:{total300s} 100:{total100s} 50:{total50s} X:{misses}");
             try
             {
                 int totalnotes = total300s + total100s + total50s + misses;
@@ -244,7 +250,7 @@ namespace osu_progressCLI
             }
             catch (Exception e)
             {
-                Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Error while Calculating Grade: {e.Message}");
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"Error while Calculating Grade: {e.Message}");
                 return "E";        
             }
             
@@ -252,16 +258,16 @@ namespace osu_progressCLI
 
         public static void StartMissAnalyzer(int id) {
 
-            Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, $"Starting OsuMissAnalyzer for scoreid: {id}");
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Calculator, $"Starting OsuMissAnalyzer for scoreid: {id}");
             DatabaseController database = new DatabaseController();
 
             Dictionary<string, object> score = database.GetScore(id);
 
             string command = $"OsuMissAnalyzer.exe \"{Credentials.Instance.GetConfig().osufolder}\\Data\\r\\{score["Replay"]}\" \"{Credentials.Instance.GetConfig().songfolder}\\{score["Foldername"]}\"";
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"MissAnalyzer Command: {command}");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"MissAnalyzer Command: {command}");
 
             string output = cmdOutput("OsuMissAnalyzer", command);
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"MissAnalyzer Output: {output}");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"MissAnalyzer Output: {output}");
 
         }
 

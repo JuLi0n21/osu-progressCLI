@@ -13,7 +13,7 @@ socket.addEventListener('open', (event) => {
 
 socket.addEventListener('message', (event) => {
     const data = event.data;
-    console.log('Received data:', data);
+    //console.log('Received data:', data);
 
     try {
         const jsonData = JSON.parse(data);
