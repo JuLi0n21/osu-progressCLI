@@ -11,14 +11,6 @@ const scoresContainer =  document.getElementById("scorecontainer");
     const scoreElement = document.createElement("a");
     scoreElement.className = "flex justify-center mb-0";
 
-      let bg = score.Cover;
-      if (score.Cover == "null") {
-          console.log(score.Background, score.Cover)
-
-          bg = `/${score.Foldername}/${score.Background}`;
-          console.log(bg);
-      }
-
       score.Acc = score.Acc.toFixed(2);
 
       scoreElement.href = `/score.html?id=${score.id}`;
@@ -40,7 +32,7 @@ const scoresContainer =  document.getElementById("scorecontainer");
             </div>
         </div>
         <div class="backdrop--dark icon rounded-lg flex-nowrap">
-            <img src="${bg}" class="w-16 h-16" alt="?">
+            <img src="${score.Cover}" class="w-16 h-16" alt="?">
         </div>
 
         <!-- Name, Score/Combo, Grade Date -->
