@@ -1,18 +1,23 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using osu_progressCLI;
+﻿using osu_progressCLI;
 using osu_progressCLI.server;
 using osu1progressbar.Game.MemoryProvider;
-using OsuMemoryDataProvider.OsuMemoryModels.Abstract;
 
 class Program
 {
 
     static async Task Main(string[] args)
     {
-
-        //Set Log Level
-        Logger.SetConsoleLogLevel(Logger.Severity.Info);
+        Logger.SetConsoleLogLevel(Logger.Severity.Warning);
+        if (args.Length > 0)
+        {
+            for(int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == "-v")
+                {
+                    Logger.SetConsoleLogLevel(Logger.Severity.Debug);
+                }
+            }
+        }
        
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
@@ -25,7 +30,6 @@ class Program
 
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
-
         
         Task listenTask = Task.Run(async () =>
         {
@@ -38,8 +42,4 @@ class Program
 
         memoryProvider.Stop();
     }
-
-    
 }
-
- 
