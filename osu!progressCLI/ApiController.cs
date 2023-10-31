@@ -164,7 +164,6 @@ namespace osu_progressCLI
         public async Task<JObject> getuser(string userid , string mode)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting User info for: {userid}, {mode}");
-
             if (usercache == null || userTimestamp <= DateTime.Now.AddMinutes(-5))
             {
                 userTimestamp = DateTime.Now;
