@@ -18,11 +18,11 @@ public class Util
     }
 
 
-    public static string getBackground(string filepath) {
-        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Getting Background from{filepath}");
-        if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}/{filepath}"))
+    public static string getBackground(string folderpath, string osufile) {
+        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Getting Background from: {folderpath}/{osufile}");
+        if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}/{folderpath}/{osufile}"))
         {
-            string fileContents = File.ReadAllText($@"{Credentials.Instance.GetConfig().songfolder}/{filepath}"); // Read the contents of the file
+            string fileContents = File.ReadAllText($@"{Credentials.Instance.GetConfig().songfolder}/{folderpath}/{osufile}"); // Read the contents of the file
 
             string pattern = @"\d+,\d+,""(?<image_filename>[^""]+\.[a-zA-Z]+)"",\d+,\d+";
 
@@ -32,7 +32,7 @@ public class Util
             {
                 string background = match.Groups["image_filename"].Value;
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Found Background Image: {background}");
-                return background;
+                return $"/{folderpath}/{background}";
             }
         }
             try {
@@ -43,6 +43,7 @@ public class Util
                 string[] bgFiles = Directory.GetFiles(bgDirectory);
                 string[] btFiles = Directory.GetFiles(btDirectory);
 
+            Console.WriteLine(btDirectory);
                 if (bgFiles.Length > 0)
                 {
                     Random random = new Random();
