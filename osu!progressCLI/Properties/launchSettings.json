@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "osu!progressCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "-v",
+      "remoteDebugEnabled": false,
+      "hotReloadEnabled": true
+    }
+  }
+}
