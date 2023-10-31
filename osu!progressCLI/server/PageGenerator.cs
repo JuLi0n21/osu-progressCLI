@@ -160,30 +160,10 @@ namespace osu_progressCLI.server
     </div>
 
 <!-- Settings panel (initially hidden) -->
-<div id=""settingsPanel"" class=""fixed top-0 right-5 transform z-30 rounded-lg scale-0 transition-transform duration-300 ease-in-out text-white text backdrop--dark"">
+<div id=""settingsPanel"" class=""fixed top-24 right-5 transform z-30 rounded-lg scale-0 transition-transform duration-300 ease-in-out text-white text backdrop--dark"">
     <i class=""fas fa-info-circle ml-2 text-blue-500 cursor-pointer hover:text-blue-700 top-0 right-0"" title=""Add informative text!""></i>
 
     <h2 class=""text-xl text-center font-semibold mb-4"">Settings</h2>
-
-    <!-- ClientId -->
-    <div class=""mb-3 flex items-center"">
-        <label for=""ClientId"" class=""flex items-center m-0"" title=""This is your Client ID, which is used for authentication. Hover for more info."">
-            ClientId
-        </label>
-        <a href=""https://osu.ppy.sh/home/account/edit#new-oauth-application"" target=""_blank"" rel=""noopener noreferrer"">
-            <i class=""fas fa-external-link-alt ml-2 text-blue-500 cursor-pointer hover:text-blue-700"" title=""You can get your OAuth credentials here!""></i>
-        </a>
-    </div>
-    <input type=""text"" id=""ClientId"" placeholder=""42069"" value=""{Credentials.Instance.GetClientId()}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
-
-    <!-- ClientSecret -->
-    <div class=""mb-3 flex items-center"">
-        <label for=""ClientSecret"" class=""flex items-center m-0"" title=""This is your Client Secret."">
-            ClientSecret
-            <i class=""fas fa-info-circle ml-2 text-blue-500 cursor-pointer hover:text-blue-700"" title=""Never Share your Credentials with anyone, these are stored locally!""></i>
-        </label>
-    </div>
-    <input type=""password"" id=""ClientSecret"" placeholder=""*******************"" value=""{Credentials.Instance.GetClientSecret()}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
 
     <!-- Toggle 1 -->
     <div class=""flex items-center justify-between mb-3"">
@@ -232,16 +212,16 @@ namespace osu_progressCLI.server
 
     <!-- Toggle 2 -->
     <div class=""flex items-center justify-between mb-3"">
-        <span>Toggle 2:</span>
+        <span>Livestatusbar:</span>
         <label class=""switch"">
-            <input type=""checkbox"" id=""toggle2"">
+            <input type=""checkbox"" id=""livestatusbartoggle"">
             <span class=""slider round""></span>
         </label>
     </div>
 
     <!-- Text Input 3 -->
     <div class=""mb-3"">
-        <label for=""userid"">Userid:</label>
+        <label for=""userid"">Userid / Username:</label>
         <input type=""text"" id=""userid"" palceholder=""{userid}"" class=""w-full border rounded px-2 py-1 backdrop--light"">
     </div>
 
@@ -253,18 +233,9 @@ namespace osu_progressCLI.server
     </div>
 </div>
 
-<!-- Sidebar -->
- <div class=""sidebar hidebar rounded-r-lg backdrop--medium flex flex-col text--pink"">
-        <a href=""#header"" class=""nav-link hover:text-yellow-500"">Header</a>
-        <a href=""#scorecontainer"" class=""nav-link hover:text-yellow-500"">Recent Scores</a>
-        <a href=""#chart1"" class=""nav-link hover:text-yellow-500"">Time by Day</a>
-        <a href=""#chart2"" class=""nav-link hover:text-yellow-500"">Difficulties</a>
-        <a href=""#chart3"" class=""nav-link hover:text-yellow-500"">Time Total</a>
-        <div class=""toggle-rectangle border-t border-b border-r border-pink-600 rounded-r-lg p-4 hover:border-yellow-500"" id=""toggleButton""></div>
-    </div>
 <!-- Recap -->
 <!-- Live Status-->
-    <div id=""status-bar"" class=""z-10 sticky top-0 w-full h-20 backdrop--medium text-white text-center p-2"">
+    <div id=""status-bar"" class=""z-10 sticky top-0 w-full h-20 backdrop--medium text-white text-center p-2 hidden"">
         <span id=""status-text""></span>
 <div id=""audio-bar"">
     <div id=""audio-time""></div>
@@ -296,9 +267,8 @@ namespace osu_progressCLI.server
                 </div>
 
                 <div class=""ml-60 text-left pt-6 pb-6"">
-                    <p class=""usernameplaceholder"">⏰ {playtimethisweek}H ({diffrencetolastweek}%) [{BanchoStatus}]</p>  
-                    <p class=""rankplaceholder"">💻 {week.Screen}</p>
-                    <p class=""countryplaceholder"">📈200pp 📊232</p>
+                    <p class=""WastedTime"">⏰ {playtimethisweek}H ({diffrencetolastweek}%) [{BanchoStatus}]</p>  
+                    <p class=""mostplayedscreen"">💻 {week.Screen}</p>
                 </div>
             </div>
 
