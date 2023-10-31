@@ -180,24 +180,92 @@ namespace osu_progressCLI.server
             WriteResponse(response, GetScoreAverages(from, to), "application/json");
         }
 
-        public void save(HttpListenerRequest request, HttpListenerResponse response) {
-
-            string requestData = null;
-            using (Stream body = request.InputStream)
+        public void Save(HttpListenerRequest request, HttpListenerResponse response)
+        {
+            try
             {
-                StreamReader reader = new StreamReader(body);
-                requestData = reader.ReadToEnd();
+                string requestData;
+                using (Stream body = request.InputStream)
+                using (StreamReader reader = new StreamReader(body))
+                {
+                    requestData = reader.ReadToEnd();
+                }
+
+                if (string.IsNullOrWhiteSpace(requestData))
+                {
+                    WriteResponse(response, "Request data is empty", "application/json", 400); // Bad Request
+                    return;
+                }
+
+                if (!TryParseJson(requestData, out JObject parameters))
+                {
+                    WriteResponse(response, "Invalid JSON data", "application/json", 400); // Bad Request
+                    return;
+                }
+
+                if (!TryUpdateConfig(parameters, out string errorMessage))
+                {
+                    WriteResponse(response, errorMessage, "application/json", 500); // Internal Server Error
+                    return;
+                }
+
+                WriteResponse(response, " { \"message\":\"Settings Saved\"}", "application/json");
             }
-
-            JObject parameters = JObject.Parse(requestData);
-
-            Credentials.Instance.UpdateApiCredentials(parameters["clientId"].ToString(), parameters["clientSecret"].ToString());
-
-            Credentials.Instance.UpdateConfig(parameters["localsettings"].ToString(), parameters["username"].ToString(), parameters["rank"].ToString(), parameters["country"].ToString(), parameters["coverUrl"].ToString(), parameters["avatarUrl"].ToString(), parameters["port"].ToString(), parameters["userid"].ToString());
-
-            string message = "Saved";
-            WriteResponse(response, message, "application/json");
+            catch (Exception ex)
+            {
+                WriteResponse(response, ex.Message, "application/json", 500); // Internal Server Error
+            }
         }
+
+        private bool TryParseJson(string json, out JObject parsedJson)
+        {
+            try
+            {
+                parsedJson = JObject.Parse(json);
+                return true;
+            }
+            catch (JsonReaderException)
+            {
+                parsedJson = null;
+                return false;
+            }
+        }
+
+        private bool TryUpdateConfig(JObject parameters, out string errorMessage)
+        {
+            try
+            {
+                Credentials.Instance.UpdateConfig(
+                    parameters["localsettings"]?.ToString(),
+                    parameters["username"]?.ToString(),
+                    parameters["rank"]?.ToString(),
+                    parameters["country"]?.ToString(),
+                    parameters["coverUrl"]?.ToString(),
+                    parameters["avatarUrl"]?.ToString(),
+                    parameters["port"]?.ToString(),
+                    parameters["userid"]?.ToString()
+                );
+                errorMessage = null;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+                return false;
+            }
+        }
+
+        private void WriteResponse(HttpListenerResponse response, string message, string contentType, int statusCode = 200)
+        {
+            response.StatusCode = statusCode;
+            response.ContentType = contentType;
+
+            using (var writer = new StreamWriter(response.OutputStream))
+            {
+                writer.Write(message);
+            }
+        }
+
 
         private string GetBeatmapData(DateTime from, DateTime to)
         {

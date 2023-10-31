@@ -1,18 +1,10 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using osu1progressbar.Game.Database;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Text.Json;
-using Fleck;
-using System.Net.WebSockets;
 using System.Collections.Concurrent;
+using System.Collections.Specialized;
+using System.Net;
+using System.Net.WebSockets;
+using System.Text;
+using System.Web;
 
 
 //add button to get credentials
@@ -176,7 +168,7 @@ namespace osu_progressCLI.server
             else if (path == "/api/save" && request.HttpMethod == "POST")
             {
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/save call");
-                helper.save(request, response);
+                helper.Save(request, response);
             }
             else if (path == "/api/run" && request.HttpMethod == "POST")
             {
@@ -248,8 +240,6 @@ namespace osu_progressCLI.server
                 // Update the last message sent time
                 lastMessageSentTime = DateTime.UtcNow;
             }
-
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"Send Websocket Data of Type: {type}");
 
             var wrapper = new
             {
