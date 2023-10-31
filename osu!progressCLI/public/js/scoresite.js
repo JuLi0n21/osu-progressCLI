@@ -1,4 +1,4 @@
-﻿let beatmapid, rowid;
+﻿let beatmapid, rowid, myChart;
 function fetchOsuBeatmap() {
     const urlParams = new URLSearchParams(window.location.search);
     const beatmapId = urlParams.get('id');
@@ -397,7 +397,7 @@ function openAnalyzer() {
 }
 
 function createLineChart(canvasId, data, highlightedScoreId) {
-    const filteredData = data.filter(entry => entry.Time > 10);
+    const filteredData = data.filter(entry => entry.Time > 5);
 
     filteredData.reverse();
 
@@ -415,8 +415,14 @@ function createLineChart(canvasId, data, highlightedScoreId) {
     console.log(highlightedScoreId);
     console.log(highlightedScoreIndex);
 
+  
     const ctx = document.getElementById(canvasId).getContext('2d');
-    const myChart = new Chart(ctx, {
+    ctx
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    myChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: dates,
@@ -642,6 +648,7 @@ searchbar.addEventListener('input', function () {
                 .then(data => {
                     console.log(data);
                     createScoreElements(data);
+                    createLineChart('mapprogress', data, rowid);
                 })
                 .catch(error => {
                     console.error(error);
