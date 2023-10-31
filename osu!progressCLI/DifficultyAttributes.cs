@@ -265,9 +265,11 @@ namespace osu_progressCLI
 
             string command = $"OsuMissAnalyzer.exe \"{Credentials.Instance.GetConfig().osufolder}\\Data\\r\\{score["Replay"]}\" \"{Credentials.Instance.GetConfig().songfolder}\\{score["Foldername"]}\"";
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"MissAnalyzer Command: {command}");
-
-            string output = cmdOutput("OsuMissAnalyzer", command);
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"MissAnalyzer Output: {output}");
+            Task.Run(() =>
+            {
+                string output = cmdOutput("OsuMissAnalyzer", command);
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"MissAnalyzer Output: {output}");
+            });
 
         }
 
