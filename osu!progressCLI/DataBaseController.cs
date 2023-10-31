@@ -86,7 +86,6 @@ namespace osu1progressbar.Game.Database
                     Mods INTEGER,
                     Version TEXT,
                     Tags TEXT,
-                    Background TEXT,
                     CoverList TEXT,
                     Cover TEXT,
                     Preview TEXT,
@@ -257,7 +256,6 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        //maybe consider passed or failed/canceld retires// more beatmap attributes
         public async void InsertScore(OsuBaseAddresses baseAddresses, float timeElapsed, string playtype, string replay = null)
         {
             Logger.Log(Logger.Severity.Info, Logger.Framework.Database, $"Inserting Score on: {baseAddresses.Beatmap.OsuFileName}");
@@ -314,7 +312,7 @@ namespace osu1progressbar.Game.Database
 
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
-                        if (reader.Read())
+                        if (reader.Read() && baseAddresses.Beatmap.Id != 0) //prevent Default Id to saved only once!
                         {
                             // Update variables with the fetched data
                             starrating = double.Parse(reader["sr"].ToString());
@@ -334,10 +332,9 @@ namespace osu1progressbar.Game.Database
                         else
                         {
                             JObject beatmap = await ApiController.Instance.getExpandedBeatmapinfo(baseAddresses.Beatmap.Id.ToString());
-                          //  Console.WriteLine(beatmap);
+
                             if (beatmap != null)
                             {
-                                starrating = double.Parse(beatmap["difficulty_rating"].ToString());
                                 bpm = double.Parse(beatmap["bpm"].ToString());
                                 creator = beatmap["beatmapset"]["creator"].ToString();
                                 artist = beatmap["beatmapset"]["artist"].ToString();
@@ -348,8 +345,16 @@ namespace osu1progressbar.Game.Database
                                 tags = beatmap["beatmapset"]["tags"].ToString();
                                 preview = beatmap["beatmapset"]["preview_url"].ToString();
                             }
+                            else {
+                               // add parsing for beatmap filename! 
+                            }
 
-                            // Create a new BeatmapHelper score with "null" values for everything except ID
+                            if (cover == "null" || cover.EndsWith("?0"))
+                            {
+                                cover = Util.getBackground(baseAddresses.Beatmap.FolderName,baseAddresses.Beatmap.OsuFileName);
+                                coverlist = cover;
+                            }
+                          
                             using (SQLiteCommand insertCommand = new SQLiteCommand(connection))
                             {
 
@@ -357,8 +362,6 @@ namespace osu1progressbar.Game.Database
                                  INSERT INTO BeatmapHelper (id, sr, bpm, creator, artist, status, coverlist, cover, preview, version, tags)
                                  VALUES (@id, @sr, @bpm, @creator, @artist, @status, @coverlist, @cover, @preview , @version, @tags)";
 
-                                //Console.WriteLine(starrating + " " + bpm + " " + creator + " " + artist + " " + status + " " + coverlist + " " + cover + " " + version + " " + tags);
-                                // Providing the beatmap's attributes
                                 insertCommand.Parameters.AddWithValue("@id", baseAddresses.Beatmap.Id);
                                 insertCommand.Parameters.AddWithValue("@sr", starrating);
                                 insertCommand.Parameters.AddWithValue("@bpm", bpm);
@@ -426,7 +429,6 @@ namespace osu1progressbar.Game.Database
                     Mods,
                     Version,
                     Tags,
-                    Background,
                     Cover,
                     Coverlist,
                     Preview, 
@@ -468,7 +470,6 @@ namespace osu1progressbar.Game.Database
                             @Mods,
                             @Version,
                             @Tags,
-                            @Background,
                             @Cover,
                             @Coverlist,
                             @Preview,
@@ -516,7 +517,6 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Mode", baseAddresses.Player.Mode);
                         command.Parameters.AddWithValue("@Mods", baseAddresses.Player.Mods.Value);
                         command.Parameters.AddWithValue("@Version", version);
-                        command.Parameters.AddWithValue("@Background", Util.getBackground($"{baseAddresses.Beatmap.FolderName}/{baseAddresses.Beatmap.OsuFileName}"));
                         command.Parameters.AddWithValue("@Cover", cover);
                         command.Parameters.AddWithValue("@Coverlist", coverlist);
                         command.Parameters.AddWithValue("@Preview", preview);
@@ -556,7 +556,6 @@ namespace osu1progressbar.Game.Database
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
             string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
 
-            //List<List<Dictionary<string, object>>> scores = new List<List<Dictionary<string, object>>>();
             List<Dictionary<string, object>> scores = new List<Dictionary<string, object>>();
             
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -566,18 +565,13 @@ namespace osu1progressbar.Game.Database
                 {
 
                     connection.Open();
-                    //command.CommandText = "SELECT Date FROM TimeWasted";
-                    //command.CommandText = "SELECT  datetime(Date, '%Y-%m-%d %H:%M') AS Date FROM TimeWasted ";
-                    //command.CommandText = " SELECT datetime(Date) AS FormattedDate FROM TimeWasted";
+                
                     command.CommandText = "SELECT rowid as id, * " +
                         "FROM ScoreData " +
                         "WHERE datetime(Date) BETWEEN @from AND @to " +
                         "ORDER BY Date DESC " +
                         "LIMIT 1000;";
-                    //command.CommandText = "SELECT Date FROM ScoreData";
-                    //command.CommandText = "SELECT strftime('%Y-%m-%d-%H-',Date) AS parsedDate, RawStatus, Time  FROM TimeWasted;";
-                    //Console.WriteLine(fromFormatted + " " + toFormatted);
-
+                 
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
 
@@ -625,7 +619,6 @@ namespace osu1progressbar.Game.Database
                                 score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
                                 score.Add("Version", reader["Version"]);
                                 score.Add("Tags", reader["Tags"]);
-                                score.Add("Background", reader["Background"]);
                                 score.Add("CoverList", reader["CoverList"]);
                                 score.Add("Cover", reader["Cover"]);
                                 score.Add("Preview", reader["Preview"]);
@@ -646,7 +639,7 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        //ar(0-12) od(0-12) cs(0-12) sr(0-XX) bpm(0-XXX) pp(0-XXXX) hp(0-12  grade(A, S, SS...) time(seconds) mods(hd, dt, nc, ...) status(0-4)
+        //ar(0-12) od(0-12) cs(0-12) sr(0-XX) bpm(0-XXX) pp(0-XXXX) hp(0-12  grade(A, S, SS...) time(seconds) mods(hd, dt, nc, ...) status(0-4) add more stuff someday
         public List<Dictionary<string, object>> GetScoreSearch(DateTime from = new DateTime(), 
             DateTime to = new DateTime(), 
             string search = "")
@@ -655,7 +648,6 @@ namespace osu1progressbar.Game.Database
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
             string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
 
-            //List<List<Dictionary<string, object>>> scores = new List<List<Dictionary<string, object>>>();
             List<Dictionary<string, object>> scores = new List<Dictionary<string, object>>();
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -681,14 +673,10 @@ namespace osu1progressbar.Game.Database
                     command.CommandText = queryBuilder.ToString();
                     DateTime dateString = DateTime.Now;
 
-                    //Console.WriteLine(queryBuilder.ToString());
-
                     try
                     {
                         using (SQLiteDataReader reader = command.ExecuteReader())
                         {
-                            //Console.WriteLine(reader.HasRows.ToString
-
                             while (reader.Read())
                             {
                                 Dictionary<string, object> score = new Dictionary<string, object>();
@@ -725,7 +713,6 @@ namespace osu1progressbar.Game.Database
                                 score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
                                 score.Add("Version", reader["Version"]);
                                 score.Add("Tags", reader["Tags"]);
-                                score.Add("Background", reader["Background"]);
                                 score.Add("CoverList", reader["CoverList"]);
                                 score.Add("Cover", reader["Cover"]);
                                 score.Add("Preview", reader["Preview"]);
@@ -1064,7 +1051,6 @@ namespace osu1progressbar.Game.Database
                                 score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
                                 score.Add("Version", reader["Version"]);
                                 score.Add("Tags", reader["Tags"]);
-                                score.Add("Background", reader["Background"]);
                                 score.Add("CoverList", reader["CoverList"]);
                                 score.Add("Cover", reader["Cover"]);
                                 score.Add("Preview", reader["Preview"]);
