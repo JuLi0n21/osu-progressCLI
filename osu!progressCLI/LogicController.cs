@@ -34,7 +34,7 @@ namespace osu1progressbar.Game.Logicstuff
         public Stopwatch timeSinceStartedPlaying;
 
         FileSystemWatcher watcher = null;
-        static string folderPath = @$"{Credentials.Instance.GetConfig().osufolder}\Data\r"; 
+        static string folderPath = @$"{Credentials.Instance.GetConfig().osufolder}\Data\r";
         static string newestFile;
         static DateTime newestFileTime = DateTime.MinValue;
 
@@ -72,7 +72,7 @@ namespace osu1progressbar.Game.Logicstuff
             {
                 newestFile = e.Name;
                 newestFileTime = fileCreationTime;
-                if (newestFile.EndsWith(".osr")) { 
+                if (newestFile.EndsWith(".osr")) {
                     replayname = newestFile;
                 }
             }
@@ -84,11 +84,10 @@ namespace osu1progressbar.Game.Logicstuff
         public bool Logiccheck(OsuBaseAddresses Values)
         {
             OsuBaseAddresses NewValues = new OsuBaseAddresses();
-            NewValues = Util.DeepCopy(Values);   
-            try
-            {
+            NewValues = Util.DeepCopy(Values);
+            if (NewValues != null) {
 
-                if (PreviousScreen != "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "Playing") { 
+                if (PreviousScreen != "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "Playing") {
                     timeSinceStartedPlaying = Stopwatch.StartNew();
                     startime = NewValues.GeneralData.AudioTime;
                 }
@@ -165,19 +164,19 @@ namespace osu1progressbar.Game.Logicstuff
 
                         });
                     }
-                    else { 
-                                Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Score Threshhold of 1000 not Reached");
+                    else {
+                        Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Score Threshhold of 1000 not Reached");
                     }
                 }
 
                 //can be buggy with broken game (fix ur game then wat)
-                if ((NewValues.GeneralData.OsuStatus.ToString() == "Playing") && (Audiotime > NewValues.GeneralData.AudioTime) && (NewValues.Player.Score >= 1000))  {
-                    
+                if ((NewValues.GeneralData.OsuStatus.ToString() == "Playing") && (Audiotime > NewValues.GeneralData.AudioTime) && (NewValues.Player.Score >= 1000) && (timeSinceStartedPlaying.ElapsedMilliseconds > 1000)) {
+
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Retry Detected");
                     db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Retry");
                 };
 
-               
+
 
                 PreviousScreen = NewValues.GeneralData.OsuStatus.ToString();
                 PreviousBanchoStatus = Values.BanchoUser.BanchoStatus.ToString();
@@ -189,12 +188,7 @@ namespace osu1progressbar.Game.Logicstuff
 
                 return true;
             }
-           
-            catch (Exception ex)
-            {
-                Logger.Log(Logger.Severity.Error, Logger.Framework.Logic, $"{ex.Message}");
-                return false;
-            }
-        }
+            return false;
+        } 
     }
 }
