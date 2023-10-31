@@ -28,14 +28,6 @@ function fetchOsuBeatmap() {
                                    </div>`;
             }
 
-            let bg = data.CoverList;
-            if (data.CoverList == "null") {
-                console.log(data.Background, data.CoverList)
-
-                bg = `/${data.Foldername}/${data.Background}`;
-                console.log(bg);
-            }
-
             document.getElementById('beatmapData').innerHTML = `
            <p class="relative top-6 left-4">${data.Status}</p>
             <div class="flex justify-center ml-4 mb-4 mr-4 text-xl">
@@ -45,7 +37,7 @@ function fetchOsuBeatmap() {
             </div>
          
 <div>
-  <div id="image-container" style="min-height: 280px; position: relative;">
+  <div id="image-container" style="min-height: 280px; min-width: 1000px; position: relative;">
     <img class="absolute top-0 left-0 w-40" src="${data.Grade}.png" alt="${data.Grade}">
     <a href="https://osu.ppy.sh/users/${data.Creator}" class="absolute bottom-10 right-0 score-backdrop--dark rounded-lg m-3 p-1 text--pink hover:text-white">${data.Version} by ${data.Creator}</a>
     <p class="absolute bottom-0 right-0 score-backdrop--dark rounded-lg m-3 p-1">${data.Username} at ${data.Date}</p>
@@ -68,7 +60,7 @@ function fetchOsuBeatmap() {
   
     <div>
     <a href="https://osu.ppy.sh/beatmapsets/${data.BeatmapSetid}#${data.Mode}/${data.Beatmapid}" target="_blank">
-        <img src="${bg}">
+        <img src="${data.CoverList}" style="min-height: 280px; min-width: 1000px; max-height: 280px; object-fit: cover">
         </a>
     </div>
   </div>
@@ -400,7 +392,7 @@ function openAnalyzer() {
         .catch(error => {
             console.error('Error making POST request:', error);
         });
-    alert("Starting OsuMissAnalyzer, while its running the Website wont Work!");
+    alert("Starting OsuMissAnalyzer!");
 
 }
 
@@ -554,14 +546,6 @@ function createScoreElements(scores) {
 
         score.Acc = score.Acc.toFixed(2);
 
-        let bg = score.Cover;
-        if (score.Cover == "null") {
-            console.log(score.Background, score.Cover)
-
-            bg = `/${score.Foldername}/${score.Background}`;
-            console.log(bg);
-        }
-
         scoreElement.href = `/score.html?id=${score.id}`;
         scoreElement.target = "_blank";
         scoreElement.rel = "noopener noreferrer";
@@ -580,7 +564,7 @@ function createScoreElements(scores) {
             </div>
         </div>
         <div class="backdrop--dark icon rounded-lg flex-nowrap">
-            <img src="${bg}" class="w-16 h-16" alt="?">
+            <img src="${score.Cover}" class="w-16 h-16" alt="?">
         </div>
 
         <!-- Name, Score/Combo, Grade Date -->

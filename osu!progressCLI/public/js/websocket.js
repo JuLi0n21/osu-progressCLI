@@ -3,8 +3,17 @@ const statusText = document.getElementById('status-text');
 const audioTimeElement = document.getElementById('audio-time');
 const audioBarElement = document.getElementById('audio-bar');
 const audioTextElement = document.getElementById('audio-text');
+const toggle = document.getElementById('livestatusbartoggle');
 let lastAudioTime = 0;
 let lastMessageReceivedTime = Date.now();
+
+toggle.addEventListener('change', function () {
+    if (toggle.checked) {
+        statusBar.classList.remove('hidden');
+    } else {
+        statusBar.classList.add('hidden');
+    }
+});
 
 socket.addEventListener('open', (event) => {
     socket.send('Hello, server!');
