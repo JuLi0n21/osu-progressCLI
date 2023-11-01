@@ -165,6 +165,18 @@ namespace osu_progressCLI.server
 
     <h2 class=""text-xl text-center font-semibold mb-4"">Settings</h2>
 
+    <!-- Osu!folder -->
+ <div class=""mb-3"">
+        <label for=""textInput3"">Osu!folder:</label>
+               <input type=""text"" id=""osufolder_input""  placeholder=""D://osu!"" value="""" class=""w-full border rounded px-2 py-1 backdrop--light"">
+    </div>
+
+    <!-- Song!folder -->
+ <div class=""mb-3"">
+        <label for=""textInput3"">Song!folder:</label>
+         <input type=""text"" id=""songfolder_input""  placeholder=""C://osu!"" value="""" class=""w-full border rounded px-2 py-1 backdrop--light"">
+    </div>
+
     <!-- Toggle 1 -->
     <div class=""flex items-center justify-between mb-3"">
         <span title=""Use Local config to set custom: Name, Rank, Banner, Avatar... (in case you're banned, for example)"">Local config:</span>
@@ -420,10 +432,7 @@ document.getElementById('loadDataButton').addEventListener('click', function () 
  
         }}
 
-        
-
-           
-
+    </script>
     
         // Trigger the initial data load when the page loads (optional)
         window.addEventListener('DOMContentLoaded', function () {{

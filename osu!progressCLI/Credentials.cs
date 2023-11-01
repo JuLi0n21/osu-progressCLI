@@ -120,7 +120,7 @@ namespace osu_progressCLI
 
         }
 
-        public bool UpdateConfig(string localconfig = "False", string username = "", string rank = "", string country = "", string cover_url = "", string avatar_url = "", string port = "4200", string userid = "")
+        public bool UpdateConfig(string osufolder = "C:\\", string songfolder = "C:\\",string localconfig = "False", string username = "", string rank = "", string country = "", string cover_url = "", string avatar_url = "", string port = "4200", string userid = "")
         {
             if (config == null) {
                 config = new JsonConfig();
@@ -134,7 +134,13 @@ namespace osu_progressCLI
                     config.Localconfig = localconfig;
 
                 if (!string.IsNullOrEmpty(port))
-                    config.port = port;
+                    config.port = port; 
+                
+                if (!string.IsNullOrEmpty(osufolder))
+                    config.osufolder = @osufolder;
+
+                if (!string.IsNullOrEmpty(songfolder))
+                    config.songfolder = @songfolder;
 
                 if (!string.IsNullOrEmpty(username))
                     config.username = username;
@@ -197,7 +203,7 @@ namespace osu_progressCLI
         public string? cover_url { get; set; } = String.Empty;
         public string? avatar_url { get; set; } = String.Empty;
         public string? userid { get;set; } = "2";
-        public string? osufolder { get; set; } = @$"C:\users\<pc username>\osu!";
-        public string? songfolder { get; set; } = @$"C:\users\<pc username>\AppData\Songs";
+        public string? osufolder { get; set; } = @$"C:\";
+        public string? songfolder { get; set; } = @$"C:\";
     }
 }

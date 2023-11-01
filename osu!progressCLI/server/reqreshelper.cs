@@ -236,6 +236,8 @@ namespace osu_progressCLI.server
             try
             {
                 Credentials.Instance.UpdateConfig(
+                    parameters["osufolder"]?.ToString(),
+                    parameters["songfolder"]?.ToString(),
                     parameters["localsettings"]?.ToString(),
                     parameters["username"]?.ToString(),
                     parameters["rank"]?.ToString(),

@@ -8,8 +8,13 @@ function saveSettings() {
     const port = document.getElementById('port_input').value;
     const userid = document.getElementById('userid').value;
     const localConfigEnabled = document.getElementById('localsettingstoggle').checked;
+    const osufolder = document.getElementById('osufolder_input').value;
+    const songfolder = document.getElementById('songfolder_input').value;
 
+    console.log(osufolder, songfolder);
     const data = {
+        osufolder: osufolder,
+        songfolder: songfolder,
         username: username,
         rank: rank,
         country: country,
