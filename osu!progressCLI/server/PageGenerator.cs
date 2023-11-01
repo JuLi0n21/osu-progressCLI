@@ -353,7 +353,6 @@ namespace osu_progressCLI.server
     <script src=""searchbar.js""></script>
     <script src=""timespend.js""></script>
     <script src=""timespendtotal.js""></script>
-    <script src=""sidebar.js""></script>
 <script>     
     const socket = new WebSocket('ws://localhost:{Credentials.Instance.GetConfig().port}');
 </script>
