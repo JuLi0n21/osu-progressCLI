@@ -1,36 +1,60 @@
-# osu!progressCLI  
-### THIS PROGRAMM IS IN EARLY ACCESS, BREAKING CHANGES ARE TO BE EXPECTED
+# osu!progressCLI  [![CodeFactor](https://www.codefactor.io/repository/github/juli0n21/osu-progresscli/badge)](https://www.codefactor.io/repository/github/juli0n21/osu-progresscli) [![GitHub release](https://img.shields.io/github/release/juli0n21/osu-progresscli.svg)](https://GitHub.com/juli0n21/osu-progresscli/releases/) [![Github all releases](https://img.shields.io/github/downloads/JuLi0n21/osu-progresscli/total.svg)](https://GitHub.com/JuLi0n21/osu-progresscli/releases/) [![Discord](https://badgen.net/discord/members/9rUMkHJEvv)](https://discord.gg/9rUMkHJEvv)
 
-CURRETN DESIGN (SUBJECT TO CHANGE)
+Prerealse versions:  [![Github all actions](https://github.com/Juli0n21/osu-progresscli/actions/workflows/build-dev.yml/badge.svg)](https://GitHub.com/JuLi0n21/osu-progresscli/actions/)
+A small Tool to Visualize localy Tracked scores for the osu! game.
 
-![Imgur](https://i.imgur.com/u575NkG.png)
-![Imgur](https://i.imgur.com/sA7HPQM.png)
-![Imgur](https://i.imgur.com/XUIgJiq.png)
-![Imgur](https://i.imgur.com/HgHABum.png)
+<details>
+  <summary>Homepage</summary>
 
-This will change!
-![Imgur](https://i.imgur.com/jmaEjyY.png)
+![Imgur](https://imgur.com/cvL9b6i.png)
+
+</details>
+
+<details>
+  <summary>Scorepage</summary>
+
+![Imgur](https://imgur.com/t58MCPB.png)
+
+</details>
+
+### Feature List
+- Automaticaly Tracks Passed, Failed, Retrys and Canceld Scores
+- Calculates PP and Fullcombo PP
+- Tracks Time spend on Any specific Screen
+- Tracks BanchoTime (Idle, playing, afk...)
+- More or less supports All Modes and Mods
+- Progression over time.
+- Missanalzer for Passed Scores
 
 ## How to run
+
+[Video Guide]()
+
 1. Download the zip
 2. Extract it
-3. run the osu!progressCLI.exe
-4. Open ur Webbrowser and go to localhost:4200 (in cause its in use change it in the config.json add osu Songsfolder aswell (appears after first run)
-5. CLick the Pen on the Website insert ur Clientid and ClientSecret and ur userid.
-6. Hit save and refresh the Page ur Profile Stats should appear
+3. Add ur [Osu!Api](https://osu.ppy.sh/home/account/edit#oauth) credentails in the credentials.json
+4. Run the Programm and open the [Webpage](localhost:4200)
+5. Add ur Username under the Pen icon hit save and refresh
+6. If ur profile stats are displayed ur done!
+
 
 ## Requirments
-- Only Windows supported currently (depends on OsuMemoryProvider)
+- Only Windows supported currently (depends on OsuMemoryProvider, Missanalzer, etc...)
 - [NET 6.0.x Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is required to run this programm
 
 ## Feedback / Problems
 - Ask in the [Discord](https://discord.gg/FtF2HNSJNC)
 - Open An Issue 
 - I got some changes/ features -> Make a pull request and maybe ill merge it
-  
-#EWWW the websites are fuckign ugly i dont like them
-if u dont like the pages U CAN MAKE UR OWN ONE 
 
+## I dont like this design
+If u dont like the design u can change ur the existign one or create an etirely new one
+<details>
+  <summary>How to</summary>
+
+If u need help hit me up!
+
+### File based Routing
 put the html/css/js/img files inside the public folders and u can fill them with ur own junk
 ### integrated api
 to better enhance ur own webpages u can use the data from the internal api
@@ -47,16 +71,21 @@ current endpoints are
 - api/timewasted
 - api/timewastedbyday
 
-## TODOs (no prioritys)
 
-- [x] extract js and css out of the page generation (server side serving needed)
+## NOTES
+- Please take official api request limits into account!
+one request every 2 seconds is ok, burst should be ok but if it goes to high ask ppy!
+
+</details>
+
+###
+<details>
+  <summary>TODOs. Is never Uptodate!</summary>
 - [ ] Add possiblity to reload api data incase no internet (or beatmap changed)  (automatic or manual)
 - [x] localbeatmap parser (offline, not submitted maps support) (use osu-tools) (bpm still missing)
 - [ ] highconfigurable website (showing what graphs u want and what not)
 - [ ] page for a single score
-- [x] api endpoint for search functionaliy (add date functionaliy)
-- [ ] make date picker work
-- [x] mod support
+- [ ] mod support
 - [ ] add local images in score displat website for mods and rankings (maybe rankedtype)
 - [x] rename some Colums to enable "better" searching
 - [x] example for costume webpages
@@ -75,10 +104,8 @@ current endpoints are
 - [ ] properly take time (account for pauses etc)
 - [ ] rework database
 - [ ] use proper front end framework for maybe faster score loading or sometning
-- [ ] use actual score design for score design
-- [ ] cache user data to not call api when page refreshing
-- [ ] add replay name to database, find a way to get failed replays
+- [ ] replace modtext with mod icons in recent score
+- [ ] api documentaion / renaming
+- [ ] api endpoint for custome querys
+</details>
 
-## NOTES
-- rate limite api calls incause i ever make a importer (1 every 2 seconds) {OFFICAL OSU API! INTERNAL API DOES NOT HAVE LIMIT}
-- change form .net 6.0 to somehting lower (to not have people install dependencys) (could nbot work cause osu tools is net6)
