@@ -28,7 +28,7 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 
 ## How to run
 
-[Video Guide]()
+[Video Guide](https://youtu.be/d7KIUrDF2mI)
 
 1. Download the zip
 2. Extract it
