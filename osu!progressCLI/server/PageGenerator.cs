@@ -431,7 +431,6 @@ document.getElementById('loadDataButton').addEventListener('click', function () 
  
         }}
 
-    </script>
     
         // Trigger the initial data load when the page loads (optional)
         window.addEventListener('DOMContentLoaded', function () {{
@@ -440,8 +439,6 @@ document.getElementById('loadDataButton').addEventListener('click', function () 
             // document.getElementById('loadDataButton').click();
             loaddata();
         }});
-
-    
     
 
     </script>
