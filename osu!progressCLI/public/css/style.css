@@ -165,3 +165,30 @@ header {
     border: none;
     cursor: pointer;
 }
+
+#audio-bar {
+    width: 98%;
+    top: 0px;
+    height: 10px;
+    background-color: rgba(42, 34, 38, 1);
+    position: fixed;
+}
+
+#audio-time {
+    width: 0;
+    height: 100%;
+    background-color: rgba(255, 102, 171, 1);
+    position: absolute;
+    transition: width 0.5s;
+    text-align: center;
+    line-height: 5px;
+    color: white;
+}
+
+#audio-text {
+   
+    width: 100%;
+    position: absolute;
+    top: 10px;
+   
+}

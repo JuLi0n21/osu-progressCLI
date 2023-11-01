@@ -12,6 +12,16 @@ function createBanchoTimeChart(data) {
     const dates = data.map(item => moment(item.Date).toDate());
     const labels = Object.keys(data[0]).filter(key => key !== "Date");
 
+    for (let i = 0; i < data.length; i++) {
+        let item = data[i];
+        for (let key in item) {
+            if (key !== 'Date' && typeof item[key] === 'number') {
+                item[key] = item[key] / 3600;
+            }
+        }
+    }
+
+
     const numberToName = {
         '11': 'MultiplayerRooms',
         '12': 'MultiplayerPlaying',
@@ -98,7 +108,7 @@ function createBanchoTimeChart(data) {
 
 function createTimeWastedChart(data) {
     // Extract the unique dates
-
+    console.log(data);
 
     const numberToScreen = {
         '0': 'Mainmenu',
@@ -107,21 +117,28 @@ function createTimeWastedChart(data) {
         '3': 'GameShutDown',
         '4': 'SongSelectEdit',
         '5': 'SongSelect',
+        '6': 'Unknown',
         '7': 'ResultScreen',
+        '8': 'Unknown',
+        '9': 'Unknown',
+        '10': 'Unknown',
         '11': 'MultiplayerRooms',
         '12': 'MultiPlayerRoom',
+        '13': 'Unknown',
+        '14': 'Unknown',
         '15': 'OsuDirect',
         '16': 'OffsetAssistent',
+        '17': 'Unknown',
+        '18': 'Unknown',
         '19': 'ProcessingBeatmaps',
     }
 
     for (let i = 0; i < data.length; i++) {
-        const item = data[i];
-        if (item.Key in numberToScreen && numberToScreen[item.Key] && item.Value >= 10) {
-            labels.push(numberToScreen[item.Key]);
-            item.Value = item.Value / 3600;
-            values.push(item.Value);
-            colors.push('#' + (Math.random() * 0xFFFFFF << 0).toString(16));
+        let item = data[i];
+        for (let key in item) {
+            if (key !== 'Date' && typeof item[key] === 'number') {
+                item[key] = item[key] / 3600;
+            }
         }
     }
 

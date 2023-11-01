@@ -1,12 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
-using static Program;
+
 
 namespace osu_progressCLI
 {
@@ -17,6 +12,9 @@ namespace osu_progressCLI
 
         private string clientid;
         private string clientsecret;
+
+        private JObject usercache = null;
+        private DateTime userTimestamp;
         private ApiController() {
 
             clientid = Credentials.Instance.GetClientId();
@@ -32,6 +30,8 @@ namespace osu_progressCLI
 
         private async void getAccessToken()
         {
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Getting AccessToken");
+
             string access_token = null;
 
             string oauthTokenEndpoint = "https://osu.ppy.sh/oauth/token";
@@ -55,14 +55,16 @@ namespace osu_progressCLI
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"HTTP Request Exception: {ex.Message}");
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Network, $"HTTP Request Exception: {ex.Message}");
+
                 return;
             }
 
             if (response.IsSuccessStatusCode)
             {
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Network, "Recieved Accesstoken, expanded Beatmap data should be availabe now.");
+
                 var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Recieved Accesstoken, expanded Beatmap data should be availabe now.");
 
                 TokenResponse tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
 
@@ -71,7 +73,8 @@ namespace osu_progressCLI
             }
             else
             {
-                Console.WriteLine($"HTTP Error: {response.StatusCode}, beatmap info will only be limited available");
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"HTTP Error: {response.StatusCode}, beatmap info will only be limited available, Check if ur Clientcredentials are correct and u have a working Internet Connection!");
+
             }
 
             httpClient.Dispose();
@@ -86,7 +89,8 @@ namespace osu_progressCLI
 
         public async Task<JObject> getExpandedBeatmapinfo(string id)
         {
-            Console.WriteLine($"Requesting Beatmap info for: {id}");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Requesting Beatmap info for: {id}");
+
             JObject beatmap = null;
             string beatmapEndpoint = $"https://osu.ppy.sh/api/v2/beatmaps/lookup?id={id}";
 
@@ -103,13 +107,15 @@ namespace osu_progressCLI
             if (reponse.IsSuccessStatusCode)
             {
                 string responseBody = await reponse.Content.ReadAsStringAsync();
-                Console.WriteLine($"Rechieved Beatmap info for: {id}");
-                Console.WriteLine(responseBody);
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Rechieved Beatmap info for: {id}");
+
+                //Console.WriteLine(responseBody);
                 beatmap = JObject.Parse(responseBody);
             }
             else
             {
-                Console.WriteLine($"Request failed with status code {reponse.StatusCode}");
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Beatmap Request failed with status code {reponse.StatusCode}");
+
                 return beatmap;
             }
 
@@ -118,6 +124,7 @@ namespace osu_progressCLI
         }
 
         public async Task<JObject> getSearch(string mode, string query) {
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Api Search Request");
 
             JObject search = null;
 
@@ -135,15 +142,17 @@ namespace osu_progressCLI
 
             if (reponse.IsSuccessStatusCode)
             {
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, $"Search Recieved for: {query}");
+
                 string responseBody = await reponse.Content.ReadAsStringAsync();
-                Console.WriteLine("search Recieved.");
                 //Console.WriteLine(responseBody);
 
                 search = JObject.Parse(responseBody);
             }
             else
             {
-                Console.WriteLine($"Request failed with status code {reponse.StatusCode}");
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Misc, $"Search Request failed with status code {reponse.StatusCode}");
+
                 return search;
             }
 
@@ -152,41 +161,49 @@ namespace osu_progressCLI
             return search;
         }
 
-        public async Task<JObject> getuser(string userid, string mode)
+        public async Task<JObject> getuser(string userid , string mode)
         {
-
-            Console.WriteLine($"Requesting User info for: {userid}");
-            JObject userJson = null;
-
-            string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{userid}/{mode}";
-
-            var client = new HttpClient();
-
-            client.BaseAddress = new Uri(searchEndpoint);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Credentials.Instance.GetAccessToken());
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-
-            HttpResponseMessage reponse = await client.GetAsync(searchEndpoint);
-
-            if (reponse.IsSuccessStatusCode)
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting User info for: {userid}, {mode}");
+            if (usercache == null || userTimestamp <= DateTime.Now.AddMinutes(-5))
             {
-                Console.WriteLine($"Recieved User info for: {userid}");
-                string responseBody = await reponse.Content.ReadAsStringAsync();
-                //Console.WriteLine(responseBody);
+                userTimestamp = DateTime.Now;
+                string searchEndpoint = $"https://osu.ppy.sh/api/v2/users/{userid}/{mode}";
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Request {searchEndpoint}");
+                var client = new HttpClient();
 
-                userJson = JObject.Parse(responseBody);
+                client.BaseAddress = new Uri(searchEndpoint);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Credentials.Instance.GetAccessToken());
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("key", "username");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+
+                HttpResponseMessage reponse = await client.GetAsync(searchEndpoint);
+
+                if (reponse.IsSuccessStatusCode)
+                {
+                    Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Recieved User info for: {userid}");
+
+                    string responseBody = await reponse.Content.ReadAsStringAsync();
+                    //Console.WriteLine(responseBody);
+
+                    usercache = JObject.Parse(responseBody);
+                }
+                else
+                {
+                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"User Request failed with status code {reponse.StatusCode}");
+
+                    client.Dispose();
+                    return usercache;
+                }
+
+                client.Dispose();
             }
-            else
-            {
-                Console.WriteLine($"Request failed with status code {reponse.StatusCode}");
-                return userJson;
+            else {
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Serving Cached user: {usercache["username"]} | Refresh in {(userTimestamp - DateTime.Now.AddMinutes(-5)).TotalSeconds.ToString().Substring(0,3)} Seconds");
+                return usercache;
             }
-
-            client.Dispose();
-
-            return userJson;
+            return usercache;
         }
 
         public static ApiController Instance

@@ -1,0 +1,37 @@
+name: Dev Branch
+
+on:
+  push:
+    branches:
+      - dev  # Workflow triggers on pushes to the main branch
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release 
+      
+    - name: Test
+      run: dotnet test
+
+    - name: Publish Artifact
+      run: dotnet publish --configuration Release --output ${{ runner.workspace }}/osu!progress
+      
+    - name: Archive Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: osu!progress_${{ github.sha }}
+        path: ${{ runner.workspace }}/osu!progress

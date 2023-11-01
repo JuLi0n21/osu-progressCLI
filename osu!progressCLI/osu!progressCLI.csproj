@@ -22,6 +22,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="Start.vbs">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Stop.vbs">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="credentials.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="OsuMissAnalyzer\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Include="public\**\*.*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
@@ -37,6 +55,7 @@
 	  <None Remove="public\js\scoreexample.js" />
 	  <None Remove="public\js\scoresite.ts" />
 	  <None Remove="public\js\sidebar.txt" />
+	  <None Remove="public\js\TextFile1.txt" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -45,6 +64,7 @@
 	
 	
 	<ItemGroup>
+    <PackageReference Include="Fleck" Version="1.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OsuMemoryDataProvider" Version="0.10.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
@@ -53,9 +73,5 @@
 	
 	<ItemGroup>
 	  <Folder Include="public\img\" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="server\" />
 	</ItemGroup>
 </Project>

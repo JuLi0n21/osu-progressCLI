@@ -1,13 +1,16 @@
-﻿using Newtonsoft.Json.Bson;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using Newtonsoft.Json.Linq;
 using osu1progressbar.Game.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.Metrics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -27,7 +30,7 @@ namespace osu_progressCLI.server
         //defautl page
         public void defaultpage(HttpListenerRequest request, HttpListenerResponse response) {
 
-            WriteResponse(response, PageGenerator.Instance.generatepage(Credentials.Instance.GetConfig().userid, "osu"), "text/html");
+            WriteResponse(response, PageGenerator.Instance.generatepage(Credentials.Instance.GetConfig().userid, "osu",controller.GetWeekCompare()), "text/html");
             //ServeStaticFile(response, "server/html/index.html", "text/html");
         }
 
@@ -112,6 +115,59 @@ namespace osu_progressCLI.server
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(parameters[0].ToString()))) ,"application/json");
         }
 
+        public void Simulateplay(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
+
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Server, @$"Request PP calc for {parameters.Count}");
+            if (parameters["Beatmapid"] != null) { 
+            
+            }
+            
+        }        
+
+        public async void user(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
+
+            //why does this shit take so long pls help
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $@"{parameters["userid"]} - {DifficultyAttributes.ModeConverter(int.Parse(parameters["mode"]))}");
+            WriteResponse(response, JsonConvert.SerializeObject(await ApiController.Instance.getuser(parameters["userid"], DifficultyAttributes.ModeConverter(int.Parse(parameters["mode"])))), "application/json");
+        }
+
+        public void run(HttpListenerRequest request, HttpListenerResponse response) 
+        {
+            try
+            {
+                string requestData = null;
+                using (Stream body = request.InputStream)
+                {
+                    StreamReader reader = new StreamReader(body);
+                    requestData = reader.ReadToEnd();
+                }
+
+                JObject parameters = JObject.Parse(requestData);
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Server, $"{parameters}");
+
+
+                if (parameters == null)
+                {
+                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Server, $"No Parameters for Programm Request");
+
+                    return;
+                }
+
+                if (parameters["programm"].ToString() == "OsuMissAnalyzer" && parameters["id"] != null)
+                {
+
+                    DifficultyAttributes.StartMissAnalyzer(int.Parse(parameters["id"].ToString()));
+
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Server, $@"{e.Message}");
+            }
+
+        }
+        
+
         public void getScore(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters) {
 
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScore(int.Parse(parameters[0]))), "application/json");
@@ -124,21 +180,94 @@ namespace osu_progressCLI.server
             WriteResponse(response, GetScoreAverages(from, to), "application/json");
         }
 
-        public void save(HttpListenerRequest request, HttpListenerResponse response) {
-
-            string requestData = null;
-            using (Stream body = request.InputStream)
+        public void Save(HttpListenerRequest request, HttpListenerResponse response)
+        {
+            try
             {
-                StreamReader reader = new StreamReader(body);
-                requestData = reader.ReadToEnd();
+                string requestData;
+                using (Stream body = request.InputStream)
+                using (StreamReader reader = new StreamReader(body))
+                {
+                    requestData = reader.ReadToEnd();
+                }
+
+                if (string.IsNullOrWhiteSpace(requestData))
+                {
+                    WriteResponse(response, "Request data is empty", "application/json", 400); // Bad Request
+                    return;
+                }
+
+                if (!TryParseJson(requestData, out JObject parameters))
+                {
+                    WriteResponse(response, "Invalid JSON data", "application/json", 400); // Bad Request
+                    return;
+                }
+
+                if (!TryUpdateConfig(parameters, out string errorMessage))
+                {
+                    WriteResponse(response, errorMessage, "application/json", 500); // Internal Server Error
+                    return;
+                }
+
+                WriteResponse(response, " { \"message\":\"Settings Saved\"}", "application/json");
             }
-
-            JObject parameters = JObject.Parse(requestData);
-
-            Credentials.Instance.UpdateApiCredentials(parameters["clientId"].ToString(), parameters["clientSecret"].ToString());
-
-            Credentials.Instance.UpdateConfig(parameters["localsettings"].ToString(), parameters["username"].ToString(), parameters["rank"].ToString(), parameters["country"].ToString(), parameters["coverUrl"].ToString(), parameters["avatarUrl"].ToString(), parameters["port"].ToString(), parameters["userid"].ToString());
+            catch (Exception ex)
+            {
+                WriteResponse(response, ex.Message, "application/json", 500); // Internal Server Error
+            }
         }
+
+        private bool TryParseJson(string json, out JObject parsedJson)
+        {
+            try
+            {
+                parsedJson = JObject.Parse(json);
+                return true;
+            }
+            catch (JsonReaderException)
+            {
+                parsedJson = null;
+                return false;
+            }
+        }
+
+        private bool TryUpdateConfig(JObject parameters, out string errorMessage)
+        {
+            try
+            {
+                Credentials.Instance.UpdateConfig(
+                    parameters["osufolder"]?.ToString(),
+                    parameters["songfolder"]?.ToString(),
+                    parameters["localsettings"]?.ToString(),
+                    parameters["username"]?.ToString(),
+                    parameters["rank"]?.ToString(),
+                    parameters["country"]?.ToString(),
+                    parameters["coverUrl"]?.ToString(),
+                    parameters["avatarUrl"]?.ToString(),
+                    parameters["port"]?.ToString(),
+                    parameters["userid"]?.ToString()
+                );
+                errorMessage = null;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+                return false;
+            }
+        }
+
+        private void WriteResponse(HttpListenerResponse response, string message, string contentType, int statusCode = 200)
+        {
+            response.StatusCode = statusCode;
+            response.ContentType = contentType;
+
+            using (var writer = new StreamWriter(response.OutputStream))
+            {
+                writer.Write(message);
+            }
+        }
+
 
         private string GetBeatmapData(DateTime from, DateTime to)
         {
@@ -177,9 +306,17 @@ namespace osu_progressCLI.server
 
         public void serveimage(HttpListenerRequest request, HttpListenerResponse response, string filepath) {
 
-            //testign needed
-            //Console.WriteLine("image/" + filepath.Split(".")[1]);
-            ServeStaticImage(response, "public/img" + filepath);
+            Console.WriteLine(WebUtility.UrlDecode($"{Credentials.Instance.GetConfig().songfolder}{filepath}"));
+            if (File.Exists("public/img" + filepath))
+            {
+                ServeStaticImage(response, "public/img" + filepath);
+            }
+            else if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}{filepath}"));
+            {
+                ServeStaticImage(response, WebUtility.UrlDecode($@"{Credentials.Instance.GetConfig().songfolder}{filepath}"));
+            }
+
+
         }
 
         public void servehtml(HttpListenerRequest request, HttpListenerResponse response, string filepath)

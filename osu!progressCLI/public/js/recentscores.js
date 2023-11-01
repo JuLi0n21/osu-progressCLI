@@ -10,7 +10,7 @@ const scoresContainer =  document.getElementById("scorecontainer");
   scores.forEach((score) => {
     const scoreElement = document.createElement("a");
     scoreElement.className = "flex justify-center mb-0";
-    
+
       score.Acc = score.Acc.toFixed(2);
 
       scoreElement.href = `/score.html?id=${score.id}`;
@@ -41,11 +41,11 @@ const scoresContainer =  document.getElementById("scorecontainer");
                 <p class="text-white whitespace-nowrap overflow-hidden">${score.Osufilename}</p>
             </div>
             <div>
-                <p class="text-white whitespace-nowrap overflow-hidden">${score.Score} / ${score.MaxCombo} {${score.MaxCombo}} ${score.ModsString}</p>
+                <p class="text-white whitespace-nowrap overflow-hidden">${score.Score} / ${score.Combo} {${score.MaxCombo}} ${score.ModsString}</p>
             </div>
             <div class="flex">
                 <p class="text--dark--yellow whitespace-nowrap overflow-hidden">${score.Version}</p>
-                <p class="text--gray ml-4">${score.Date}</p>
+                <p class="text--gray ml-4">${score.Date} (${score.Playtype})</p>
             </div>
         </div>
 

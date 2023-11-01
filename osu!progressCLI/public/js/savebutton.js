@@ -1,7 +1,5 @@
 ﻿// Save config settings
 function saveSettings() {
-    const clientId = document.getElementById('ClientId').value;
-    const clientSecret = document.getElementById('ClientSecret').value;
     const username = document.getElementById('username_input').value;
     const rank = document.getElementById('rank_input').value;
     const country = document.getElementById('country_input').value;
@@ -10,10 +8,13 @@ function saveSettings() {
     const port = document.getElementById('port_input').value;
     const userid = document.getElementById('userid').value;
     const localConfigEnabled = document.getElementById('localsettingstoggle').checked;
+    const osufolder = document.getElementById('osufolder_input').value;
+    const songfolder = document.getElementById('songfolder_input').value;
 
+    console.log(osufolder, songfolder);
     const data = {
-        clientId: clientId,
-        clientSecret: clientSecret,
+        osufolder: osufolder,
+        songfolder: songfolder,
         username: username,
         rank: rank,
         country: country,
@@ -21,25 +22,32 @@ function saveSettings() {
         coverUrl: coverUrl,
         port: port,
         localsettings: localConfigEnabled,
-        userid: userid
+        userid: userid,
     };
 
-    // Send a POST request to the api/save endpoint
-    fetch('api/save', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-        .then(response => {
-            if (response.ok) {
-                alert('Settings saved successfully');
-            } else {
-                console.error('Failed to save settings');
-            }
+        // Send a POST request to the api/save endpoint
+        fetch('api/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
         })
-        .catch(error => {
-            alert('An error occurred: ' + error);
-        });
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // Assuming the server sends a JSON response
+                } else {
+                    throw new Error('Failed to save settings');
+                }
+            })
+            .then(data => {
+                console.log(data);
+                alert("Settings saved, to Avoid overloading the Osu api will users only be refreshed every 5 minutes (or restart the program)");
+                location.reload();
+
+            })
+            .catch(error => {
+                console.error(error);
+                alert('An error occurred while saving settings. Please try again later.');
+            });
 }
