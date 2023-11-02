@@ -90,7 +90,7 @@ namespace osu1progressbar.Game.Logicstuff
                 }
 
                 //DOESNT WORK WITH THE COPYED DATA (IDK WHY)
-                if (PreviousBanchoStatus != Values.BanchoUser.BanchoStatus.ToString())
+                if (PreviousBanchoStatus != NewValues.BanchoUser.BanchoStatus.ToString())
                 {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, $"Banchotime: {BanchoTimeStopWatch.ElapsedMilliseconds / 1000}s {PreviousBanchoStatus}");
                     db.UpdateBanchoTime(PreviousBanchoStatus, BanchoTimeStopWatch.ElapsedMilliseconds / 1000);
@@ -109,10 +109,8 @@ namespace osu1progressbar.Game.Logicstuff
                             watcher.Created += OnFileCreated;
                             watcher.EnableRaisingEvents = true;
                             watcher.WaitForChanged(WatcherChangeTypes.Created);
-                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"old values: {NewValues.Player.Hit300} new values: {Values.Player.Hit300}");
                             Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Replay found");
                             db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass", replayname);
-                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"old values: {NewValues.Player.Hit300} new values: {Values.Player.Hit300}");
                             replayname = null;
                             watcher.Dispose();
                         } catch (Exception e) { 
@@ -179,7 +177,7 @@ namespace osu1progressbar.Game.Logicstuff
 
 
                 PreviousScreen = NewValues.GeneralData.OsuStatus.ToString();
-                PreviousBanchoStatus = Values.BanchoUser.BanchoStatus.ToString();
+                PreviousBanchoStatus = NewValues.BanchoUser.BanchoStatus.ToString();
                 PreviousRawStatus = NewValues.GeneralData.RawStatus;
                 Audiotime = NewValues.GeneralData.AudioTime;
                 isReplay = NewValues.Player.IsReplay;
