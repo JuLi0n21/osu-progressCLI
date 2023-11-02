@@ -182,7 +182,7 @@ namespace osu1progressbar.Game.Logicstuff
                 Audiotime = NewValues.GeneralData.AudioTime;
                 isReplay = NewValues.Player.IsReplay;
 
-                Task.Run(async () => await Webserver.Instance().SendData("baseaddresses", Values));
+                Task.Run(async () => await Webserver.Instance().SendData("baseaddresses", NewValues));
 
                 return true;
             }
