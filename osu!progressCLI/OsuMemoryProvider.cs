@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Globalization;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
-using System.Security.AccessControl;
-using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using osu1progressbar.Game.Logicstuff;
 using OsuMemoryDataProvider;
 using OsuMemoryDataProvider.OsuMemoryModels;
-using OsuMemoryDataProvider.OsuMemoryModels.Abstract;
 using OsuMemoryDataProvider.OsuMemoryModels.Direct;
+using System.Diagnostics;
 
 
 //make it slow down when osu! not found so it can easily run in the background wihtouht wasting much cpu cycles

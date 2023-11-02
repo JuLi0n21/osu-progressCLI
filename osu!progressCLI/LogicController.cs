@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
-using Fleck;
-using osu_progressCLI;
+﻿using osu_progressCLI;
 using osu_progressCLI.server;
 using osu1progressbar.Game.Database;
-using osu1progressbar.Game.MemoryProvider;
 using OsuMemoryDataProvider.OsuMemoryModels;
+using System.Diagnostics;
 
 
 //detect score fails 
@@ -89,7 +81,6 @@ namespace osu1progressbar.Game.Logicstuff
                     screenTimeStopWatch.Restart();
                 }
 
-                //DOESNT WORK WITH THE COPYED DATA (IDK WHY)
                 if (PreviousBanchoStatus != Data.BanchoUser.BanchoStatus.ToString())
                 {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, $"Banchotime: {BanchoTimeStopWatch.ElapsedMilliseconds / 1000}s {PreviousBanchoStatus}");

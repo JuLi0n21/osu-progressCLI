@@ -1,7 +1,6 @@
-﻿using osu_progressCLI;
-using System.Text.Json;
+﻿using DeepCopy;
+using osu_progressCLI;
 using System.Text.RegularExpressions;
-using DeepCopy;
 
 public class Util
 {

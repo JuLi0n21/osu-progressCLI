@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace osu_progressCLI
 {

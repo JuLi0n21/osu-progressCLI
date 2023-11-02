@@ -1,18 +1,9 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
 using Newtonsoft.Json.Linq;
 using osu1progressbar.Game.Database;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics.Metrics;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace osu_progressCLI.server
 {
