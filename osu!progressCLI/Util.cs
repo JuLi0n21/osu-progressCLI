@@ -1,20 +1,13 @@
 ﻿using osu_progressCLI;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using DeepCopy;
 
 public class Util
 {
     public static T DeepCopy<T>(T input)
     {
-        try
-        {
-            var jsonString = JsonSerializer.Serialize(input);
-            return JsonSerializer.Deserialize<T>(jsonString);
-        }
-        catch (Exception e) {
-            Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, @$"{e.Message}");
-            return default(T);
-        }
+       return DeepCopier.Copy(input);
     }
 
 
