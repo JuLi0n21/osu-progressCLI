@@ -98,6 +98,14 @@ namespace osu_progressCLI.server
                 return;
             }
 
+            if (path.EndsWith(".osr"))
+            {
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"Serving {path}");
+
+                helper.serveosr(request, response, path);
+                return;
+            }
+
             //default page
             if (path == "/")
             {

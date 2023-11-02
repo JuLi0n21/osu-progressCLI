@@ -323,6 +323,14 @@ namespace osu_progressCLI.server
             ServeStaticFile(response, jsFilePath, "text/javascript");
         }
 
+        public void serveosr(HttpListenerRequest request, HttpListenerResponse response, string filepath)
+        {
+
+            string jsFilePath = $"{Credentials.Instance.GetConfig().osufolder}/Data/r/{filepath}";
+
+            ServeStaticFile(response, jsFilePath, "application/osr");
+        }
+
         public void servecss(HttpListenerRequest request, HttpListenerResponse response, string filepath)
         {
 
