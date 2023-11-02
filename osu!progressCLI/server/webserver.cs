@@ -207,9 +207,7 @@ namespace osu_progressCLI.server
                     {
                         // Handle received data here
                         string receivedMessage = System.Text.Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
-                        Console.WriteLine($"Received: {receivedMessage}");
 
-                        // Send a response (you can customize this part)
                         string responseMessage = $"Received: {receivedMessage}";
                         byte[] responseBytes = System.Text.Encoding.UTF8.GetBytes(responseMessage);
                         await webSocket.SendAsync(new ArraySegment<byte>(responseBytes), WebSocketMessageType.Text, true, CancellationToken.None);

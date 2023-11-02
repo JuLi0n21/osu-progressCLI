@@ -306,7 +306,6 @@ namespace osu_progressCLI.server
 
         public void serveimage(HttpListenerRequest request, HttpListenerResponse response, string filepath) {
 
-            Console.WriteLine(WebUtility.UrlDecode($"{Credentials.Instance.GetConfig().songfolder}{filepath}"));
             if (File.Exists("public/img" + filepath))
             {
                 ServeStaticImage(response, "public/img" + filepath);
