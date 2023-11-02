@@ -51,24 +51,8 @@ namespace osu1progressbar.Game.Logicstuff
             BanchoTimeStopWatch.Start();
 
             timeSinceStartedPlaying = new Stopwatch();
-
-                Thread watcherThread = new Thread(new ThreadStart(StartFileSystemWatcher));
-                watcherThread.Start();
           
             Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Instanciated LogicController");
-        }
-
-        private void StartFileSystemWatcher()
-        {
-            try
-            {
-                watcher = new FileSystemWatcher(folderPath);
-                watcher.Created += OnFileCreated;
-                watcher.EnableRaisingEvents = true;
-            } catch (Exception ex)
-            {
-                Logger.Log(Logger.Severity.Error, Logger.Framework.Logic, $"{ex.Message}, make sure the osu and song folder are correct!");
-            }
         }
 
         private static void OnFileCreated(object sender, FileSystemEventArgs e)
@@ -119,12 +103,22 @@ namespace osu1progressbar.Game.Logicstuff
 
                     Task.Run(() =>
                     {
-                        watcher.WaitForChanged(WatcherChangeTypes.Created);
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"old values: {NewValues.Player.Hit300} new values: {Values.Player.Hit300}");
-                        Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Replay found");
-                        db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass", replayname);
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"old values: {NewValues.Player.Hit300} new values: {Values.Player.Hit300}");
-                        replayname = null;
+                        try
+                        {
+                            watcher = new FileSystemWatcher(folderPath);
+                            watcher.Created += OnFileCreated;
+                            watcher.EnableRaisingEvents = true;
+                            watcher.WaitForChanged(WatcherChangeTypes.Created);
+                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"old values: {NewValues.Player.Hit300} new values: {Values.Player.Hit300}");
+                            Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Replay found");
+                            db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass", replayname);
+                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"old values: {NewValues.Player.Hit300} new values: {Values.Player.Hit300}");
+                            replayname = null;
+                            watcher.Dispose();
+                        } catch (Exception e) { 
+                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"{e.Message} Trying to Save score anyway");
+                            db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass", replayname);
+                        }
                     });
                 }
                 else if (!isReplay && PreviousScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "MultiplayerResultsscreen") {

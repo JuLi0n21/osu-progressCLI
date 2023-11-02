@@ -162,6 +162,8 @@ namespace osu_progressCLI
 
                 File.WriteAllText(filePath, JsonConvert.SerializeObject(config));
 
+                if (!string.IsNullOrEmpty(osufolder) && !string.IsNullOrEmpty(songfolder))
+                    updateOsuMissAnalyzer(osufolder, songfolder);
 
                 return true;
             }
@@ -173,6 +175,32 @@ namespace osu_progressCLI
             }
         }
 
+        private static void updateOsuMissAnalyzer(string osufolder, string songsfolder) {
+            string filepath = "OsuMissAnalyzer/options.cfg";
+            try
+            {
+                string[] lines = File.ReadAllLines(filepath);
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (lines[i].StartsWith("OsuDir="))
+                    {
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Replaced {lines[i]} with OsuDir={@osufolder}");
+                        lines[i] = @$"OsuDir={osufolder}";
+                    }
+                    if (lines[i].StartsWith("SongsDir="))
+                    {
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Replaced {lines[i]} with SongsDir={@songsfolder}");
+                        lines[i] = @$"SongsDir={songsfolder}";
+                    }
+                }
+                File.WriteAllLines(filepath, lines);
+            } catch (Exception e)
+            {
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, $"Error: {e.Message}");
+
+            }
+        }
         public static Credentials Instance
         {
             get
