@@ -205,7 +205,7 @@ namespace osu1progressbar.Game.MemoryProvider
         }
         private void SreaderOnInvalidRead(object sender, (object readObject, string propPath) e)
         {
-            Logger.Log(Logger.Severity.Error, Logger.Framework.MemoryProvider, $"Error reading {e.propPath}{Environment.NewLine}");
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.MemoryProvider, $"Error reading {e.propPath}{Environment.NewLine}");
             try
             {
                 //Console.WriteLine($"{DateTime.Now:T} Error reading {e.propPath}{Environment.NewLine}");
