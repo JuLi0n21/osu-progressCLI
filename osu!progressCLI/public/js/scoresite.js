@@ -21,7 +21,9 @@ function fetchOsuBeatmap() {
             if (Object.keys(data.Replay).length != 0) {
                 missanalyzerdiv = `<div class="flex justify-evenly">
                                    <button id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600 hover:text-white">${data.HitMiss}↩</pre> </button>
-                                   </div>`;
+                                   <a href="${data.Replay}" target="_blank" title="Download Replay"><span class="fa fa-fw"><span class="fas fa-download"></span></span></a>
+                                   </div>
+                                   `;
             } else {
                 missanalyzerdiv = `<div class="flex justify-evenly">
                                    <button id="">  <pre title="No Replay Saved!" class="text-red-600">${data.HitMiss}⚠️</pre> </button>

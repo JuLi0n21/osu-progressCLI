@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
-using Fleck;
-using osu_progressCLI;
+﻿using osu_progressCLI;
 using osu_progressCLI.server;
 using osu1progressbar.Game.Database;
-using osu1progressbar.Game.MemoryProvider;
 using OsuMemoryDataProvider.OsuMemoryModels;
+using System.Diagnostics;
 
 
 //detect score fails 
@@ -73,31 +65,30 @@ namespace osu1progressbar.Game.Logicstuff
         //(and is probably not running cause its set to stop in the memoryprovider incase no osu is found
         public bool Logiccheck(OsuBaseAddresses Values)
         {
-            OsuBaseAddresses NewValues = new OsuBaseAddresses();
-            NewValues = Util.DeepCopy(Values);
-            if (NewValues != null) {
+            OsuBaseAddresses Data = new OsuBaseAddresses();
+            Data = Util.DeepCopy(Values);
+            if (Data != null) {
 
-                if (PreviousScreen != "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "Playing") {
+                if (PreviousScreen != "Playing" && Data.GeneralData.OsuStatus.ToString() == "Playing") {
                     timeSinceStartedPlaying = Stopwatch.StartNew();
-                    startime = NewValues.GeneralData.AudioTime;
+                    startime = Data.GeneralData.AudioTime;
                 }
 
-                if (PreviousScreen != NewValues.GeneralData.OsuStatus.ToString())
+                if (PreviousScreen != Data.GeneralData.OsuStatus.ToString())
                 {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, $"Screentime: {screenTimeStopWatch.ElapsedMilliseconds / 1000}s {PreviousScreen}");
                     db.UpdateTimeWasted(PreviousRawStatus, screenTimeStopWatch.ElapsedMilliseconds / 1000);
                     screenTimeStopWatch.Restart();
                 }
 
-                //DOESNT WORK WITH THE COPYED DATA (IDK WHY)
-                if (PreviousBanchoStatus != Values.BanchoUser.BanchoStatus.ToString())
+                if (PreviousBanchoStatus != Data.BanchoUser.BanchoStatus.ToString())
                 {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, $"Banchotime: {BanchoTimeStopWatch.ElapsedMilliseconds / 1000}s {PreviousBanchoStatus}");
                     db.UpdateBanchoTime(PreviousBanchoStatus, BanchoTimeStopWatch.ElapsedMilliseconds / 1000);
                     BanchoTimeStopWatch.Restart();
                 }
 
-                if (!isReplay && PreviousScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "ResultsScreen")
+                if (!isReplay && PreviousScreen == "Playing" && Data.GeneralData.OsuStatus.ToString() == "ResultsScreen")
                 {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Pass Detected Waiting for Replay");
 
@@ -109,32 +100,30 @@ namespace osu1progressbar.Game.Logicstuff
                             watcher.Created += OnFileCreated;
                             watcher.EnableRaisingEvents = true;
                             watcher.WaitForChanged(WatcherChangeTypes.Created);
-                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"old values: {NewValues.Player.Hit300} new values: {Values.Player.Hit300}");
                             Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Replay found");
-                            db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass", replayname);
-                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"old values: {NewValues.Player.Hit300} new values: {Values.Player.Hit300}");
+                            db.InsertScore(Data, Data.GeneralData.AudioTime / 1000, "Pass", replayname);
                             replayname = null;
                             watcher.Dispose();
                         } catch (Exception e) { 
                             Logger.Log(Logger.Severity.Debug, Logger.Framework.Logic, $"{e.Message} Trying to Save score anyway");
-                            db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass", replayname);
+                            db.InsertScore(Data, Data.GeneralData.AudioTime / 1000, "Pass", replayname);
                         }
                     });
                 }
-                else if (!isReplay && PreviousScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() == "MultiplayerResultsscreen") {
+                else if (!isReplay && PreviousScreen == "Playing" && Data.GeneralData.OsuStatus.ToString() == "MultiplayerResultsscreen") {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Multiplay detected");
-                    if (NewValues.Player.Score >= 1000)
+                    if (Data.Player.Score >= 1000)
                     {
                         Task.Run(() =>
                         {
-                            if (NewValues.Player.HP == 0)
+                            if (Data.Player.HP == 0)
                             {
-                                db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Fail");
+                                db.InsertScore(Data, Data.GeneralData.AudioTime / 1000, "Fail");
                                 Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Multiplay Failed");
                             }
                             else
                             {
-                                db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Pass");
+                                db.InsertScore(Data, Data.GeneralData.AudioTime / 1000, "Pass");
                                 Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Multiplay Passed");
                             }
 
@@ -145,20 +134,20 @@ namespace osu1progressbar.Game.Logicstuff
                         Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Score Threshhold of 1000 not Reached");
                     }
                 }
-                else if (!isReplay && PreviousScreen == "Playing" && NewValues.GeneralData.OsuStatus.ToString() != "Playing")
+                else if (!isReplay && PreviousScreen == "Playing" && Data.GeneralData.OsuStatus.ToString() != "Playing")
                 {
-                    if (NewValues.Player.Score >= 1000)
+                    if (Data.Player.Score >= 1000)
                     {
                         Task.Run(() =>
                         {
-                            if (NewValues.Player.HP == 0)
+                            if (Data.Player.HP == 0)
                             {
-                                db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Fail");
+                                db.InsertScore(Data, Data.GeneralData.AudioTime / 1000, "Fail");
                                 Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Cancel detected");
                             }
                             else
                             {
-                                db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Cancel");
+                                db.InsertScore(Data, Data.GeneralData.AudioTime / 1000, "Cancel");
                                 Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Fail detected");
                             }
 
@@ -170,21 +159,21 @@ namespace osu1progressbar.Game.Logicstuff
                 }
 
                 //can be buggy with broken game (fix ur game then wat)
-                if ((NewValues.GeneralData.OsuStatus.ToString() == "Playing") && (Audiotime > NewValues.GeneralData.AudioTime) && (NewValues.Player.Score >= 1000) && (timeSinceStartedPlaying.ElapsedMilliseconds > 1000)) {
+                if ((Data.GeneralData.OsuStatus.ToString() == "Playing") && (Audiotime > Data.GeneralData.AudioTime) && (Data.Player.Score >= 1000) && (timeSinceStartedPlaying.ElapsedMilliseconds > 1000)) {
 
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Retry Detected");
-                    db.InsertScore(NewValues, NewValues.GeneralData.AudioTime / 1000, "Retry");
+                    db.InsertScore(Data, Data.GeneralData.AudioTime / 1000, "Retry");
                 };
 
 
 
-                PreviousScreen = NewValues.GeneralData.OsuStatus.ToString();
-                PreviousBanchoStatus = Values.BanchoUser.BanchoStatus.ToString();
-                PreviousRawStatus = NewValues.GeneralData.RawStatus;
-                Audiotime = NewValues.GeneralData.AudioTime;
-                isReplay = NewValues.Player.IsReplay;
+                PreviousScreen = Data.GeneralData.OsuStatus.ToString();
+                PreviousBanchoStatus = Data.BanchoUser.BanchoStatus.ToString();
+                PreviousRawStatus = Data.GeneralData.RawStatus;
+                Audiotime = Data.GeneralData.AudioTime;
+                isReplay = Data.Player.IsReplay;
 
-                Task.Run(async () => await Webserver.Instance().SendData("baseaddresses", Values));
+                Task.Run(async () => await Webserver.Instance().SendData("baseaddresses", Data));
 
                 return true;
             }
