@@ -46,7 +46,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="public\css\importer.css" />
 	  <None Remove="public\css\style.css" />
+	  <None Remove="public\html\import.html" />
 	  <None Remove="public\html\scores.html" />
 	  <None Remove="public\html\tags.html" />
 	  <None Remove="public\js\configmenu.js" />

@@ -1,0 +1,53 @@
+﻿body {
+    background-color: rgba(23,28,23,255);
+}
+
+.content {
+    max-width: 1000px;
+    min-width: 1000px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.backdrop--light {
+    background-color: rgba(53,77,51,255);
+}
+
+.backdrop--medium--light {
+    background-color: rgba(42,61,41,255);
+}
+
+.backdrop--medium {
+    background-color: rgba(32,46,31,255);
+}
+
+.backdrop--medium--dark {
+    background-color: rgba(35,42,34,255);
+}
+
+.backdrop--dark {
+    background-color: rgba(23,28,23,255);
+}
+
+.text--dark--yellow {
+    color: rgba(221, 159, 8, 1);
+}
+
+.text--gray {
+    color: rgba(162, 142, 151, 1);
+}
+
+.text--yellow {
+    color: rgba(252, 198, 51, 1);
+}
+
+.text--pink {
+    color: rgba(255, 102, 171, 1);
+}
+
+.text--orange {
+    color: #dc8726;
+}
+
+.text--pink--dark {
+    color: #663e70;
+}

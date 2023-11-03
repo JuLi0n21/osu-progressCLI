@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <title>Osu! Beatmap Viewer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.11.0/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="importer.css">
+</head>
+<body id="backdrop--dark">
+
+    <div class="fixed top-0 left-0">
+        <a href="/">
+            <button id="loadDataButton" class="text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 backdrop--medium--light">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/Home-icon.svg" alt="home" style="width: 24px; height: 24px; filter: invert(100%);">
+            </button>
+        </a>
+    </div>
+
+    <!-- -->
+
+    <div class="flex justify-center items-center">
+        <div class="p-4 rounded-lg shadow-lg backdrop--medium text--pink text-xl">
+
+            <h1 class="text-3xl font-bold text-center mb-4">Import Scores!</h1>
+
+            <div class="text-center mb-6">
+                <p class="text-lg">Thanks to the Glorious People over at osu!alternative, we can import all your previously set scores (not including fails and only standard).</p>
+            </div>
+
+            <div class="mb-6">
+                <p class="font-bold">Follow these steps:</p>
+                <ol class="list-decimal ml-6">
+                    <li class="mb-6 ml-6">
+                        Join osu!Alternative Discord
+                        <a href="https://discord.gg/VZWRZZXcW4" target="_blank" class="flex items-center justify-center backdrop--light text-white p-2 rounded-lg hover:backdropp--light transition duration-200">
+                            <img src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/636e0a6918e57475a843f59f_icon_clyde_black_RGB.svg" loading="lazy" alt="" class="h-8 w-8 mr-5">
+                            osu!Alternative
+                        </a>
+                    </li>
+                    <li class="mb-6 ml-6">
+                        Register in the #registration channel using <p class="backdrop--dark text-white">!register -user-id</p>
+                        <img src="registeruserid.png">
+                    </li>
+                    <li class="mb-6 ml-6">Head over to <a href="https://osualt.respektive.pw/" target="_blank" class="text--pink--dark hover:text-white">https://osualt.respektive.pw/</a> to fetch all your scores. This process will take 8 hours. </li>
+                    <li class="mb-6 ml-6">
+                        Export All scores <p class="backdrop--dark text-white">!getfile -type scores</p>
+                        <img src="getfile.png">
+                    </li>
+                    <li class="mb-6 ml-6">
+                        Download the csv
+                        <img src="downloadscorescsv.png">
+                    </li>
+                </ol>
+            </div>
+
+            <div class="mb-6 ml-6">
+                <label for="fileInput" class="text-lg">Your Scores .csv</label>
+                <input type="file" id="fileInput" class="text--pink--dark hover:text-white" accept="application/csv, .csv">
+            </div>
+
+
+            <div class="text-center text--pink ml-6">
+                <button id="startImportButton" class="backdrop--light px-4 py-2 rounded-lg hover:text-white transition duration-200">Start Import</button>
+            </div>
+
+        </div>
+    </div>
+
+
+
+</body>
+</html>
