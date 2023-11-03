@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.IO.Compression;
+using System.Web;
 
 namespace osu_progressCLI
 {
@@ -73,7 +74,7 @@ namespace osu_progressCLI
                 TokenResponse tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
                 Credentials.Instance.SetAccessToken(tokenResponse.access_token);
 
-               await getMostPlayedMaps("14100399",10150,50, true);
+               //await getMostPlayedMaps("14100399",10150,50, true);
             }
             else
             {
@@ -259,10 +260,15 @@ namespace osu_progressCLI
                 return beatmaps;
         }
 
-        private async Task<bool> DownloadBeatmapset(int beatmapsetid) {
+        private async Task<bool> DownloadBeatmapset(int beatmapsetid, string folderpath = null, bool unzip = true) {
+            
             Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Checking if Beatmapset Exists: {beatmapsetid}");
 
-            string[] files = Directory.GetDirectories(Credentials.Instance.GetConfig().songfolder);
+            if (folderpath == null) {
+                folderpath = Credentials.Instance.GetConfig().songfolder;
+            }
+
+            string[] files = Directory.GetDirectories(folderpath);
             
             bool doesexist = false;
             for (int i = 0; i < files.Length; i++)
@@ -293,8 +299,8 @@ namespace osu_progressCLI
 
                         string sanitizedMapName = $"{mapNameData.SetId} {artist} - {title}";
 
-                        string filePath = Path.Combine(Credentials.Instance.GetConfig().songfolder, $"{sanitizedMapName}.osz");
-                        string dirPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, $"{sanitizedMapName}");
+                        string filePath = Path.Combine(folderpath, $"{sanitizedMapName}.osz");
+                        string dirPath = Path.Combine(folderpath, $"{sanitizedMapName}");
 
 
                         using (FileStream fileStream = File.OpenWrite(filePath))
@@ -302,12 +308,16 @@ namespace osu_progressCLI
                             fileStream.Write(mapFile, 0, mapFile.Length);
                         }
 
-                        ZipFile.ExtractToDirectory(filePath, dirPath);
+                        if (unzip) {
+                            ZipFile.ExtractToDirectory(filePath, dirPath);
+                        }
 
                         Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Beatmap Set with ID: {beatmapsetid} Downloaded Succesfully");
+                        return true;
                     } catch (Exception ex)
                     {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"{ex.Message}");
+                        return false;
                     }
                 }
 
