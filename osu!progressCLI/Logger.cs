@@ -41,7 +41,7 @@ public static class Logger
     {
         string logEntry = $"{DateTime.Now} | {severity.ToString().PadRight(7)} | {framework.ToString().PadRight(8)} | {message}";
 
-        string logFileName = $"{framework}_Log.txt";
+        string logFileName = $@"Logs\{framework}_Log.txt";
 
         try
         {
@@ -57,7 +57,11 @@ public static class Logger
             }
         }
         catch(Exception e){
-        
+            
+            if(!Directory.Exists("Logs"))
+            {
+                Directory.CreateDirectory("Logs");
+            }
             Logger.Log(Severity.Error,Framework.Misc,e.Message);
         }
     }
