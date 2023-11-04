@@ -260,7 +260,7 @@ namespace osu_progressCLI
                 return beatmaps;
         }
 
-        private async Task<bool> DownloadBeatmapset(int beatmapsetid, string folderpath = null, bool unzip = true) {
+        public async Task<string> DownloadBeatmapset(int beatmapsetid, string folderpath = null, bool unzip = true) {
             
             Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Checking if Beatmapset Exists: {beatmapsetid}");
 
@@ -277,7 +277,7 @@ namespace osu_progressCLI
                 {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Beatmap Set with ID: {beatmapsetid} Exists! Canceling Download...");
 
-                    return false;
+                    return Path.GetFileName(files[i]);
                 }
             }
 
@@ -313,17 +313,17 @@ namespace osu_progressCLI
                         }
 
                         Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Beatmap Set with ID: {beatmapsetid} Downloaded Succesfully");
-                        return true;
+                        return sanitizedMapName;
                     } catch (Exception ex)
                     {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"{ex.Message}");
-                        return false;
+                        return null;
                     }
                 }
 
             } 
 
-            return false;
+            return null;
         }
 
         public static ApiController Instance
