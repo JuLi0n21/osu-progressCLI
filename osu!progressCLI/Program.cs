@@ -18,7 +18,9 @@ class Program
                 }
             }
         }
-       
+
+        //Task.Run(() =>  ScoreImporter.ImportScores("imports/shit.csv"));
+
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
         Console.WriteLine("Keep this Terminal Open or the Progamm will stop if u want it run in the background follow the guide on the github!");
