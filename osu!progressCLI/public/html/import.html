@@ -65,15 +65,34 @@
                 <input type="file" id="fileInput" class="text--pink--dark hover:text-white" accept="application/csv, .csv">
             </div>
 
+            <div class="flex justify-center">
+                <div class="flex flex-col">
+                    <div class="text--pink">
+                        <label for="downloadBeatmaps" class="mb-2">
+                            <input type="checkbox" id="downloadBeatmaps" class="" checked>
+                            Download Beatmaps
+                        </label>
+                    </div>
 
-            <div class="text-center text--pink ml-6">
-                <button id="startImportButton" class="backdrop--light px-4 py-2 rounded-lg hover:text-white transition duration-200">Start Import</button>
+                    <div class="text--pink">
+                        <label for="importScores" class="mb-2">
+                            <input type="checkbox" id="importScores" class="" checked>
+                            Import Scores
+                        </label>
+                    </div>
+                </div>
+
+                <button id="startImportButton"
+                        class="backdrop--light ml-5 px-4 py-2 rounded-lg hover:text-white transition duration-200"
+                        onclick="uploadFile()">
+                    Start Import
+                </button>
             </div>
 
         </div>
     </div>
 
-
+    <script src="importer.js"></script>
 
 </body>
 </html>
