@@ -125,7 +125,8 @@ namespace osu_progressCLI.server
                 DateTime to = DateTime.Now;
                 helper.getBeatmapsinTimeSpan(request, response, from, to);
             }
-            else if (path == "/api/beatmaps/search" && queryparams["searchquery"] != null) {
+            else if (path == "/api/beatmaps/search" && queryparams["searchquery"] != null)
+            {
 
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/beatmaps/search call with {queryparams["timespan"]}");
                 helper.search(request, response, queryparams);
@@ -182,6 +183,10 @@ namespace osu_progressCLI.server
             {
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/run call");
                 helper.run(request, response);
+            }
+            else if (path == "/api/upload" && request.HttpMethod == "POST") {
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/upload call");
+                helper.upload(request, response);
             }
             else
             {

@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using osu1progressbar.Game.Database;
 using System.Collections.Specialized;
+using System.IO;
 using System.Net;
 using System.Text;
 
@@ -337,6 +338,45 @@ namespace osu_progressCLI.server
             string jsFilePath = "public/css" + filepath;
 
             ServeStaticFile(response, jsFilePath, "text/css");
+        }
+
+        public async Task<bool> upload(HttpListenerRequest request, HttpListenerResponse response)
+        {
+          
+            try
+            {
+                string uploadDir = "imports";
+                if (!Directory.Exists(uploadDir))
+                {
+                    Directory.CreateDirectory(uploadDir);
+                }
+
+                string fileName = request.Headers["filename"];
+
+                string filePath = Path.Combine(uploadDir, fileName);
+
+              //  using (Stream inputStream = request.InputStream)
+              /*  using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    // await inputStream.CopyToAsync(fileStream);
+                }
+              */
+
+                if (fileName.EndsWith(".csv"))
+                //    Task.Run(() => ScoreImporter.ImportScores(fileName));
+
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Server, $"Received and saved: {fileName}");
+
+                WriteResponse(response, "{\"message\":\"Upload Successful!\"}", "application/json");
+                return true;
+
+             
+            }
+            catch (Exception ex)
+            {
+                WriteResponse(response, $"{{ \"message\":\"{ex.Message}\"}}", "application/json");
+                return false;
+            }
         }
 
         static void ServeStaticFile(HttpListenerResponse response, string filePath, string contentType)
