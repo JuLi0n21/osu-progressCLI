@@ -19,6 +19,7 @@ public static class Logger
         Network,
         MemoryProvider,
         Calculator,
+        Scoreimporter,
         Misc
     }
 
