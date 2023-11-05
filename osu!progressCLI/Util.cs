@@ -12,11 +12,23 @@ public class Util
     }
 
 
-    public static string getBackground(string folderpath, string osufile) {
+    public static string getBackground(string folderpath, string osufile, string fullparentpath = null) {
+
         Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Getting Background from: {folderpath}/{osufile}");
-        if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}/{folderpath}/{osufile}"))
+
+        string filepath = null;
+
+        if (fullparentpath == null)
         {
-            string fileContents = File.ReadAllText($@"{Credentials.Instance.GetConfig().songfolder}/{folderpath}/{osufile}"); // Read the contents of the file
+            filepath = $"{Credentials.Instance.GetConfig().songfolder}/{folderpath}/{osufile}";
+        }
+        else {
+            filepath = $"{fullparentpath}/{folderpath}/{osufile}";
+        }
+        
+        if (File.Exists(filepath))
+        {
+            string fileContents = File.ReadAllText($@"{filepath}"); // Read the contents of the file
 
             string pattern = @"\d+,\d+,""(?<image_filename>[^""]+\.[a-zA-Z]+)"",\d+,\d+";
 
@@ -28,6 +40,19 @@ public class Util
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Found Background Image: {background}");
                 return $"/{folderpath}/{background}";
             }
+
+            pattern = @"\d+,\d+,""(?<image_filename>[^""]+\.[a-zA-Z]+)""";
+
+            match = Regex.Match(fileContents, pattern);
+
+            if (match.Success)
+            {
+                string background = match.Groups["image_filename"].Value;
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Found Background Image: {background}");
+                return $"/{folderpath}/{background}";
+            }
+
+            //older beatmap versions x,x,"name"
         }
             try {
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"No Background Image Found Finding Backup!");
@@ -58,15 +83,85 @@ public class Util
         return null;
     }
 
-    public static string osufile(string foldername, string version) {
+    public static string osufile(string foldername, string version, string fullparentpath = null) {
 
-        string[] files = Directory.GetFiles($"{Credentials.Instance.GetConfig().songfolder}/{foldername}");
+        string[] files = { };//empty array
+        if (fullparentpath == null)
+        {
+            files = Directory.GetFiles($"{Credentials.Instance.GetConfig().songfolder}/{foldername}");
+        }
+        else { 
+            files = Directory.GetFiles($"{fullparentpath}/{foldername}");
+        }
 
-        for(int i = 0; i < files.Length; i++)
+        for (int i = 0; i < files.Length; i++)
         {
             if(files[i].Contains(version))
                 return Path.GetFileName(files[i]);
         }
         return null;
+    }
+
+
+    public class ThreadPool : IDisposable
+    {
+        private readonly object lockObject = new object();
+        private readonly int maxThreads;
+        private int runningThreads = 0;
+        private bool disposed = false;
+
+        public ThreadPool(int maxThreads)
+        {
+            this.maxThreads = maxThreads;
+        }
+
+        public void QueueUserWorkItem(ParameterizedThreadStart method, object parameter)
+        {
+            if (disposed)
+                throw new ObjectDisposedException("CustomThreadPool");
+
+            lock (lockObject)
+            {
+                while (runningThreads >= maxThreads)
+                {
+                    Monitor.Wait(lockObject);
+                }
+
+                runningThreads++;
+            }
+
+            Thread workerThread = new Thread(() =>
+            {
+                try
+                {
+                    method(parameter);
+                }
+                finally
+                {
+                    lock (lockObject)
+                    {
+                        runningThreads--;
+                        Monitor.Pulse(lockObject);
+                    }
+                }
+            });
+
+            workerThread.Start();
+        }
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                disposed = true;
+                lock (lockObject)
+                {
+                    while (runningThreads > 0)
+                    {
+                        Monitor.Wait(lockObject);
+                    }
+                }
+            }
+        }
     }
 }
