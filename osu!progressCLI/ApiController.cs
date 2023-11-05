@@ -7,6 +7,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.IO.Compression;
 using System.Web;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace osu_progressCLI
 {
@@ -190,7 +192,7 @@ namespace osu_progressCLI
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Recieved User info for: {userid}");
 
                     string responseBody = await reponse.Content.ReadAsStringAsync();
-                    Console.WriteLine(responseBody);
+                    //Console.WriteLine(responseBody);
 
                     usercache = JObject.Parse(responseBody);
                 }
@@ -242,7 +244,7 @@ namespace osu_progressCLI
                     {
                         foreach (JObject beatmap in beatmaps)
                         {
-                            await DownloadBeatmapset(int.Parse(beatmap["beatmap"]["beatmapset_id"].ToString()));
+                            await DownloadBeatmapset(client, int.Parse(beatmap["beatmap"]["beatmapset_id"].ToString()));
                         }
                      Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Successfully Downloaded All Requested Beatmaps");
 
@@ -260,68 +262,88 @@ namespace osu_progressCLI
                 return beatmaps;
         }
 
-        public async Task<string> DownloadBeatmapset(int beatmapsetid, string folderpath = null, bool unzip = true) {
-            
-            Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Checking if Beatmapset Exists: {beatmapsetid}");
-
-            if (folderpath == null) {
-                folderpath = Credentials.Instance.GetConfig().songfolder;
-            }
-
-            string[] files = Directory.GetDirectories(folderpath);
-            
-            bool doesexist = false;
-            for (int i = 0; i < files.Length; i++)
+        public async Task<string> DownloadBeatmapset(HttpClient client, int beatmapsetid, bool unzip = true, string folderpath = null) {
+            try
             {
-                if (files[i].Contains($"{beatmapsetid} ")) //avoids 2345 counting for 234 
-                {
-                    Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Beatmap Set with ID: {beatmapsetid} Exists! Canceling Download...");
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Checking if Beatmapset Exists: {beatmapsetid}");
 
-                    return Path.GetFileName(files[i]);
+                if (folderpath == null)
+                {
+                    folderpath = Credentials.Instance.GetConfig().songfolder;
                 }
-            }
-
-
-            if (!doesexist)
-            {
+                else
                 {
-                    try {
-                        Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Starting Download for:  {beatmapsetid}");
-
-                        using HttpClient client = new HttpClient();
-
-                        byte[] mapFile = client.GetByteArrayAsync($"https://api.chimu.moe/v1/download/{beatmapsetid}").Result;
-                        string mapNameJson = client.GetStringAsync($"https://api.chimu.moe/v1/set/{beatmapsetid}").Result;
-                        dynamic mapNameData = JsonConvert.DeserializeObject(mapNameJson);
-                        // Console.WriteLine(mapNameJson);
-                        string artist = mapNameData.Artist;
-                        string title = mapNameData.Title;
-
-                        string sanitizedMapName = $"{mapNameData.SetId} {artist} - {title}";
-
-                        string filePath = Path.Combine(folderpath, $"{sanitizedMapName}.osz");
-                        string dirPath = Path.Combine(folderpath, $"{sanitizedMapName}");
-
-
-                        using (FileStream fileStream = File.OpenWrite(filePath))
-                        {
-                            fileStream.Write(mapFile, 0, mapFile.Length);
-                        }
-
-                        if (unzip) {
-                            ZipFile.ExtractToDirectory(filePath, dirPath);
-                        }
-
-                        Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Beatmap Set with ID: {beatmapsetid} Downloaded Succesfully");
-                        return sanitizedMapName;
-                    } catch (Exception ex)
+                    if (!Directory.Exists(folderpath))
                     {
-                    Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"{ex.Message}");
-                        return null;
+                        Directory.CreateDirectory(folderpath);
+                        Logger.Log(Logger.Severity.Warning, Logger.Framework.Scoreimporter, $"{folderpath} not found creating new Folder!");
                     }
                 }
 
-            } 
+
+                string[] files = Directory.GetDirectories(folderpath);
+
+                bool doesexist = false;
+                for (int i = 0; i < files.Length; i++)
+                {
+                    if (files[i].Contains($"{beatmapsetid} ")) //avoids 2345 counting for 234 
+                    {
+                        Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Beatmap Set with ID: {beatmapsetid} Exists! Canceling Download...");
+
+                        return Path.GetFileName(files[i]);
+                    }
+                }
+
+
+                if (!doesexist)
+                {
+                    {
+                        try
+                        {
+                            Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Starting Download for:  {beatmapsetid}");
+                            Stopwatch time = Stopwatch.StartNew();
+
+                            byte[] mapFile = client.GetByteArrayAsync($"https://api.chimu.moe/v1/download/{beatmapsetid}").Result;
+                            string mapNameJson = client.GetStringAsync($"https://api.chimu.moe/v1/set/{beatmapsetid}").Result;
+                            dynamic mapNameData = JsonConvert.DeserializeObject(mapNameJson);
+                            // Console.WriteLine(mapNameJson);
+                            string artist = mapNameData.Artist;
+                            string title = mapNameData.Title;
+
+                            string unfilterd = $"{mapNameData.SetId} {artist} - {title}";
+                            string sanitizedMapName = Regex.Replace(unfilterd, "[<>\":/\\|?*]", "");
+
+                            string filePath = Path.Combine(folderpath, $"{sanitizedMapName}.osz");
+                            string dirPath = Path.Combine(folderpath, $"{sanitizedMapName}");
+
+
+                            using (FileStream fileStream = File.OpenWrite(filePath))
+                            {
+                                fileStream.Write(mapFile, 0, mapFile.Length);
+                            }
+
+                            if (unzip)
+                            {
+                                ZipFile.ExtractToDirectory(filePath, dirPath);
+                            }
+
+                            Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Beatmap Set with ID: {beatmapsetid} Downloaded Succesfully in {time.Elapsed.TotalSeconds}");
+                            return sanitizedMapName;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, $"{ex.Message}");
+                            return null;
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Network, $"{ex.Message}");
+                return null;
+            }
 
             return null;
         }
