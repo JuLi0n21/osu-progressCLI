@@ -1,72 +1,198 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
+using Newtonsoft.Json.Linq;
+using osu_progressCLI.server;
 using osu1progressbar.Game.Database;
-using System.Configuration;
+using OsuParsers.Database.Objects;
+using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Runtime.CompilerServices;
+using System.Reflection.Metadata.Ecma335;
 
 namespace osu_progressCLI
-    {
+{
     internal class ScoreImporter
     {
-        public async static Task<bool> ImportScores(string filepath) {
 
-            //filepath = @"upload/score.csv";
-            Stopwatch stopwatch = new Stopwatch();  
+        private static ScoreImporter instance;
+        List<Score> scores;
+        List<Score> alreadyimportedscores;
+        private string DEFAULTFILEPATH = "imports/Alreadyimportedscores.csv";
+        private readonly object objectlock = new object();
+
+        private ScoreImporter()
+        {
+            scores = new List<Score>();
+            alreadyimportedscores = FetchAlreadyImported();
+        }
+
+        public static ScoreImporter Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new ScoreImporter();
+                }
+                return instance;
+            }
+        }
+
+        public async Task<bool> TrackImportedScore(Score score)
+        {
+            lock (objectlock) // Lock the critical section
+            {
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = false,
+                };
+
+                if (!File.Exists(DEFAULTFILEPATH) || new FileInfo(DEFAULTFILEPATH).Length == 0)
+                {
+                    config = new CsvConfiguration(CultureInfo.InvariantCulture);
+                }
+
+                using (var stream = new FileStream(DEFAULTFILEPATH, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+                using (var writer = new StreamWriter(stream)) // Append to the file
+                using (var csv = new CsvWriter(writer, config))
+                {
+                    csv.WriteRecordsAsync(new List<Score> { score });
+                }
+            }
+
+            return true;
+        }
+
+        public List<Score> FetchAlreadyImported() {
+
+            if (!File.Exists(DEFAULTFILEPATH))
+            {
+                return new List<Score>();
+            }
+
+            using (var reader = new StreamReader(DEFAULTFILEPATH))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            {
+                var records = csv.GetRecords<Score>();
+                alreadyimportedscores = records.ToList();
+                Console.WriteLine(alreadyimportedscores.Count);
+            }
+
+            return alreadyimportedscores;
+        }
+
+        public bool WriteScore(string filePath, List<Score> score)
+        {
+            try {
+
+                using (var writer = new StreamWriter(filePath, false)) 
+                using (var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)))
+                {
+                    csv.WriteRecords(score);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, ex.Message);
+            }
+
+            return true;
+        }
+
+        private void removedoubleentrys(string filepath) {
+
+            List<Score> filteredscores = new List<Score>();
+            try
+            {
+                using (var reader = new StreamReader(filepath))
+                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+               
+                    var records = csv.GetRecords<Score>();
+                    scores = records.ToList();
+
+                    string prev = "random string";
+                    foreach (var score in scores)
+                    {
+                        string check = $"{score.beatmap_id}{score.rank}{score.pp}";
+
+                        if (prev != check)
+                        {
+                            prev = check;
+                            filteredscores.Add(score);
+                        }
+                    }
+                }
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Scoreimporter, $"Scores to Import {filteredscores.Count()}");
+
+                WriteScore(filepath, filteredscores);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, ex.Message);
+            }
+        }
+
+        public async Task<bool> ImportScores(string filepath)
+        {
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Scoreimporter, "Removing Doubles");
+            removedoubleentrys(filepath);
+
+            Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Trying to Parse {filepath}");
 
-            using (var reader = new StreamReader(filepath)) 
+            using (var reader = new StreamReader(filepath))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 try
                 {
-                    var records = csv.GetRecords<Score>();
-                    List<Score> scores = records.ToList();
-                    Console.WriteLine("Potential Beatmaps to Download: " + scores.Count());
+                    scores = csv.GetRecords<Score>().ToList();
 
-                    string prev = "random string";
+                    List<Score> Filterdscores = new List<Score>();
+
+                    ScoreComparer comparer = new ScoreComparer();
+                    List<Score> filteredScores = scores.Where(score =>
+                    {
+                        bool matchFound = alreadyimportedscores.Any(existingscore => comparer.Compare(score, existingscore) == 0);
+                        return !matchFound;
+                    }).ToList();
+
+                    Console.WriteLine("Potential Beatmaps to Download: " + filteredScores.Count + "/" + scores.Count);
+
                     int count = 0;
 
                     var tasks = new List<Task>();
 
-                    foreach (var item in scores)
+                    foreach (var item in filteredScores)
                     {
-                        string check = $"{item.beatmap_id}{item.rank}{item.pp}";
-
-                        if (prev != check)
+                        tasks.Add(Task.Run(async () =>
                         {
-                            tasks.Add(Task.Run(async () =>
+                            try
                             {
-                                try
-                                {
-                                    await DatabaseController.ImportScore(item);
-                                    Interlocked.Increment(ref count);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine($"Error importing score: {ex.Message}");
-                                }
-                            }));
-                        }
-                        else
-                        {
-                            Console.WriteLine("Duplicate Score found. Skipping!");
-                        }
-
-                        if (tasks.Count >= 50) // Limit to 10 concurrent tasks
+                                await DatabaseController.ImportScore(item);
+                                await TrackImportedScore(item);
+                                alreadyimportedscores.Add(item);
+                                Task.Run(async () => await Webserver.Instance().SendData("ScoreCount", alreadyimportedscores.Count));
+                                Interlocked.Increment(ref count);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error importing score: {ex.Message}");
+                            }
+                        }));
+                        if (tasks.Count >= 20)
                         {
                             await Task.WhenAll(tasks);
                             tasks.Clear();
                         }
-
-                        prev = check;
                     }
 
                     await Task.WhenAll(tasks);
 
-                    Console.WriteLine($"Scores Successfully imported! ({count} Skipped:{scores.Count()-count}) in {stopwatch.Elapsed.Hours}:{stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}");
+                    Console.WriteLine($"Scores Successfully imported! ({count} Skipped:{alreadyimportedscores.Count()}) in {stopwatch.Elapsed.Hours}:{stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}");
 
                     return true;
 
@@ -77,7 +203,7 @@ namespace osu_progressCLI
                     return false;
                 }
             }
-                return true;
+            return true;
         }
     }
 
@@ -147,6 +273,23 @@ namespace osu_progressCLI
         public double modded_cs { get; set; }
         public double modded_hp { get; set; }
         public string packs { get; set; }
+
+       
+    }
+
+    public class ScoreComparer : IComparer<Score>
+    {
+        public int Compare(Score x, Score y)
+        {
+            // Define your custom comparison logic here
+            // For example, compare by Property1 first, and then by Property2
+            int result = x.pp.CompareTo(y.pp);
+            if (result == 0)
+            {
+                result = String.Compare(x.file_md5, y.file_md5, StringComparison.Ordinal);
+            }
+            return result;
+        }
     }
 
 }
