@@ -38,7 +38,7 @@ public static class Logger
         currentLogLevel = level;
     }
 
-    public static void Log(Severity severity, Framework framework, string message)
+    public static async void Log(Severity severity, Framework framework, string message)
     {
         string logEntry = $"{DateTime.Now} | {severity.ToString().PadRight(7)} | {framework.ToString().PadRight(8)} | {message}";
 
@@ -46,7 +46,13 @@ public static class Logger
 
         try
         {
-            File.AppendAllText(logFileName, logEntry + Environment.NewLine);
+            await Task.Run(() => {
+                using (var fileStream = new FileStream(logFileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+                using (var writer = new StreamWriter(fileStream))
+                {
+                    writer.WriteLineAsync(logEntry);
+                }
+            });
 
             if (severity >= Severity.Error)
             {
@@ -63,7 +69,6 @@ public static class Logger
             {
                 Directory.CreateDirectory("Logs");
             }
-            Logger.Log(Severity.Error,Framework.Misc,e.Message);
         }
     }
 }
