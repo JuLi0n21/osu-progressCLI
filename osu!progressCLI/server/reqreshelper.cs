@@ -396,21 +396,28 @@ namespace osu_progressCLI.server
 
         static void ServeStaticImage(HttpListenerResponse response, string imagePath)
         {
-            if (File.Exists(imagePath))
+            try
             {
-                string contentType = GetContentType(Path.GetExtension(imagePath));
+                if (File.Exists(imagePath))
+                {
+                    string contentType = GetContentType(Path.GetExtension(imagePath));
 
-                byte[] imageBytes = File.ReadAllBytes(imagePath);
-                response.ContentType = contentType;
-                response.ContentLength64 = imageBytes.Length;
-                response.OutputStream.Write(imageBytes, 0, imageBytes.Length);
-                response.OutputStream.Close();
+                    byte[] imageBytes = File.ReadAllBytes(imagePath);
+                    response.ContentType = contentType;
+                    response.ContentLength64 = imageBytes.Length;
+                    response.OutputStream.Write(imageBytes, 0, imageBytes.Length);
+                    response.OutputStream.Close();
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    string responseString = $"404 - Not Found: Image not found at {imagePath}";
+                    WriteResponse(response, responseString, "text/plain");
+                }
             }
-            else
+            catch (Exception e)
             {
-                response.StatusCode = 404;
-                string responseString = $"404 - Not Found: Image not found at {imagePath}";
-                WriteResponse(response, responseString, "text/plain");
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Server, e.Message);
             }
         }
 
