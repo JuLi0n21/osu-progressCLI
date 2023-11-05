@@ -1,15 +1,20 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using osu1progressbar.Game.Database;
+using System.Configuration;
+using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
-    namespace osu_progressCLI
+namespace osu_progressCLI
     {
     internal class ScoreImporter
     {
         public async static Task<bool> ImportScores(string filepath) {
 
             //filepath = @"upload/score.csv";
+            Stopwatch stopwatch = new Stopwatch();  
+            stopwatch.Start();
             Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Trying to Parse {filepath}");
 
             using (var reader = new StreamReader(filepath)) 
@@ -18,23 +23,52 @@ using System.Globalization;
                 try
                 {
                     var records = csv.GetRecords<Score>();
+                    List<Score> scores = records.ToList();
+                    Console.WriteLine("Potential Beatmaps to Download: " + scores.Count());
 
-                    // Console.WriteLine(records.Count());
+                    string prev = "random string";
+                    int count = 0;
 
-                    foreach (var item in records)
+                    var tasks = new List<Task>();
+
+                    foreach (var item in scores)
                     {
-                        Console.WriteLine(item.beatmap_id);
-                        DatabaseController.ImportScore(item.title, item.beatmap_id, item.stars,
-                        item.bpm, item.creator, item.artist, "Ranked", item.diffname,
-                        item.tags, item.set_id, "Pass", item.ar, item.cs, item.hp,
-                        item.od, Credentials.Instance.GetConfig().username, item.accuracy, item.maxcombo, item.score,
-                        item.combo, item.count50, item.count100, item.count300, 0, item.countmiss,
-                        item.mode, item.enabled_mods, item.date_played, item.drain, item.pp, 0, 0, 0, item.rank);
+                        string check = $"{item.beatmap_id}{item.rank}{item.pp}";
+
+                        if (prev != check)
+                        {
+                            tasks.Add(Task.Run(async () =>
+                            {
+                                try
+                                {
+                                    await DatabaseController.ImportScore(item);
+                                    Interlocked.Increment(ref count);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error importing score: {ex.Message}");
+                                }
+                            }));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Duplicate Score found. Skipping!");
+                        }
+
+                        if (tasks.Count >= 50) // Limit to 10 concurrent tasks
+                        {
+                            await Task.WhenAll(tasks);
+                            tasks.Clear();
+                        }
+
+                        prev = check;
                     }
 
-                    
+                    await Task.WhenAll(tasks);
 
-                    Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Scores Successfully imported!");
+                    Console.WriteLine($"Scores Successfully imported! ({count} Skipped:{scores.Count()-count}) in {stopwatch.Elapsed.Hours}:{stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}");
+
+                    return true;
 
                 }
                 catch (Exception ex)

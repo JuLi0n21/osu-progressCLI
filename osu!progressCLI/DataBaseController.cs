@@ -4,6 +4,7 @@ using OsuMemoryDataProvider.OsuMemoryModels;
 using System;
 using System.Data.SQLite;
 using System.Globalization;
+using System.Net.Http.Headers;
 using System.Text;
 
 
@@ -258,240 +259,217 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        public async static void ImportScore(string title,
-                                            int beatmapid,
-                                            double starrating, 
-                                            double bpm, 
-                                            string creator, 
-                                            string artist, 
-                                            string status, 
-                                            string version, 
-                                            string tags,
-                                            int beatmapsetid,
-                                            string playtype,
-                                            double ar,
-                                            double cs,
-                                            double hp,
-                                            double od,
-                                            string username,
-                                            double acc,
-                                            int maxcombo,
-                                            int score,
-                                            int combo,
-                                            int hit50,
-                                            int hit100,
-                                            int hit300,
-                                            int ur,
-                                            int hitmiss,
-                                            int mode,
-                                            int mods,
-                                            DateTime date,
-                                            int time,
-                                            double pp,
-                                            double aim,
-                                            double speed,
-                                            double accuracyatt,
-                                            string grade
-            ){
+        public async static Task<bool> ImportScore(object importscore){
 
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Insert Score {beatmapid}");
-                using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
+            Score score = (Score)importscore;
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Insert Score {score.file_md5} {score.pp}");
+            using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
+            {
+                try
                 {
-                     try
+                    connection.Open();
+
+                    using (SQLiteCommand insertCommand = new SQLiteCommand(connection))
+                    {
+
+                        insertCommand.CommandText = @"
+                            INSERT INTO BeatmapHelper (id, sr, bpm, creator, artist, status, coverlist, cover, preview, version, tags)
+                            VALUES (@id, @sr, @bpm, @creator, @artist, @status, @coverlist, @cover, @preview , @version, @tags)";
+
+                        insertCommand.Parameters.AddWithValue("@id", score.beatmap_id);
+                        insertCommand.Parameters.AddWithValue("@sr", score.stars);
+                        insertCommand.Parameters.AddWithValue("@bpm", score.bpm);
+                        insertCommand.Parameters.AddWithValue("@creator", score.creator);
+                        insertCommand.Parameters.AddWithValue("@artist", score.artist);
+                        insertCommand.Parameters.AddWithValue("@status", "Ranked");
+                        insertCommand.Parameters.AddWithValue("@coverlist", null);
+                        insertCommand.Parameters.AddWithValue("@cover", null);
+                        insertCommand.Parameters.AddWithValue("@version", score.diffname);
+                        insertCommand.Parameters.AddWithValue("@tags", score.tags);
+                        insertCommand.Parameters.AddWithValue("@preview", null);
+
+                        int rowsInserted = insertCommand.ExecuteNonQuery();
+
+                        if (rowsInserted > 0)
                         {
-                        connection.Open();
+                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"New BeatmapHelper score with id: {score.beatmap_id} created.");
 
-                        using (SQLiteCommand insertCommand = new SQLiteCommand(connection))
-                        {
-
-                            insertCommand.CommandText = @"
-                                     INSERT INTO BeatmapHelper (id, sr, bpm, creator, artist, status, coverlist, cover, preview, version, tags)
-                                     VALUES (@id, @sr, @bpm, @creator, @artist, @status, @coverlist, @cover, @preview , @version, @tags)";
-
-                            insertCommand.Parameters.AddWithValue("@id", beatmapid);
-                            insertCommand.Parameters.AddWithValue("@sr", starrating);
-                            insertCommand.Parameters.AddWithValue("@bpm", bpm);
-                            insertCommand.Parameters.AddWithValue("@creator", creator);
-                            insertCommand.Parameters.AddWithValue("@artist", artist);
-                            insertCommand.Parameters.AddWithValue("@status", status);
-                            insertCommand.Parameters.AddWithValue("@coverlist", null);
-                            insertCommand.Parameters.AddWithValue("@cover", null);
-                            insertCommand.Parameters.AddWithValue("@version", version);
-                            insertCommand.Parameters.AddWithValue("@tags", tags);
-                            insertCommand.Parameters.AddWithValue("@preview", null);
-
-                            int rowsInserted = insertCommand.ExecuteNonQuery();
-
-                            if (rowsInserted > 0)
-                            {
-                                Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"New BeatmapHelper score with id: {beatmapid} created.");
-
-                            }
                         }
-
-                    //GET FOLDER AND FILENAME
-                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Get Beatmap {beatmapid}");
-                    string foldername = await ApiController.Instance.DownloadBeatmapset(beatmapsetid, null, true);
-
-                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Get Filename {beatmapid}");
-                    string osufilename = Util.osufile(foldername, version);
-
-                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Find Background for {beatmapid}");
-                    string background = Util.getBackground(foldername,osufilename);
-
-                        string insertQuery = @"
-                        INSERT INTO ScoreData (
-                        Date,
-                        BeatmapSetid,
-                        Beatmapid,
-                        Osufilename,
-                        Foldername,
-                        Replay,
-                        Playtype,
-                        Ar,
-                        Cs,
-                        Hp,
-                        Od,
-                        Status,
-                        SR,
-                        Bpm,
-                        Creator,
-                        Artist,
-                        Username,
-                        Acc,
-                        MaxCombo,
-                        Score,
-                        Combo,
-                        Hit50,
-                        Hit100,
-                        Hit300,
-                        Ur,
-                        HitMiss,
-                        Mode,
-                        Mods,
-                        Version,
-                        Tags,
-                        Cover,
-                        Coverlist,
-                        Preview, 
-                        Time,
-                        pp,
-                        fcpp,
-                        aim,
-                        speed,
-                        accuracyatt,
-                        grade
-                        ) VALUES (
-                                @Date,
-                                @BeatmapSetid,
-                                @Beatmapid,
-                                @Osufilename,
-                                @Foldername,
-                                @Replay,
-                                @Playtype,
-                                @Ar,
-                                @Cs,
-                                @Hp,
-                                @Od,
-                                @Status,
-                                @SR,
-                                @Bpm,
-                                @Creator,
-                                @Artist,
-                                @Username,
-                                @Acc,
-                                @MaxCombo,
-                                @Score,
-                                @Combo,
-                                @Hit50,
-                                @Hit100,
-                                @Hit300,
-                                @Ur,
-                                @HitMiss,
-                                @Mode,
-                                @Mods,
-                                @Version,
-                                @Tags,
-                                @Cover,
-                                @Coverlist,
-                                @Preview,
-                                @Time,
-                                @pp,
-                                @fcpp,
-                                @aim,
-                                @speed,
-                                @accuracyatt,
-                                @grade
-                            );
-                        ";
-
-
-
-                        //YYYY-MM-DD HH:MM THIS FORMAT IS SUPPOSED TO BE USED 
-                        using (var command = new SQLiteCommand(insertQuery, connection))
-                        {
-                            command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd HH:mm"));
-                            command.Parameters.AddWithValue("@BeatmapSetid", beatmapsetid);
-                            command.Parameters.AddWithValue("@Beatmapid", beatmapid);
-                            command.Parameters.AddWithValue("@Osufilename", osufilename);
-                            command.Parameters.AddWithValue("@Foldername", foldername);
-                            command.Parameters.AddWithValue("@Replay", null);
-                            command.Parameters.AddWithValue("@Playtype", playtype);
-                            command.Parameters.AddWithValue("@Ar", ar);
-                            command.Parameters.AddWithValue("@Cs", cs); //needs mod recalculation
-                            command.Parameters.AddWithValue("@Hp", hp); //needs mod recalculation
-                            command.Parameters.AddWithValue("@Od", od);
-                            command.Parameters.AddWithValue("@Status", status);
-                            command.Parameters.AddWithValue("@SR", starrating);
-                            command.Parameters.AddWithValue("@Bpm", bpm);
-                            command.Parameters.AddWithValue("@Creator", creator);
-                            command.Parameters.AddWithValue("@Artist", artist);
-                            command.Parameters.AddWithValue("@Username", username);
-                            command.Parameters.AddWithValue("@Acc", acc);
-                            command.Parameters.AddWithValue("@MaxCombo", maxcombo);
-                            command.Parameters.AddWithValue("@Score", score);
-                            command.Parameters.AddWithValue("@Combo", combo);
-                            command.Parameters.AddWithValue("@Hit50", hit50);
-                            command.Parameters.AddWithValue("@Hit100", hit100);
-                            command.Parameters.AddWithValue("@Hit300", hit300);
-                            command.Parameters.AddWithValue("@Ur", 0);
-                            command.Parameters.AddWithValue("@HitMiss", hitmiss);
-                            command.Parameters.AddWithValue("@Mode", mode);
-                            command.Parameters.AddWithValue("@Mods", mods);
-                            command.Parameters.AddWithValue("@Version", version);
-                            command.Parameters.AddWithValue("@Cover", background);
-                            command.Parameters.AddWithValue("@Coverlist", background);
-                            command.Parameters.AddWithValue("@Preview", null);
-                            command.Parameters.AddWithValue("@Tags", tags);
-                            command.Parameters.AddWithValue("@Time", time);
-                            command.Parameters.AddWithValue("@pp", pp);
-                            command.Parameters.AddWithValue("@fcpp", 0);
-                            command.Parameters.AddWithValue("@aim", aim);
-                            command.Parameters.AddWithValue("@speed", speed);
-                            command.Parameters.AddWithValue("@accuracyatt", accuracyatt);
-                            command.Parameters.AddWithValue("@grade", grade);
-
-                            command.ExecuteNonQuery();
-                        }
-
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Saved Score: {title}");
-
-                
                     }
+
+                    string foldername = "";
+
+                    string osufilename = "";
+
+                    string background = "";
+                    //GET FOLDER AND FILENAME
+                    HttpClient client = new HttpClient();
+                    
+                        foldername = await ApiController.Instance.DownloadBeatmapset(client, score.set_id, true, "TESTFOLDERDELETEAFTER");
+                        
+                        client.Dispose();
+                       
+
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Get Filename {score.beatmap_id}");
+                        osufilename = Util.osufile(foldername, score.diffname, "TESTFOLDERDELETEAFTER");
+
+                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Find Background for {score.beatmap_id}");
+                        background = Util.getBackground(foldername, osufilename, "TESTFOLDERDELETEAFTER");
+                    
+
+                    string insertQuery = @"
+                        INSERT INTO ScoreData (
+                                Date,
+                                BeatmapSetid,
+                                Beatmapid,
+                                Osufilename,
+                                Foldername,
+                                Replay,
+                                Playtype,
+                                Ar,
+                                Cs,
+                                Hp,
+                                Od,
+                                Status,
+                                SR,
+                                Bpm,
+                                Creator,
+                                Artist,
+                                Username,
+                                Acc,
+                                MaxCombo,
+                                Score,
+                                Combo,
+                                Hit50,
+                                Hit100,
+                                Hit300,
+                                Ur,
+                                HitMiss,
+                                Mode,
+                                Mods,
+                                Version,
+                                Tags,
+                                Cover,
+                                Coverlist,
+                                Preview, 
+                                Time,
+                                pp,
+                                fcpp,
+                                aim,
+                                speed,
+                                accuracyatt,
+                                grade
+                                    ) VALUES (
+                                        @Date,
+                                        @BeatmapSetid,
+                                        @Beatmapid,
+                                        @Osufilename,
+                                        @Foldername,
+                                        @Replay,
+                                        @Playtype,
+                                        @Ar,
+                                        @Cs,
+                                        @Hp,
+                                        @Od,
+                                        @Status,
+                                        @SR,
+                                        @Bpm,
+                                        @Creator,
+                                        @Artist,
+                                        @Username,
+                                        @Acc,
+                                        @MaxCombo,
+                                        @Score,
+                                        @Combo,
+                                        @Hit50,
+                                        @Hit100,
+                                        @Hit300,
+                                        @Ur,
+                                        @HitMiss,
+                                        @Mode,
+                                        @Mods,
+                                        @Version,
+                                        @Tags,
+                                        @Cover,
+                                        @Coverlist,
+                                        @Preview,
+                                        @Time,
+                                        @pp,
+                                        @fcpp,
+                                        @aim,
+                                        @speed,
+                                        @accuracyatt,
+                                        @grade
+                                            );
+                    ";
+
+
+
+                    //YYYY-MM-DD HH:MM THIS FORMAT IS SUPPOSED TO BE USED 
+                    using (var command = new SQLiteCommand(insertQuery, connection))
+                    {
+                        command.Parameters.AddWithValue("@Date", score.date_played.ToString("yyyy-MM-dd HH:mm"));
+                        command.Parameters.AddWithValue("@BeatmapSetid", score.set_id);
+                        command.Parameters.AddWithValue("@Beatmapid", score.beatmap_id);
+                        command.Parameters.AddWithValue("@Osufilename", osufilename);
+                        command.Parameters.AddWithValue("@Foldername", foldername);
+                        command.Parameters.AddWithValue("@Replay", null);
+                        command.Parameters.AddWithValue("@Playtype", "Pass");
+                        command.Parameters.AddWithValue("@Ar", score.ar);
+                        command.Parameters.AddWithValue("@Cs", score.cs); //needs mod recalculation
+                        command.Parameters.AddWithValue("@Hp", score.hp); //needs mod recalculation
+                        command.Parameters.AddWithValue("@Od", score.od);
+                        command.Parameters.AddWithValue("@Status", "Ranked");
+                        command.Parameters.AddWithValue("@SR", score.stars);
+                        command.Parameters.AddWithValue("@Bpm", score.bpm);
+                        command.Parameters.AddWithValue("@Creator", score.creator);
+                        command.Parameters.AddWithValue("@Artist", score.artist);
+                        command.Parameters.AddWithValue("@Username", Credentials.Instance.GetConfig().username);
+                        command.Parameters.AddWithValue("@Acc", score.accuracy);
+                        command.Parameters.AddWithValue("@MaxCombo", score.maxcombo);
+                        command.Parameters.AddWithValue("@Score", score.score);
+                        command.Parameters.AddWithValue("@Combo", score.combo);
+                        command.Parameters.AddWithValue("@Hit50", score.count50);
+                        command.Parameters.AddWithValue("@Hit100", score.count100);
+                        command.Parameters.AddWithValue("@Hit300", score.count300);
+                        command.Parameters.AddWithValue("@Ur", 0);
+                        command.Parameters.AddWithValue("@HitMiss", score.countmiss);
+                        command.Parameters.AddWithValue("@Mode", score.mode);
+                        command.Parameters.AddWithValue("@Mods", score.enabled_mods);
+                        command.Parameters.AddWithValue("@Version", score.diffname);
+                        command.Parameters.AddWithValue("@Cover", background);
+                        command.Parameters.AddWithValue("@Coverlist", background);
+                        command.Parameters.AddWithValue("@Preview", null);
+                        command.Parameters.AddWithValue("@Tags", score.tags);
+                        command.Parameters.AddWithValue("@Time", score.drain);
+                        command.Parameters.AddWithValue("@pp", score.pp);
+                        command.Parameters.AddWithValue("@fcpp", 0);
+                        command.Parameters.AddWithValue("@aim", 0);
+                        command.Parameters.AddWithValue("@speed", 0);
+                        command.Parameters.AddWithValue("@accuracyatt", 0);
+                        command.Parameters.AddWithValue("@grade", score.rank);
+
+                        command.ExecuteNonQuery();
+                    }
+
+                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Saved Score: {score.title}");
+                    return true;
+
+                }
                 catch (Exception e)
                 {
-                Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"{e.Message}");
-
-                Console.WriteLine(e.ToString());
+                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Failed to Import Score({score.file_md5}):{e.Message}");
+                    return false;
+                    Console.WriteLine(e.ToString());
 
                 }
                 finally
                 {
-                connection.Close();
+                    connection.Close();
+                }
             }
         }
-    }
-        
+
 
         public async void InsertScore(OsuBaseAddresses baseAddresses, float timeElapsed, string playtype, string replay = null)
         {
