@@ -3,6 +3,9 @@
 //fix its broken
 namespace osu_progressCLI
 {
+    /// <summary>
+    /// Used for Handling Config and Api Credentials
+    /// </summary>
     public sealed class Credentials
     {
         private static Credentials instance;
@@ -20,10 +23,10 @@ namespace osu_progressCLI
 
             try
             {
-                
+
                 if (!File.Exists(credentialsFilePath))
                 {
-                    UpdateApiCredentials("","");
+                    UpdateApiCredentials("", "");
                 }
                 else
                 {
@@ -32,7 +35,7 @@ namespace osu_progressCLI
                         string jsonCredentialsString = credentialsReader.ReadToEnd();
                         dataHelper = JsonConvert.DeserializeObject<JsonCredentials>(jsonCredentialsString);
                     }
-                    
+
                 }
 
                 string configFilePath = "config.json";
@@ -75,13 +78,15 @@ namespace osu_progressCLI
             return dataHelper.client_id;
         }
 
-        public JsonConfig GetConfig() {
+        public JsonConfig GetConfig()
+        {
             return config;
         }
 
         public bool UpdateApiCredentials(string clientid, string clientsecret)
         {
-            if (dataHelper == null) {
+            if (dataHelper == null)
+            {
                 dataHelper = new JsonCredentials();
             }
 
@@ -96,7 +101,7 @@ namespace osu_progressCLI
                     if (!string.IsNullOrEmpty(clientsecret))
                         dataHelper.client_secret = clientsecret;
 
-                   
+
                     ApiController.Instance.updateapitokken(dataHelper.client_id, dataHelper.client_secret);
                 }
 
@@ -113,9 +118,25 @@ namespace osu_progressCLI
 
         }
 
-        public bool UpdateConfig(string osufolder = "C:\\", string songfolder = "C:\\",string localconfig = "False", string username = "", string rank = "", string country = "", string cover_url = "", string avatar_url = "", string port = "4200", string userid = "")
+        /// <summary>
+        /// updates config or returns default config
+        /// Sets Missanalyzer config aswell
+        /// </summary>
+        /// <param name="osufolder"></param>
+        /// <param name="songfolder"></param>
+        /// <param name="localconfig"></param>
+        /// <param name="username"></param>
+        /// <param name="rank"></param>
+        /// <param name="country"></param>
+        /// <param name="cover_url"></param>
+        /// <param name="avatar_url"></param>
+        /// <param name="port"></param>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        public bool UpdateConfig(string osufolder = "C:\\", string songfolder = "C:\\", string localconfig = "False", string username = "", string rank = "", string country = "", string cover_url = "", string avatar_url = "", string port = "4200", string userid = "")
         {
-            if (config == null) {
+            if (config == null)
+            {
                 config = new JsonConfig();
             }
 
@@ -127,8 +148,8 @@ namespace osu_progressCLI
                     config.Localconfig = localconfig;
 
                 if (!string.IsNullOrEmpty(port))
-                    config.port = port; 
-                
+                    config.port = port;
+
                 if (!string.IsNullOrEmpty(osufolder))
                     config.osufolder = @osufolder;
 
@@ -168,7 +189,8 @@ namespace osu_progressCLI
             }
         }
 
-        private static void updateOsuMissAnalyzer(string osufolder, string songsfolder) {
+        private static void updateOsuMissAnalyzer(string osufolder, string songsfolder)
+        {
             string filepath = "OsuMissAnalyzer/options.cfg";
             try
             {
@@ -188,12 +210,14 @@ namespace osu_progressCLI
                     }
                 }
                 File.WriteAllLines(filepath, lines);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, $"Error: {e.Message}");
 
             }
         }
+
         public static Credentials Instance
         {
             get
@@ -216,14 +240,14 @@ namespace osu_progressCLI
 
     public class JsonConfig
     {
-        public string? Localconfig { get ; set; } = "False";
+        public string? Localconfig { get; set; } = "False";
         public string? port { get; set; } = "4200";
         public string? username { get; set; } = String.Empty;
         public string? rank { get; set; } = String.Empty;
         public string? country { get; set; } = String.Empty;
         public string? cover_url { get; set; } = String.Empty;
         public string? avatar_url { get; set; } = String.Empty;
-        public string? userid { get;set; } = "2";
+        public string? userid { get; set; } = "2";
         public string? osufolder { get; set; } = @$"C:\";
         public string? songfolder { get; set; } = @$"C:\";
     }

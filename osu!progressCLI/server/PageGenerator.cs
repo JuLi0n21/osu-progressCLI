@@ -4,6 +4,9 @@ using System.Diagnostics;
 
 namespace osu_progressCLI.server
 {
+    /// <summary>
+    /// PageGenerator Creates the Default Homepage.
+    /// </summary>
     public sealed class PageGenerator
     {
         JObject user = null;
@@ -26,7 +29,8 @@ namespace osu_progressCLI.server
 
         public string generatepage(string userid, string mode, WeekCompare week)
         {
-            try {
+            try
+            {
 
                 var config = Credentials.Instance.GetConfig();
 
@@ -44,12 +48,15 @@ namespace osu_progressCLI.server
                 string BanchoStatus = week.Status;
                 string playtimethisweek = (week.ThisWeek / 3600).ToString().PadRight(5).Substring(0, 5);
                 string diffrencetolastweek = ((week.ThisWeek - week.LastWeek) / week.LastWeek * 100).ToString().PadRight(6).Substring(0, 6);
-                if (config.Localconfig == "False" || user == null) {
-                  try
+                if (config.Localconfig == "False" || user == null)
+                {
+                    try
                     {
                         user = ApiController.Instance.getuser(userid, mode).Result;
 
-                    } catch {
+                    }
+                    catch
+                    {
                         if (!string.IsNullOrEmpty(config.username))
                         {
                             username = config.username;
@@ -87,7 +94,8 @@ namespace osu_progressCLI.server
                         countryrank = user["statistics"]["country_rank"]?.ToString();
                     }
                 }
-                else {
+                else
+                {
 
                     if (!string.IsNullOrEmpty(config.username))
                     {
@@ -448,11 +456,12 @@ document.getElementById('loadDataButton').addEventListener('click', function () 
             ";
 
                 return html;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Logger.Log(Logger.Severity.Error, Logger.Framework.Network, e.Message);
                 return "Please make sure ur internet is working";
             }
-        }  
-    } 
+        }
+    }
 }

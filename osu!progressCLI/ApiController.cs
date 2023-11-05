@@ -1,17 +1,15 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OsuMemoryDataProvider.OsuMemoryModels.Abstract;
-using System.Data.Entity.Core.Mapping;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.IO.Compression;
-using System.Web;
 using System.Diagnostics;
+using System.IO.Compression;
+using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 
 namespace osu_progressCLI
 {
+    /// <summary>
+    /// Handels Api reqests to offical osu api / other apis
+    /// </summary>
     public sealed class ApiController
     {
 
@@ -22,19 +20,22 @@ namespace osu_progressCLI
 
         private JObject usercache = null;
         private DateTime userTimestamp;
-        private ApiController() {
+        private ApiController()
+        {
 
             clientid = Credentials.Instance.GetClientId();
             clientsecret = Credentials.Instance.GetClientSecret();
 
-            if(Credentials.Instance.GetAccessToken() == null)
+            if (Credentials.Instance.GetAccessToken() == null)
             {
                 getAccessToken();
             }
         }
 
-
-
+        /// <summary>
+        /// fetches Api token.
+        /// the token active for 24H.
+        /// </summary>
         private async void getAccessToken()
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Getting AccessToken");
@@ -76,7 +77,7 @@ namespace osu_progressCLI
                 TokenResponse tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
                 Credentials.Instance.SetAccessToken(tokenResponse.access_token);
 
-               //await getMostPlayedMaps("14100399",10150,50, true);
+                //await getMostPlayedMaps("14100399",10150,50, true);
             }
             else
             {
@@ -88,12 +89,25 @@ namespace osu_progressCLI
 
         }
 
-        public async void updateapitokken(string clientid, string clientsecret) {
+        /// <summary>
+        /// Should not be used doesnt work!
+        /// </summary>
+        /// <param name="clientid"></param>
+        /// <param name="clientsecret"></param>
+        public async void updateapitokken(string clientid, string clientsecret)
+        {
             this.clientid = clientid;
             this.clientsecret = clientsecret;
             getAccessToken();
         }
 
+        /// <summary>
+        /// Fetches Beatmap info from osu api
+        /// </summary>
+        /// <param name="id">
+        /// Beatmapid to be fetched
+        /// </param>
+        /// <returns>Returns Beatmap in Json format</returns>
         public async Task<JObject> getExpandedBeatmapinfo(string id)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Requesting Beatmap info for: {id}");
@@ -129,8 +143,14 @@ namespace osu_progressCLI
             client.Dispose();
             return beatmap;
         }
-
-        public async Task<JObject> getSearch(string mode, string query) {
+        /// <summary>
+        /// Osu Api search
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="query"></param>
+        /// <returns>response Json</returns>
+        public async Task<JObject> getSearch(string mode, string query)
+        {
             Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Api Search Request");
 
             JObject search = null;
@@ -168,7 +188,13 @@ namespace osu_progressCLI
             return search;
         }
 
-        public async Task<JObject> getuser(string userid , string mode)
+        /// <summary>
+        /// Gets user on ID or Username
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <param name="mode"></param>
+        /// <returns>response Json</returns>
+        public async Task<JObject> getuser(string userid, string mode)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting User info for: {userid}, {mode}");
             if (usercache == null || userTimestamp <= DateTime.Now.AddMinutes(-5))
@@ -206,15 +232,25 @@ namespace osu_progressCLI
 
                 client.Dispose();
             }
-            else {
-                Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Serving Cached user: {usercache["username"]} | Refresh in {(userTimestamp - DateTime.Now.AddMinutes(-5)).TotalSeconds.ToString().Substring(0,3)} Seconds");
+            else
+            {
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Serving Cached user: {usercache["username"]} | Refresh in {(userTimestamp - DateTime.Now.AddMinutes(-5)).TotalSeconds.ToString().Substring(0, 3)} Seconds");
                 return usercache;
             }
             return usercache;
         }
 
-        private async Task<JArray> getMostPlayedMaps(string userid, int offset = 0, int count = 1, bool downloadmissingbeatmaps = false) {
-            
+        /// <summary>
+        /// Fetches Most played Beatmap for Userid
+        /// </summary>
+        /// <param name="userid">Userid</param>
+        /// <param name="offset">offset of the request</param>
+        /// <param name="count">amount max is 50</param>
+        /// <param name="downloadmissingbeatmaps"> if u want to download the missing beatmaps</param>
+        /// <returns>List of Beatmaps</returns>
+        private async Task<JArray> getMostPlayedMaps(string userid, int offset = 0, int count = 1, bool downloadmissingbeatmaps = false)
+        {
+
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting MostplayedMaps for: {userid} offset: {offset}, count: {count}, download?={downloadmissingbeatmaps}");
             JArray beatmaps = null;
 
@@ -231,38 +267,47 @@ namespace osu_progressCLI
             HttpResponseMessage reponse = await client.GetAsync(MostPlayedEndpoint);
 
 
-                if (reponse.IsSuccessStatusCode)
-                {
+            if (reponse.IsSuccessStatusCode)
+            {
 
-                    string responseBody = await reponse.Content.ReadAsStringAsync();
-                    //Console.WriteLine(responseBody);
+                string responseBody = await reponse.Content.ReadAsStringAsync();
+                //Console.WriteLine(responseBody);
 
                 beatmaps = JArray.Parse(responseBody);
                 Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Recieved Mostplayed for: {userid} Count:{beatmaps.Count}");
 
                 if (downloadmissingbeatmaps)
-                    {
-                        foreach (JObject beatmap in beatmaps)
-                        {
-                            await DownloadBeatmapset(client, int.Parse(beatmap["beatmap"]["beatmapset_id"].ToString()));
-                        }
-                     Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Successfully Downloaded All Requested Beatmaps");
-
-                    }
-                }
-                else
                 {
+                    foreach (JObject beatmap in beatmaps)
+                    {
+                        await DownloadBeatmapset(client, int.Parse(beatmap["beatmap"]["beatmapset_id"].ToString()));
+                    }
+                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Successfully Downloaded All Requested Beatmaps");
+
+                }
+            }
+            else
+            {
                 Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"User Request failed with status code {reponse.StatusCode}");
 
                 client.Dispose();
-                    return beatmaps;
-                }
-                
-                client.Dispose();
                 return beatmaps;
+            }
+
+            client.Dispose();
+            return beatmaps;
         }
 
-        public async Task<string> DownloadBeatmapset(HttpClient client, int beatmapsetid, bool unzip = true, string folderpath = null) {
+        /// <summary>
+        /// Downloads Beatmap
+        /// </summary>
+        /// <param name="client">client used for the Operation</param>
+        /// <param name="beatmapsetid">beatmap to be downloaded</param>
+        /// <param name="unzip">if it shoudl be unzipped</param>
+        /// <param name="folderpath">overwrite default save path (Songs Folder given in config.)</param>
+        /// <returns>relative foldername/zipname </returns>
+        public async Task<string> DownloadBeatmapset(HttpClient client, int beatmapsetid, bool unzip = true, string folderpath = null)
+        {
             try
             {
                 Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Checking if Beatmapset Exists: {beatmapsetid}");

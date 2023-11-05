@@ -10,6 +10,9 @@ using System.Web;
 //add button to get credentials
 namespace osu_progressCLI.server
 {
+    /// <summary>
+    /// Used for Hosting the Webpage (no way) right.
+    /// </summary>
     public sealed class Webserver
     {
         private static Webserver instance;
@@ -18,7 +21,7 @@ namespace osu_progressCLI.server
         private readonly object lockObject = new object();
         private DateTime lastMessageSentTime = DateTime.MinValue;
 
-        private reqreshelper helper;
+        private Reqreshelper helper;
         private ConcurrentBag<WebSocket> connectedSockets = new ConcurrentBag<WebSocket>();
 
         private string ip = "127.0.0.1";
@@ -32,7 +35,7 @@ namespace osu_progressCLI.server
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"Starting Weberver on localhost:{port}/");
 
             Console.WriteLine($"You can view ur Stats on localhost:{port}/");
-            helper = new reqreshelper();
+            helper = new Reqreshelper();
 
         }
 
@@ -53,7 +56,12 @@ namespace osu_progressCLI.server
             await HandleRequest(context);
         }
 
-
+        /// <summary>
+        /// main entry Point of Serving Content
+        /// Passes each request through to the Reqesthelper.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private async Task HandleRequest(HttpListenerContext context)
         {
             if (context.Request.IsWebSocketRequest)
@@ -184,7 +192,8 @@ namespace osu_progressCLI.server
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/run call");
                 helper.run(request, response);
             }
-            else if (path == "/api/upload" && request.HttpMethod == "POST") {
+            else if (path == "/api/upload" && request.HttpMethod == "POST")
+            {
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/upload call");
                 helper.upload(request, response);
             }
@@ -197,6 +206,12 @@ namespace osu_progressCLI.server
             }
 
         }
+
+        /// <summary>
+        /// Handels Connection Establishing on a websocket request.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private async Task WebSocketRequest(HttpListenerContext context)
         {
             HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
@@ -238,6 +253,14 @@ namespace osu_progressCLI.server
 
         }
 
+        /// <summary>
+        /// Sends data over websocket to client.
+        /// </summary>
+        /// <param name="type"></param>
+        /// sets the Type of the Object so the js can understand what type it is
+        /// <param name="data"></param>
+        /// data to be send can be anything depedning on how its handeld on js.
+        /// <returns></returns>
         public async Task SendData(string type, object data)
         {
             lock (lockObject)

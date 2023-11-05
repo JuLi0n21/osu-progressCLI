@@ -16,7 +16,7 @@ namespace osu_progressCLI
             string fullPath = Path.Combine(Credentials.Instance.GetConfig().songfolder, folderName, fileName);
             string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} \"{fullPath}\" {cmdmodehelper(accuracy, score, mods, missCount, mehCount, goodCount, perfectcount, combo, mode)}";
 
-            string output = cmdOutput("osu-tools",command);
+            string output = cmdOutput("osu-tools", command);
 
             perfomanceAttributes = ParseOutput(output);
             perfomanceAttributes.grade = CalculateGrade(perfectcount, goodCount, mehCount, missCount);
@@ -33,19 +33,23 @@ namespace osu_progressCLI
             string command = $"dotnet PerformanceCalculator.dll simulate {ModeConverter(mode)} {Beatmapid} {cmdmodehelper(accuracy, score, mods, missCount, mehCount, goodCount, perfectcount, combo, mode)}";
 
             string output = cmdOutput("osu-tools", command);
-            
+
             perfomanceAttributes = ParseOutput(output);
             perfomanceAttributes.grade = CalculateGrade(perfectcount, goodCount, mehCount, missCount);
 
             return perfomanceAttributes;
         }
 
-        private static string cmdmodehelper(double accuracy, int score, int mods, int missCount, int mehCount, int goodCount, int perfectcount, int combo, int mode = 0) {
+        private static string cmdmodehelper(double accuracy, int score, int mods, int missCount, int mehCount, int goodCount, int perfectcount, int combo, int mode = 0)
+        {
 
             StringBuilder command = new StringBuilder();
-            switch (mode) { 
-                case 0: {
-                        if(accuracy != 0) {
+            switch (mode)
+            {
+                case 0:
+                    {
+                        if (accuracy != 0)
+                        {
                             command.Append($" --accuracy {accuracy}");
                         }
 
@@ -53,7 +57,8 @@ namespace osu_progressCLI
                         {
                             command.Append($" --combo {combo}");
                         }
-                        else {
+                        else
+                        {
                             command.Append($" --percent-combo 100");
                         }
                         if (missCount != 0)
@@ -107,7 +112,7 @@ namespace osu_progressCLI
                     {
                         command.Append($" --misses {missCount}");
                     }
-                    
+
                     command.Append($" {ModParser.PPCalcMods(mods)}");
                     return command.ToString();
                 case 3: //mania
@@ -115,7 +120,7 @@ namespace osu_progressCLI
             }
 
             Logger.Log(Logger.Severity.Warning, Logger.Framework.Calculator, $"Mode: {mode} not Supported!");
-        return null;
+            return null;
         }
 
         private static PerfomanceAttributes ParseOutput(string output)
@@ -171,7 +176,7 @@ namespace osu_progressCLI
 
                     if (match.Groups["overalldifficulty"].Success && double.TryParse(match.Groups["overalldifficulty"].Value.Replace(".", "").Replace(",", ""), out double od))
                     {
-                        attributes.od = od/ 100;
+                        attributes.od = od / 100;
                         Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"overalldifficulty: {attributes.od}");
                     }
 
@@ -186,7 +191,8 @@ namespace osu_progressCLI
             return attributes;
         }
 
-        private static string cmdOutput(string path,string command) {
+        private static string cmdOutput(string path, string command)
+        {
 
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"Starting Shell: path:{path} cmd:{command}");
 
@@ -250,12 +256,13 @@ namespace osu_progressCLI
             catch (Exception e)
             {
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"Error while Calculating Grade: {e.Message}");
-                return "E";        
+                return "E";
             }
-            
+
         }
 
-        public static void StartMissAnalyzer(int id) {
+        public static void StartMissAnalyzer(int id)
+        {
 
             Logger.Log(Logger.Severity.Info, Logger.Framework.Calculator, $"Starting OsuMissAnalyzer for scoreid: {id}");
             DatabaseController database = new DatabaseController();
@@ -272,23 +279,24 @@ namespace osu_progressCLI
 
         }
 
-        public static string ModeConverter(int mode) { 
-        
+        public static string ModeConverter(int mode)
+        {
+
             switch (mode)
-            { 
-                case 0 :
+            {
+                case 0:
                     return "osu";
-                
-                case 1 :
+
+                case 1:
                     return "taiko";
 
-                case 2 :
+                case 2:
                     return "catch";
 
-                case 3 :
+                case 3:
                     return "mania";
 
-                default :
+                default:
                     return "osu";
             }
         }
@@ -324,23 +332,24 @@ namespace osu_progressCLI
                 case 19:
                     return "ProcessingBeatmaps";
                 default:
-                    return "Unknown"; 
+                    return "Unknown";
             }
         }
 
 
     }
 
-    public class PerfomanceAttributes {
-       public double aim { get; set; }
-       public double speed { get;set; }
-       public double accuracy { get; set; }
-       public double pp { get; set; }
-       public double starrating { get; set; }
-       public double ar { get; set; }
-       public double od { get; set; }
-       public int Maxcombo { get; set; }
-       public string grade { get; set; } = "E";
+    public class PerfomanceAttributes
+    {
+        public double aim { get; set; }
+        public double speed { get; set; }
+        public double accuracy { get; set; }
+        public double pp { get; set; }
+        public double starrating { get; set; }
+        public double ar { get; set; }
+        public double od { get; set; }
+        public int Maxcombo { get; set; }
+        public string grade { get; set; } = "E";
     }
 
 
