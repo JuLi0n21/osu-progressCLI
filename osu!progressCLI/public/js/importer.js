@@ -11,14 +11,14 @@
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('downloadBeatmaps', downloadBeatmaps.checked);
-    formData.append('importScores', importScores.checked);
 
     fetch('/api/upload', {
         method: 'POST',
         body: formData,
         headers: {
             'filename': file.name,
+            'download': downloadBeatmaps.checked,
+            'import': importScores.checked,
         },
     })
         .then((response) => {
