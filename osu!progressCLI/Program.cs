@@ -10,7 +10,7 @@ class Program
         Logger.SetConsoleLogLevel(Logger.Severity.Warning);
         if (args.Length > 0)
         {
-            for(int i = 0; i < args.Length; i++)
+            for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "-v")
                 {
@@ -27,17 +27,17 @@ class Program
         Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, "Initialzing Components");
 
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");
-        Credentials crendtials = Credentials.Instance; 
+        Credentials crendtials = Credentials.Instance;
         ApiController apiController = ApiController.Instance;
 
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
-        
+
         Task listenTask = Task.Run(async () =>
         {
             while (true)
             {
-                await Webserver.Instance().listen(); 
+                await Webserver.Instance().listen();
             }
         });
         await listenTask;

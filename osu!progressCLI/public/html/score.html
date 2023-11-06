@@ -1,61 +1,84 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <title>Osu! Beatmap Viewer</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.11.0/css/flag-icons.min.css" />
-    <link rel="stylesheet" href="style.css">
-</head>
-<body id="scorebody">
-
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.11.0/css/flag-icons.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body id="scorebody">
     <div class="fixed top-0 left-0">
-        <a href="/">
-            <button id="loadDataButton" class="text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 score-backdrop--medium--light">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/Home-icon.svg" alt="home" style="width: 24px; height: 24px; filter: invert(100%);">
-            </button>
-        </a>
+      <a href="/">
+        <button
+          id="loadDataButton"
+          class="text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 score-backdrop--medium--light"
+        >
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/3/34/Home-icon.svg"
+            alt="home"
+            style="width: 24px; height: 24px; filter: invert(100%)"
+          />
+        </button>
+      </a>
     </div>
 
     <div class="flex justify-center items-center">
-
-        <div class="content w-1/2 rounded-lg score-backdrop--medium--light text-white">
-            <div id="beatmapData">
-                <!-- Beatmap data will be displayed here -->
-            </div>
-
-            <div class="flex flex-col score-backdrop--dark">
-                <div class="flex justify-center score-backdrop--dark mt-4 mb-4">
-                    <h2>Map Progression</h2>
-                </div>
-               
-                <canvas id="mapprogress"></canvas>
-            </div>
-
-            <div class="flex rounded-t-lg justify-between score-backdrop--medium--dark">
-
-                <div id="filler" class=" ">
-                </div>
-                <h1 class=" m-4"></h1>
-                <h1 class=" m-4">Recent Scores</h1>
-                <div>
-                    <input type="text" id="mapsearch" class="text--yellow score-backdrop--medium--dark border-b-4" title="Supported Terms cs, hp, od, ar, sr, acc, pp, fcpp, bpm!">
-                </div>
-
-            </div>
-
-            <div id="scorecontainer" class="flex-col overflow-auto score-backdrop--medium--dark page-width"></div>
-            <div class="p-2 rounded-b-lg score-backdrop--medium--dark"><h1></h1></div>
-
+      <div
+        class="content w-1/2 rounded-lg score-backdrop--medium--light text-white"
+      >
+        <div id="beatmapData">
+          <!-- Beatmap data will be displayed here -->
         </div>
+
+        <div class="flex flex-col score-backdrop--dark">
+          <div class="flex justify-center score-backdrop--dark mt-4 mb-4">
+            <h2>Map Progression</h2>
+          </div>
+
+          <canvas id="mapprogress"></canvas>
+        </div>
+
+        <div
+          class="flex rounded-t-lg justify-between score-backdrop--medium--dark"
+        >
+          <div id="filler" class=" "></div>
+          <h1 class="m-4"></h1>
+          <h1 class="m-4">Recent Scores</h1>
+          <div>
+            <input
+              type="text"
+              id="mapsearch"
+              class="text--yellow score-backdrop--medium--dark border-b-4"
+              title="Supported Terms cs, hp, od, ar, sr, acc, pp, fcpp, bpm!"
+            />
+          </div>
+        </div>
+
+        <div
+          id="scorecontainer"
+          class="flex-col overflow-auto score-backdrop--medium--dark page-width"
+        ></div>
+        <div class="p-2 rounded-b-lg score-backdrop--medium--dark">
+          <h1></h1>
+        </div>
+      </div>
     </div>
     <script src="scoresite.js"></script>
-
-</body>
+  </body>
 </html>

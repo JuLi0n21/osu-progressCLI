@@ -14,7 +14,8 @@ namespace osu_progressCLI.server
     {
         DatabaseController controller;
 
-        public Reqreshelper()
+        public reqreshelper()
+
         {
             controller = new DatabaseController();
         }
@@ -22,10 +23,12 @@ namespace osu_progressCLI.server
         public void defaultpage(HttpListenerRequest request, HttpListenerResponse response)
         {
             WriteResponse(response, PageGenerator.Instance.generatepage(Credentials.Instance.GetConfig().userid, "osu", controller.GetWeekCompare()), "text/html");
+
         }
 
         public void getAllBeatmapScroes(HttpListenerRequest request, HttpListenerResponse response)
         {
+
             DateTime to = DateTime.Now;
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
@@ -123,6 +126,11 @@ namespace osu_progressCLI.server
 
                 JObject parameters = JObject.Parse(requestData);
                 Logger.Log(Logger.Severity.Info, Logger.Framework.Server, $"{parameters}");
+
+                string osufolder = Credentials.Instance.GetConfig().osufolder;
+                string songfolder = Credentials.Instance.GetConfig().songfolder;
+
+                Credentials.updateOsuMissAnalyzer(osufolder, songfolder);
 
                 if (parameters == null)
                 {
@@ -271,6 +279,7 @@ namespace osu_progressCLI.server
 
         public void serveimage(HttpListenerRequest request, HttpListenerResponse response, string filepath)
         {
+
             if (File.Exists("public/img" + filepath))
             {
                 ServeStaticImage(response, "public/img" + filepath);
@@ -290,6 +299,7 @@ namespace osu_progressCLI.server
 
         public void servejs(HttpListenerRequest request, HttpListenerResponse response, string filepath)
         {
+
             string jsFilePath = "public/js" + filepath;
 
             ServeStaticFile(response, jsFilePath, "text/javascript");
@@ -311,6 +321,7 @@ namespace osu_progressCLI.server
 
         public async Task<bool> upload(HttpListenerRequest request, HttpListenerResponse response)
         {
+
             try
             {
                 string uploadDir = "imports";
@@ -338,6 +349,7 @@ namespace osu_progressCLI.server
 
                 WriteResponse(response, "{\"message\":\"Upload Successful!\"}", "application/json");
                 return true;
+
             }
             catch (Exception ex)
             {

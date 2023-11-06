@@ -189,7 +189,7 @@ namespace osu_progressCLI
             }
         }
 
-        private static void updateOsuMissAnalyzer(string osufolder, string songsfolder)
+        public static void updateOsuMissAnalyzer(string osufolder, string songsfolder)
         {
             string filepath = "OsuMissAnalyzer/options.cfg";
             try

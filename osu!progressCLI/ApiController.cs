@@ -89,6 +89,7 @@ namespace osu_progressCLI
 
         }
 
+
         /// <summary>
         /// Should not be used doesnt work!
         /// </summary>
@@ -143,6 +144,7 @@ namespace osu_progressCLI
             client.Dispose();
             return beatmap;
         }
+
         /// <summary>
         /// Osu Api search
         /// </summary>
@@ -240,6 +242,7 @@ namespace osu_progressCLI
             return usercache;
         }
 
+
         /// <summary>
         /// Fetches Most played Beatmap for Userid
         /// </summary>
@@ -248,6 +251,7 @@ namespace osu_progressCLI
         /// <param name="count">amount max is 50</param>
         /// <param name="downloadmissingbeatmaps"> if u want to download the missing beatmaps</param>
         /// <returns>List of Beatmaps</returns>
+
         private async Task<JArray> getMostPlayedMaps(string userid, int offset = 0, int count = 1, bool downloadmissingbeatmaps = false)
         {
 
@@ -297,7 +301,7 @@ namespace osu_progressCLI
             client.Dispose();
             return beatmaps;
         }
-
+      
         /// <summary>
         /// Downloads Beatmap
         /// </summary>

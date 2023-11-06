@@ -1,25 +1,24 @@
 function createScoreElements(scores) {
-const scoresContainer =  document.getElementById("scorecontainer");
-    scoresContainer.innerHTML = "";
+  const scoresContainer = document.getElementById("scorecontainer");
+  scoresContainer.innerHTML = "";
 
-    console.log(scores);
+  console.log(scores);
 
-    if (scores.length == 0) {
-        scoresContainer.innerHTML = "<p>No Score Found!</p>";
-    }
+  if (scores.length == 0) {
+    scoresContainer.innerHTML = "<p>No Score Found!</p>";
+  }
   scores.forEach((score) => {
     const scoreElement = document.createElement("a");
     scoreElement.className = "flex justify-center mb-0";
 
-      score.Acc = score.Acc.toFixed(2);
+    score.Acc = score.Acc.toFixed(2);
 
-      scoreElement.href = `/score.html?id=${score.id}`;
-      //scoreElement.target = "_blank";
-      scoreElement.rel = "noopener noreferrer";
+    scoreElement.href = `/score.html?id=${score.id}`;
+    //scoreElement.target = "_blank";
+    scoreElement.rel = "noopener noreferrer";
 
     // Build the HTML structure for each score using the provided data
-    scoreElement.innerHTML = 
-          `
+    scoreElement.innerHTML = `
         <div class="flex backdrop--light h-16 rounded justify-between m-4 w-5/6 mb-1 mt-1">
         <!-- Status and Grade-->
         <div class="flex flex-col grade-rank-container rounded justify-evenly w-1/6">
@@ -82,7 +81,6 @@ const scoresContainer =  document.getElementById("scorecontainer");
 </div>
 </div>
 `;
-    
 
     // Append the score element to the container
     scoresContainer.appendChild(scoreElement);

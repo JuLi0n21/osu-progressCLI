@@ -73,6 +73,7 @@ public class Util
                 int index = random.Next(bgFiles.Length);
                 File.Copy(Path.GetFullPath(bgFiles[index]), $"public/img/{Path.GetFileName(bgFiles[index])}", true);
                 return Path.GetFileName(bgFiles[index]);
+
             }
             else if (btFiles.Length > 0)
             {
@@ -81,6 +82,7 @@ public class Util
                 File.Copy(Path.GetFullPath(btFiles[index]), $"public/img/{Path.GetFileName(btFiles[index])}", true);
                 return Path.GetFileName(btFiles[index]);
             }
+
         }
         catch (Exception e)
         {
