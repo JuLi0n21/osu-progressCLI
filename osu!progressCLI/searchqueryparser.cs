@@ -7,6 +7,10 @@ public class QueryParser
     public Dictionary<string, List<string>> QueryParams { get; } = new Dictionary<string, List<string>>();
     public List<string> ParametersWithoutOperators { get; } = new List<string>();
 
+    /// <summary>
+    /// trys to setup search terms to fit with database model
+    /// </summary>
+    /// <param name="queryString"></param>
     public void Parse(string queryString)
     {
         string[] parts = queryString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);

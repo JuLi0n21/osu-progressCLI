@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-public static class Logger
+﻿public static class Logger
 {
     public enum Severity
     {

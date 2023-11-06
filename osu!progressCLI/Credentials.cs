@@ -3,6 +3,9 @@
 //fix its broken
 namespace osu_progressCLI
 {
+    /// <summary>
+    /// Used for Handling Config and Api Credentials
+    /// </summary>
     public sealed class Credentials
     {
         private static Credentials instance;
@@ -115,6 +118,21 @@ namespace osu_progressCLI
 
         }
 
+        /// <summary>
+        /// updates config or returns default config
+        /// Sets Missanalyzer config aswell
+        /// </summary>
+        /// <param name="osufolder"></param>
+        /// <param name="songfolder"></param>
+        /// <param name="localconfig"></param>
+        /// <param name="username"></param>
+        /// <param name="rank"></param>
+        /// <param name="country"></param>
+        /// <param name="cover_url"></param>
+        /// <param name="avatar_url"></param>
+        /// <param name="port"></param>
+        /// <param name="userid"></param>
+        /// <returns></returns>
         public bool UpdateConfig(string osufolder = "C:\\", string songfolder = "C:\\", string localconfig = "False", string username = "", string rank = "", string country = "", string cover_url = "", string avatar_url = "", string port = "4200", string userid = "")
         {
             if (config == null)
@@ -199,6 +217,7 @@ namespace osu_progressCLI
 
             }
         }
+
         public static Credentials Instance
         {
             get

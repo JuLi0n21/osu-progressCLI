@@ -1,17 +1,15 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OsuMemoryDataProvider.OsuMemoryModels.Abstract;
-using System.Data.Entity.Core.Mapping;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.IO.Compression;
-using System.Web;
 using System.Diagnostics;
+using System.IO.Compression;
+using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 
 namespace osu_progressCLI
 {
+    /// <summary>
+    /// Handels Api reqests to offical osu api / other apis
+    /// </summary>
     public sealed class ApiController
     {
 
@@ -34,8 +32,10 @@ namespace osu_progressCLI
             }
         }
 
-
-
+        /// <summary>
+        /// fetches Api token.
+        /// the token active for 24H.
+        /// </summary>
         private async void getAccessToken()
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Getting AccessToken");
@@ -89,6 +89,12 @@ namespace osu_progressCLI
 
         }
 
+
+        /// <summary>
+        /// Should not be used doesnt work!
+        /// </summary>
+        /// <param name="clientid"></param>
+        /// <param name="clientsecret"></param>
         public async void updateapitokken(string clientid, string clientsecret)
         {
             this.clientid = clientid;
@@ -96,6 +102,13 @@ namespace osu_progressCLI
             getAccessToken();
         }
 
+        /// <summary>
+        /// Fetches Beatmap info from osu api
+        /// </summary>
+        /// <param name="id">
+        /// Beatmapid to be fetched
+        /// </param>
+        /// <returns>Returns Beatmap in Json format</returns>
         public async Task<JObject> getExpandedBeatmapinfo(string id)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Requesting Beatmap info for: {id}");
@@ -132,6 +145,12 @@ namespace osu_progressCLI
             return beatmap;
         }
 
+        /// <summary>
+        /// Osu Api search
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="query"></param>
+        /// <returns>response Json</returns>
         public async Task<JObject> getSearch(string mode, string query)
         {
             Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Api Search Request");
@@ -171,6 +190,12 @@ namespace osu_progressCLI
             return search;
         }
 
+        /// <summary>
+        /// Gets user on ID or Username
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <param name="mode"></param>
+        /// <returns>response Json</returns>
         public async Task<JObject> getuser(string userid, string mode)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting User info for: {userid}, {mode}");
@@ -216,6 +241,16 @@ namespace osu_progressCLI
             }
             return usercache;
         }
+
+
+        /// <summary>
+        /// Fetches Most played Beatmap for Userid
+        /// </summary>
+        /// <param name="userid">Userid</param>
+        /// <param name="offset">offset of the request</param>
+        /// <param name="count">amount max is 50</param>
+        /// <param name="downloadmissingbeatmaps"> if u want to download the missing beatmaps</param>
+        /// <returns>List of Beatmaps</returns>
 
         private async Task<JArray> getMostPlayedMaps(string userid, int offset = 0, int count = 1, bool downloadmissingbeatmaps = false)
         {
@@ -266,7 +301,15 @@ namespace osu_progressCLI
             client.Dispose();
             return beatmaps;
         }
-
+      
+        /// <summary>
+        /// Downloads Beatmap
+        /// </summary>
+        /// <param name="client">client used for the Operation</param>
+        /// <param name="beatmapsetid">beatmap to be downloaded</param>
+        /// <param name="unzip">if it shoudl be unzipped</param>
+        /// <param name="folderpath">overwrite default save path (Songs Folder given in config.)</param>
+        /// <returns>relative foldername/zipname </returns>
         public async Task<string> DownloadBeatmapset(HttpClient client, int beatmapsetid, bool unzip = true, string folderpath = null)
         {
             try

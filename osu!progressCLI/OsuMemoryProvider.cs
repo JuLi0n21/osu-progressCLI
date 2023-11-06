@@ -6,10 +6,14 @@ using OsuMemoryDataProvider.OsuMemoryModels.Direct;
 using System.Diagnostics;
 
 
-//make it slow down when osu! not found so it can easily run in the background wihtouht wasting much cpu cycles
+//make it slow down when osu! not found so it can easily run in the background wihtouht wasting much cpu cycles idk seems fine on full speed
 
 namespace osu1progressbar.Game.MemoryProvider
 {
+    /// <summary>
+    /// Copy paste of example from OsuMemoryProvider Repo.
+    /// Calls the Logic Controller after each run.
+    /// </summary>
     public class OsuMemoryProvider
     {
         private readonly string osuWindowTitle;
@@ -35,10 +39,7 @@ namespace osu1progressbar.Game.MemoryProvider
 
             logic = new LogicController();
             Logger.Log(Logger.Severity.Info, Logger.Framework.MemoryProvider, "Instanciated OsuMemoryProvider");
-
-
         }
-
 
         ~OsuMemoryProvider()
         {
@@ -64,6 +65,7 @@ namespace osu1progressbar.Game.MemoryProvider
 
         private int ReadInt(object readObj, string propName)
             => ReadProperty(readObj, propName, -5);
+
         private short ReadShort(object readObj, string propName)
             => ReadProperty<short>(readObj, propName, -5);
 
@@ -81,7 +83,6 @@ namespace osu1progressbar.Game.MemoryProvider
 
             await Task.Run(async () =>
             {
-
 
                 Stopwatch stopwatch;
                 double readTimeMs, readTimeMsMin, readTimeMsMax;

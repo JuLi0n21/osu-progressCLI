@@ -1,16 +1,16 @@
 ﻿using Newtonsoft.Json.Linq;
 using osu_progressCLI;
 using OsuMemoryDataProvider.OsuMemoryModels;
-using System;
 using System.Data.SQLite;
-using System.Globalization;
-using System.Net.Http.Headers;
 using System.Text;
 
 
 
 namespace osu1progressbar.Game.Database
 {
+    /// <summary>
+    /// Handeling Database Stuff
+    /// </summary>
     public class DatabaseController
     {
         private readonly string dbname = null;

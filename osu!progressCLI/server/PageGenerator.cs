@@ -4,6 +4,9 @@ using System.Diagnostics;
 
 namespace osu_progressCLI.server
 {
+    /// <summary>
+    /// PageGenerator Creates the Default Homepage.
+    /// </summary>
     public sealed class PageGenerator
     {
         JObject user = null;

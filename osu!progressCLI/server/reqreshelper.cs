@@ -2,30 +2,28 @@
 using Newtonsoft.Json.Linq;
 using osu1progressbar.Game.Database;
 using System.Collections.Specialized;
-using System.IO;
 using System.Net;
 using System.Text;
 
 namespace osu_progressCLI.server
 {
-    internal class reqreshelper
+    /// <summary>
+    /// Model View Design (Partialy implementet).
+    /// </summary>
+    internal class Reqreshelper
     {
-        HttpListenerRequest request;
-        HttpListenerResponse response;
-
         DatabaseController controller;
 
         public reqreshelper()
+
         {
             controller = new DatabaseController();
         }
 
-        //defautl page
         public void defaultpage(HttpListenerRequest request, HttpListenerResponse response)
         {
-
             WriteResponse(response, PageGenerator.Instance.generatepage(Credentials.Instance.GetConfig().userid, "osu", controller.GetWeekCompare()), "text/html");
-            //ServeStaticFile(response, "server/html/index.html", "text/html");
+
         }
 
         public void getAllBeatmapScroes(HttpListenerRequest request, HttpListenerResponse response)
@@ -38,18 +36,13 @@ namespace osu_progressCLI.server
 
             WriteResponse(response, beatmapstring, "application/json");
         }
-        //get all beatmap scores
 
-        //get beatmaps in timespan (from, to)
         public void getBeatmapsinTimeSpan(HttpListenerRequest request, HttpListenerResponse response, DateTime from, DateTime to)
         {
-
             string beatmapstring = GetBeatmapData(from, to);
 
             WriteResponse(response, beatmapstring, "application/json");
         }
-
-        //time wasted 
 
         public void getAllTimeWasted(HttpListenerRequest request, HttpListenerResponse response)
         {
@@ -59,7 +52,6 @@ namespace osu_progressCLI.server
             string beatmapstring = GetTimeWasted(from, to);
 
             WriteResponse(response, beatmapstring, "application/json");
-
         }
 
         public void getTimeWastedinTimeSpan(HttpListenerRequest request, HttpListenerResponse response, DateTime from, DateTime to)
@@ -82,8 +74,6 @@ namespace osu_progressCLI.server
             DateTime to = DateTime.Now;
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
-            string beatmapstring = GetBanchoTime(from, to);
-
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTimebyDay(from, to)), "application/json");
         }
 
@@ -93,7 +83,6 @@ namespace osu_progressCLI.server
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWastedByDay(from, to)), "application/json");
-
         }
 
         public void getBanchoTimeinTineSpan(HttpListenerRequest request, HttpListenerResponse response, DateTime from, DateTime to)
@@ -103,31 +92,23 @@ namespace osu_progressCLI.server
 
         public void search(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters)
         {
-
-            //Console.WriteLine("searchquery: " + parameters[0].ToString());
             DateTime to = DateTime.Now;
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
-
-
 
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(parameters[0].ToString()))), "application/json");
         }
 
         public void Simulateplay(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters)
         {
-
             Logger.Log(Logger.Severity.Info, Logger.Framework.Server, @$"Request PP calc for {parameters.Count}");
             if (parameters["Beatmapid"] != null)
             {
-
+                //implement
             }
-
         }
 
         public async void user(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters)
         {
-
-            //why does this shit take so long pls help
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $@"{parameters["userid"]} - {DifficultyAttributes.ModeConverter(int.Parse(parameters["mode"]))}");
             WriteResponse(response, JsonConvert.SerializeObject(await ApiController.Instance.getuser(parameters["userid"], DifficultyAttributes.ModeConverter(int.Parse(parameters["mode"])))), "application/json");
         }
@@ -160,22 +141,17 @@ namespace osu_progressCLI.server
 
                 if (parameters["programm"].ToString() == "OsuMissAnalyzer" && parameters["id"] != null)
                 {
-
                     DifficultyAttributes.StartMissAnalyzer(int.Parse(parameters["id"].ToString()));
-
                 }
             }
             catch (Exception e)
             {
                 Logger.Log(Logger.Severity.Error, Logger.Framework.Server, $@"{e.Message}");
             }
-
         }
-
 
         public void getScore(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters)
         {
-
             WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScore(int.Parse(parameters[0]))), "application/json");
         }
 
@@ -278,38 +254,27 @@ namespace osu_progressCLI.server
 
         private string GetBeatmapData(DateTime from, DateTime to)
         {
-
-            //make database maybe single ton aswell or save accestoken somewhere instead of inside the object.
-            // databaseController.GetScoresInTimeSpan(from, to);
-            string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetScoresInTimeSpan(from, to));
-            return jsondata;
-
+           return System.Text.Json.JsonSerializer.Serialize(controller.GetScoresInTimeSpan(from, to));
         }
 
         private string GetBanchoTime(DateTime from, DateTime to)
         {
-            string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTime(from, to));
-            return jsondata;
+            return System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTime(from, to));
         }
 
         private string GetTimeWasted(DateTime from, DateTime to)
         {
-
-            string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWasted(from, to));
-            return jsondata;
-
+            return System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWasted(from, to));
         }
 
         private string GetScoreAverages(DateTime from, DateTime to)
         {
-            string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetScoreAveragesbyDay(from, to));
-            return jsondata;
+            return System.Text.Json.JsonSerializer.Serialize(controller.GetScoreAveragesbyDay(from, to));
         }
 
         private string GetScore(int id)
         {
-            string jsondata = System.Text.Json.JsonSerializer.Serialize(controller.GetScore(id));
-            return jsondata;
+           return System.Text.Json.JsonSerializer.Serialize(controller.GetScore(id));
         }
 
         public void serveimage(HttpListenerRequest request, HttpListenerResponse response, string filepath)
@@ -319,12 +284,10 @@ namespace osu_progressCLI.server
             {
                 ServeStaticImage(response, "public/img" + filepath);
             }
-            else if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}{filepath}")) ;
+            else if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}{filepath}"))
             {
                 ServeStaticImage(response, WebUtility.UrlDecode($@"{Credentials.Instance.GetConfig().songfolder}{filepath}"));
             }
-
-
         }
 
         public void servehtml(HttpListenerRequest request, HttpListenerResponse response, string filepath)
@@ -344,7 +307,6 @@ namespace osu_progressCLI.server
 
         public void serveosr(HttpListenerRequest request, HttpListenerResponse response, string filepath)
         {
-
             string jsFilePath = $"{Credentials.Instance.GetConfig().osufolder}/Data/r/{filepath}";
 
             ServeStaticFile(response, jsFilePath, "application/osr");
@@ -352,7 +314,6 @@ namespace osu_progressCLI.server
 
         public void servecss(HttpListenerRequest request, HttpListenerResponse response, string filepath)
         {
-
             string jsFilePath = "public/css" + filepath;
 
             ServeStaticFile(response, jsFilePath, "text/css");
@@ -370,24 +331,24 @@ namespace osu_progressCLI.server
                 }
 
                 string fileName = request.Headers["filename"];
+                bool download = bool.Parse(request.Headers["download"]);
+                bool import = bool.Parse(request.Headers["import"]);
 
+                Console.WriteLine($"download: {download}, import: {import}");
                 string filePath = Path.Combine(uploadDir, fileName);
 
-                //  using (Stream inputStream = request.InputStream)
-                /*  using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
-                  {
-                      // await inputStream.CopyToAsync(fileStream);
-                  }
-                */
+                using (Stream inputStream = request.InputStream)
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await inputStream.CopyToAsync(fileStream);
+                }
 
                 if (fileName.EndsWith(".csv"))
                     //    Task.Run(() => ScoreImporter.ImportScores(fileName));
-
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Server, $"Received and saved: {fileName}");
 
                 WriteResponse(response, "{\"message\":\"Upload Successful!\"}", "application/json");
                 return true;
-
 
             }
             catch (Exception ex)
@@ -474,7 +435,7 @@ namespace osu_progressCLI.server
             }
             catch (Exception e)
             {
-
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Server, e.Message);
             }
         }
 

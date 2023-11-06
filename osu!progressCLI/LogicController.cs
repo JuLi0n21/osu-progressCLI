@@ -10,6 +10,9 @@ using System.Diagnostics;
 
 namespace osu1progressbar.Game.Logicstuff
 {
+    /// <summary>
+    /// Logic to Track Scores and Times
+    /// </summary>
     public class LogicController
     {
         private DatabaseController db;

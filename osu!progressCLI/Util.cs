@@ -1,9 +1,10 @@
 ﻿using DeepCopy;
 using osu_progressCLI;
 using System.Text.RegularExpressions;
-using System.Timers;
-using System.Threading.Tasks;
 
+/// <summary>
+/// random Utilies.
+/// </summary>
 public class Util
 {
     public static T DeepCopy<T>(T input)
@@ -72,6 +73,7 @@ public class Util
                 int index = random.Next(bgFiles.Length);
                 File.Copy(Path.GetFullPath(bgFiles[index]), $"public/img/{Path.GetFileName(bgFiles[index])}", true);
                 return Path.GetFileName(bgFiles[index]);
+
             }
             else if (btFiles.Length > 0)
             {
@@ -80,18 +82,20 @@ public class Util
                 File.Copy(Path.GetFullPath(btFiles[index]), $"public/img/{Path.GetFileName(btFiles[index])}", true);
                 return Path.GetFileName(btFiles[index]);
             }
+
         }
         catch (Exception e)
         {
             Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, $"{e.Message}");
         }
+
         return null;
     }
 
     public static string osufile(string foldername, string version, string fullparentpath = null)
     {
 
-        string[] files = { };//empty array
+        string[] files = Array.Empty<string>();//empty array
         if (fullparentpath == null)
         {
             files = Directory.GetFiles($"{Credentials.Instance.GetConfig().songfolder}/{foldername}");
@@ -106,69 +110,7 @@ public class Util
             if (files[i].Contains(version))
                 return Path.GetFileName(files[i]);
         }
+
         return null;
-    }
-
-
-    public class ThreadPool : IDisposable
-    {
-        private readonly object lockObject = new object();
-        private readonly int maxThreads;
-        private int runningThreads = 0;
-        private bool disposed = false;
-
-        public ThreadPool(int maxThreads)
-        {
-            this.maxThreads = maxThreads;
-        }
-
-        public void QueueUserWorkItem(ParameterizedThreadStart method, object parameter)
-        {
-            if (disposed)
-                throw new ObjectDisposedException("CustomThreadPool");
-
-            lock (lockObject)
-            {
-                while (runningThreads >= maxThreads)
-                {
-                    Monitor.Wait(lockObject);
-                }
-
-                runningThreads++;
-            }
-
-            Thread workerThread = new Thread(() =>
-            {
-                try
-                {
-                    method(parameter);
-                }
-                finally
-                {
-                    lock (lockObject)
-                    {
-                        runningThreads--;
-                        Monitor.Pulse(lockObject);
-                    }
-                }
-            });
-
-            workerThread.Start();
-        }
-
-        public void Dispose()
-        {
-            if (!disposed)
-            {
-                disposed = true;
-                lock (lockObject)
-                {
-                    while (runningThreads > 0)
-                    {
-                        Monitor.Wait(lockObject);
-                    }
-                }
-            }
-        }
     }
 }

@@ -1,5 +1,8 @@
 ﻿namespace osu_progressCLI
 {
+    /// <summary>
+    /// used to turn Mod Value into ModString
+    /// </summary>
     public static class ModParser
     {
 
