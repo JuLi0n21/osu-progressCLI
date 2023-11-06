@@ -46,7 +46,8 @@ public static class Logger
 
         try
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 using (var fileStream = new FileStream(logFileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
                 using (var writer = new StreamWriter(fileStream))
                 {
@@ -63,9 +64,10 @@ public static class Logger
                 Console.WriteLine(logEntry);
             }
         }
-        catch(Exception e){
-            
-            if(!Directory.Exists("Logs"))
+        catch (Exception e)
+        {
+
+            if (!Directory.Exists("Logs"))
             {
                 Directory.CreateDirectory("Logs");
             }

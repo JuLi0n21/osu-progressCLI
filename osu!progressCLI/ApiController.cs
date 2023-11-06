@@ -22,12 +22,13 @@ namespace osu_progressCLI
 
         private JObject usercache = null;
         private DateTime userTimestamp;
-        private ApiController() {
+        private ApiController()
+        {
 
             clientid = Credentials.Instance.GetClientId();
             clientsecret = Credentials.Instance.GetClientSecret();
 
-            if(Credentials.Instance.GetAccessToken() == null)
+            if (Credentials.Instance.GetAccessToken() == null)
             {
                 getAccessToken();
             }
@@ -76,7 +77,7 @@ namespace osu_progressCLI
                 TokenResponse tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
                 Credentials.Instance.SetAccessToken(tokenResponse.access_token);
 
-               //await getMostPlayedMaps("14100399",10150,50, true);
+                //await getMostPlayedMaps("14100399",10150,50, true);
             }
             else
             {
@@ -88,7 +89,8 @@ namespace osu_progressCLI
 
         }
 
-        public async void updateapitokken(string clientid, string clientsecret) {
+        public async void updateapitokken(string clientid, string clientsecret)
+        {
             this.clientid = clientid;
             this.clientsecret = clientsecret;
             getAccessToken();
@@ -130,7 +132,8 @@ namespace osu_progressCLI
             return beatmap;
         }
 
-        public async Task<JObject> getSearch(string mode, string query) {
+        public async Task<JObject> getSearch(string mode, string query)
+        {
             Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Api Search Request");
 
             JObject search = null;
@@ -168,7 +171,7 @@ namespace osu_progressCLI
             return search;
         }
 
-        public async Task<JObject> getuser(string userid , string mode)
+        public async Task<JObject> getuser(string userid, string mode)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting User info for: {userid}, {mode}");
             if (usercache == null || userTimestamp <= DateTime.Now.AddMinutes(-5))
@@ -206,15 +209,17 @@ namespace osu_progressCLI
 
                 client.Dispose();
             }
-            else {
-                Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Serving Cached user: {usercache["username"]} | Refresh in {(userTimestamp - DateTime.Now.AddMinutes(-5)).TotalSeconds.ToString().Substring(0,3)} Seconds");
+            else
+            {
+                Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Serving Cached user: {usercache["username"]} | Refresh in {(userTimestamp - DateTime.Now.AddMinutes(-5)).TotalSeconds.ToString().Substring(0, 3)} Seconds");
                 return usercache;
             }
             return usercache;
         }
 
-        private async Task<JArray> getMostPlayedMaps(string userid, int offset = 0, int count = 1, bool downloadmissingbeatmaps = false) {
-            
+        private async Task<JArray> getMostPlayedMaps(string userid, int offset = 0, int count = 1, bool downloadmissingbeatmaps = false)
+        {
+
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting MostplayedMaps for: {userid} offset: {offset}, count: {count}, download?={downloadmissingbeatmaps}");
             JArray beatmaps = null;
 
@@ -231,38 +236,39 @@ namespace osu_progressCLI
             HttpResponseMessage reponse = await client.GetAsync(MostPlayedEndpoint);
 
 
-                if (reponse.IsSuccessStatusCode)
-                {
+            if (reponse.IsSuccessStatusCode)
+            {
 
-                    string responseBody = await reponse.Content.ReadAsStringAsync();
-                    //Console.WriteLine(responseBody);
+                string responseBody = await reponse.Content.ReadAsStringAsync();
+                //Console.WriteLine(responseBody);
 
                 beatmaps = JArray.Parse(responseBody);
                 Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Recieved Mostplayed for: {userid} Count:{beatmaps.Count}");
 
                 if (downloadmissingbeatmaps)
-                    {
-                        foreach (JObject beatmap in beatmaps)
-                        {
-                            await DownloadBeatmapset(client, int.Parse(beatmap["beatmap"]["beatmapset_id"].ToString()));
-                        }
-                     Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Successfully Downloaded All Requested Beatmaps");
-
-                    }
-                }
-                else
                 {
+                    foreach (JObject beatmap in beatmaps)
+                    {
+                        await DownloadBeatmapset(client, int.Parse(beatmap["beatmap"]["beatmapset_id"].ToString()));
+                    }
+                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"Successfully Downloaded All Requested Beatmaps");
+
+                }
+            }
+            else
+            {
                 Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"User Request failed with status code {reponse.StatusCode}");
 
                 client.Dispose();
-                    return beatmaps;
-                }
-                
-                client.Dispose();
                 return beatmaps;
+            }
+
+            client.Dispose();
+            return beatmaps;
         }
 
-        public async Task<string> DownloadBeatmapset(HttpClient client, int beatmapsetid, bool unzip = true, string folderpath = null) {
+        public async Task<string> DownloadBeatmapset(HttpClient client, int beatmapsetid, bool unzip = true, string folderpath = null)
+        {
             try
             {
                 Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Checking if Beatmapset Exists: {beatmapsetid}");

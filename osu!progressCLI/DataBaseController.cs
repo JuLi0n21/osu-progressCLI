@@ -142,7 +142,7 @@ namespace osu1progressbar.Game.Database
             DateTime time = DateTime.UtcNow;
             string date = time.ToString("yyyy-MM-dd HH:00");
 
-            if(OldStatus == -1)
+            if (OldStatus == -1)
             {
                 return;
             }
@@ -259,7 +259,8 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        public async static Task<bool> ImportScore(object importscore){
+        public async static Task<bool> ImportScore(object importscore)
+        {
 
             Score score = (Score)importscore;
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Insert Score {score.file_md5} {score.pp}");
@@ -304,18 +305,18 @@ namespace osu1progressbar.Game.Database
                     string background = "";
                     //GET FOLDER AND FILENAME
                     HttpClient client = new HttpClient();
-                    
-                        foldername = await ApiController.Instance.DownloadBeatmapset(client, score.set_id, true, "TESTFOLDERDELETEAFTER");
-                        
-                        client.Dispose();
-                       
 
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Get Filename {score.beatmap_id}");
-                        osufilename = Util.osufile(foldername, score.diffname, "TESTFOLDERDELETEAFTER");
+                    foldername = await ApiController.Instance.DownloadBeatmapset(client, score.set_id, true, "TESTFOLDERDELETEAFTER");
 
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Find Background for {score.beatmap_id}");
-                        background = Util.getBackground(foldername, osufilename, "TESTFOLDERDELETEAFTER");
-                    
+                    client.Dispose();
+
+
+                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Get Filename {score.beatmap_id}");
+                    osufilename = Util.osufile(foldername, score.diffname, "TESTFOLDERDELETEAFTER");
+
+                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Find Background for {score.beatmap_id}");
+                    background = Util.getBackground(foldername, osufilename, "TESTFOLDERDELETEAFTER");
+
 
                     string insertQuery = @"
                         INSERT INTO ScoreData (
@@ -475,7 +476,7 @@ namespace osu1progressbar.Game.Database
         {
             Logger.Log(Logger.Severity.Info, Logger.Framework.Database, $"Inserting Score on: {baseAddresses.Beatmap.OsuFileName}");
 
-            string creator = "null", artist = "null", status = baseAddresses.Beatmap.Status.ToString(), version = "null", tags = "null", coverlist = "null", cover = "null", preview ="null";
+            string creator = "null", artist = "null", status = baseAddresses.Beatmap.Status.ToString(), version = "null", tags = "null", coverlist = "null", cover = "null", preview = "null";
             double bpm = -1;
             double starrating = -1;
 
@@ -497,7 +498,8 @@ namespace osu1progressbar.Game.Database
                                 baseAddresses.Player.Mode);
 
             //Override Grade incase Play was not passed
-            if (playtype == "Cancel" || playtype == "Fail" || playtype == "Retry") {
+            if (playtype == "Cancel" || playtype == "Fail" || playtype == "Retry")
+            {
                 perfomanceAttributes.grade = "F";
             }
 
@@ -510,7 +512,7 @@ namespace osu1progressbar.Game.Database
                                 baseAddresses.Player.Hit50,
                                 baseAddresses.Player.Hit100,
                                 baseAddresses.Player.Hit300,
-                                0, 
+                                0,
                                 0,
                                 baseAddresses.Player.Mode);
 
@@ -560,16 +562,17 @@ namespace osu1progressbar.Game.Database
                                 tags = beatmap["beatmapset"]["tags"].ToString();
                                 preview = beatmap["beatmapset"]["preview_url"].ToString();
                             }
-                            else {
-                               // add parsing for beatmap filename! 
+                            else
+                            {
+                                // add parsing for beatmap filename! 
                             }
 
                             if (cover == "null" || cover.EndsWith("?0") || cover.Equals(""))
                             {
-                                cover = Util.getBackground(baseAddresses.Beatmap.FolderName,baseAddresses.Beatmap.OsuFileName);
+                                cover = Util.getBackground(baseAddresses.Beatmap.FolderName, baseAddresses.Beatmap.OsuFileName);
                                 coverlist = cover;
                             }
-                          
+
                             using (SQLiteCommand insertCommand = new SQLiteCommand(connection))
                             {
 
@@ -727,7 +730,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Hit50", baseAddresses.Player.Hit50);
                         command.Parameters.AddWithValue("@Hit100", baseAddresses.Player.Hit100);
                         command.Parameters.AddWithValue("@Hit300", baseAddresses.Player.Hit300);
-                        command.Parameters.AddWithValue("@Ur", null); 
+                        command.Parameters.AddWithValue("@Ur", null);
                         command.Parameters.AddWithValue("@HitMiss", baseAddresses.Player.HitMiss);
                         command.Parameters.AddWithValue("@Mode", baseAddresses.Player.Mode);
                         command.Parameters.AddWithValue("@Mods", baseAddresses.Player.Mods.Value);
@@ -772,7 +775,7 @@ namespace osu1progressbar.Game.Database
             string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
 
             List<Dictionary<string, object>> scores = new List<Dictionary<string, object>>();
-            
+
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
 
@@ -780,13 +783,13 @@ namespace osu1progressbar.Game.Database
                 {
 
                     connection.Open();
-                
+
                     command.CommandText = "SELECT rowid as id, * " +
                         "FROM ScoreData " +
                         "WHERE datetime(Date) BETWEEN @from AND @to " +
                         "ORDER BY Date DESC " +
                         "LIMIT 1000;";
-                 
+
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
 
@@ -801,6 +804,101 @@ namespace osu1progressbar.Game.Database
                             //List<Dictionary<string, object>> row = new List<Dictionary<string, object>>();
                             //Turn it back into a beatmap
                             Dictionary<string, object> score = new Dictionary<string, object>();
+
+                            score.Add("id", reader["id"]);
+                            score.Add("Date", reader["Date"]);
+                            score.Add("BeatmapSetid", reader["BeatmapSetid"]);
+                            score.Add("Beatmapid", reader["Beatmapid"]);
+                            score.Add("Osufilename", reader["Osufilename"]);
+                            score.Add("Foldername", reader["Foldername"]);
+                            score.Add("Replay", reader["Replay"]);
+                            score.Add("Playtype", reader["Playtype"]);
+                            score.Add("Ar", reader["Ar"]);
+                            score.Add("Cs", reader["Cs"]);
+                            score.Add("Hp", reader["Hp"]);
+                            score.Add("Od", reader["Od"]);
+                            score.Add("Status", reader["Status"]);
+                            score.Add("SR", reader["SR"]);
+                            score.Add("Bpm", reader["Bpm"]);
+                            score.Add("Artist", reader["Artist"]);
+                            score.Add("Creator", reader["Creator"]);
+                            score.Add("Username", reader["Username"]);
+                            score.Add("Acc", reader["Acc"]);
+                            score.Add("MaxCombo", reader["MaxCombo"]);
+                            score.Add("Score", reader["Score"]);
+                            score.Add("Combo", reader["Combo"]);
+                            score.Add("Hit50", reader["Hit50"]);
+                            score.Add("Hit100", reader["Hit100"]);
+                            score.Add("Hit300", reader["Hit300"]);
+                            score.Add("Ur", reader["Ur"]);
+                            score.Add("HitMiss", reader["HitMiss"]);
+                            score.Add("Mode", reader["Mode"]);
+                            score.Add("Mods", reader["Mods"]);
+                            score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
+                            score.Add("Version", reader["Version"]);
+                            score.Add("Tags", reader["Tags"]);
+                            score.Add("CoverList", reader["CoverList"]);
+                            score.Add("Cover", reader["Cover"]);
+                            score.Add("Preview", reader["Preview"]);
+                            score.Add("Time", reader["Time"]);
+                            score.Add("PP", reader["PP"]);
+                            score.Add("AIM", reader["AIM"]);
+                            score.Add("SPEED", reader["SPEED"]);
+                            score.Add("ACCURACYATT", reader["ACCURACYATT"]);
+                            score.Add("Grade", reader["Grade"]);
+                            score.Add("FCPP", reader["FCPP"]);
+
+                            scores.Add(score);
+                        }
+                    }
+                    connection.Close();
+                }
+                return scores;
+            }
+        }
+
+        //ar(0-12) od(0-12) cs(0-12) sr(0-XX) bpm(0-XXX) pp(0-XXXX) hp(0-12  grade(A, S, SS...) time(seconds) mods(hd, dt, nc, ...) status(0-4) add more stuff someday
+        public List<Dictionary<string, object>> GetScoreSearch(DateTime from = new DateTime(),
+            DateTime to = new DateTime(),
+            string search = "")
+        {
+
+            string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
+            string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
+
+            List<Dictionary<string, object>> scores = new List<Dictionary<string, object>>();
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+
+                using (var command = new SQLiteCommand(connection))
+                {
+
+                    connection.Open();
+
+                    StringBuilder queryBuilder = new StringBuilder("SELECT rowid as id, * FROM ScoreData WHERE 1=1 ");
+
+
+                    if (from != null || to != null)
+                    {
+                        queryBuilder.Append("AND datetime(Date) BETWEEN @from AND @to ");
+                        queryBuilder.Append(search);
+                        queryBuilder.Append("ORDER BY Date DESC LIMIT 1000;");
+                        command.Parameters.AddWithValue("@from", fromFormatted);
+                        command.Parameters.AddWithValue("@to", toFormatted);
+                    }
+
+
+                    command.CommandText = queryBuilder.ToString();
+                    DateTime dateString = DateTime.Now;
+
+                    try
+                    {
+                        using (SQLiteDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                Dictionary<string, object> score = new Dictionary<string, object>();
 
                                 score.Add("id", reader["id"]);
                                 score.Add("Date", reader["Date"]);
@@ -844,119 +942,28 @@ namespace osu1progressbar.Game.Database
                                 score.Add("ACCURACYATT", reader["ACCURACYATT"]);
                                 score.Add("Grade", reader["Grade"]);
                                 score.Add("FCPP", reader["FCPP"]);
-                            
-                            scores.Add(score);
-                        }
-                    }
-                    connection.Close();
-                }
-                return scores;
-            }
-        }
 
-        //ar(0-12) od(0-12) cs(0-12) sr(0-XX) bpm(0-XXX) pp(0-XXXX) hp(0-12  grade(A, S, SS...) time(seconds) mods(hd, dt, nc, ...) status(0-4) add more stuff someday
-        public List<Dictionary<string, object>> GetScoreSearch(DateTime from = new DateTime(), 
-            DateTime to = new DateTime(), 
-            string search = "")
-        {
-
-            string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
-            string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
-
-            List<Dictionary<string, object>> scores = new List<Dictionary<string, object>>();
-
-            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-            {
-
-                using (var command = new SQLiteCommand(connection))
-                {
-
-                    connection.Open();
-
-                    StringBuilder queryBuilder = new StringBuilder("SELECT rowid as id, * FROM ScoreData WHERE 1=1 ");
-                    
-
-                    if (from != null || to != null) {
-                        queryBuilder.Append("AND datetime(Date) BETWEEN @from AND @to ");
-                        queryBuilder.Append(search);
-                        queryBuilder.Append("ORDER BY Date DESC LIMIT 1000;");
-                        command.Parameters.AddWithValue("@from", fromFormatted);
-                        command.Parameters.AddWithValue("@to", toFormatted);
-                    }
-
-                
-                    command.CommandText = queryBuilder.ToString();
-                    DateTime dateString = DateTime.Now;
-
-                    try
-                    {
-                        using (SQLiteDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                Dictionary<string, object> score = new Dictionary<string, object>();
-
-                                score.Add("id", reader["id"]);
-                                score.Add("Date", reader["Date"]);
-                                score.Add("BeatmapSetid", reader["BeatmapSetid"]);
-                                score.Add("Beatmapid", reader["Beatmapid"]);
-                                score.Add("Osufilename", reader["Osufilename"]);
-                                score.Add("Foldername", reader["Foldername"]);
-                                score.Add("Replay", reader["Replay"]);
-                                score.Add("Playtype", reader["Playtype"]);
-                                score.Add("Ar", reader["Ar"]);
-                                score.Add("Cs", reader["Cs"]);
-                                score.Add("Hp", reader["Hp"]);
-                                score.Add("Od", reader["Od"]);
-                                score.Add("Status", reader["Status"]);
-                                score.Add("SR", reader["SR"]);
-                                score.Add("Bpm", reader["Bpm"]);
-                                score.Add("Artist", reader["Artist"]);
-                                score.Add("Creator", reader["Creator"]); 
-                                score.Add("Username", reader["Username"]); 
-                                score.Add("Acc", reader["Acc"]);
-                                score.Add("MaxCombo", reader["MaxCombo"]);
-                                score.Add("Score", reader["Score"]);
-                                score.Add("Combo", reader["Combo"]);
-                                score.Add("Hit50", reader["Hit50"]);
-                                score.Add("Hit100", reader["Hit100"]);
-                                score.Add("Hit300", reader["Hit300"]);
-                                score.Add("Ur", reader["Ur"]);
-                                score.Add("HitMiss", reader["HitMiss"]);
-                                score.Add("Mode", reader["Mode"]);
-                                score.Add("Mods", reader["Mods"]);
-                                score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
-                                score.Add("Version", reader["Version"]);
-                                score.Add("Tags", reader["Tags"]);
-                                score.Add("CoverList", reader["CoverList"]);
-                                score.Add("Cover", reader["Cover"]);
-                                score.Add("Preview", reader["Preview"]);
-                                score.Add("Time", reader["Time"]);
-                                score.Add("PP", reader["PP"]);
-                                score.Add("AIM", reader["AIM"]);
-                                score.Add("SPEED", reader["SPEED"]);
-                                score.Add("ACCURACYATT", reader["ACCURACYATT"]);
-                                score.Add("Grade", reader["Grade"]);
-                                score.Add("FCPP", reader["FCPP"]);
-                         
                                 scores.Add(score);
                             }
                         }
 
                     }
-                    catch {
+                    catch
+                    {
                         return null;
                     }
-                    finally {
+                    finally
+                    {
                         connection.Close();
                     }
-                    
+
                 }
                 return scores;
             }
         }
 
-        public List<Dictionary<string, object>> GetScoreAveragesbyDay(DateTime from, DateTime to) {
+        public List<Dictionary<string, object>> GetScoreAveragesbyDay(DateTime from, DateTime to)
+        {
 
             List<Dictionary<string, object>> scoreAverages = new List<Dictionary<string, object>>();
 
@@ -1001,7 +1008,7 @@ namespace osu1progressbar.Game.Database
                             result["AverageAr"] = Convert.ToDouble(reader["AverageAr"]);
                             result["AverageCs"] = Convert.ToDouble(reader["AverageCs"]);
                             result["AverageHp"] = Convert.ToDouble(reader["AverageHp"]);
-                            result["AverageOd"] = Convert.ToDouble(reader["AverageOd"]);    
+                            result["AverageOd"] = Convert.ToDouble(reader["AverageOd"]);
 
                             scoreAverages.Add(result);
                         }
@@ -1013,11 +1020,11 @@ namespace osu1progressbar.Game.Database
 
         public WeekCompare GetWeekCompare()
         {
-            
+
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 WeekCompare week = new WeekCompare();
-                
+
                 connection.Open();
 
                 string sqlQuery = @"
@@ -1143,7 +1150,7 @@ namespace osu1progressbar.Game.Database
                     {
 
                         while (reader.Read())
-                        { 
+                        {
                             BanchoTime.Add(new KeyValuePair<string, double>(reader["BanchoStatus"].ToString(), Convert.ToDouble(reader["Time"])));
                         }
                     }
@@ -1211,7 +1218,8 @@ namespace osu1progressbar.Game.Database
         }
 
 
-        public Dictionary<string, object> GetScore(int id) {
+        public Dictionary<string, object> GetScore(int id)
+        {
             Dictionary<string, object> score = new Dictionary<string, object>();
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -1283,7 +1291,7 @@ namespace osu1progressbar.Game.Database
                     }
                 }
             }
-             
+
             return score;
         }
 

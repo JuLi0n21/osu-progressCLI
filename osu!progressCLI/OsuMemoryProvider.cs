@@ -32,7 +32,7 @@ namespace osu1progressbar.Game.MemoryProvider
         {
             sreader = StructuredOsuMemoryReader.Instance.GetInstanceForWindowTitleHint(osuWindowTitle);
             baseAddresses = new OsuBaseAddresses();
-            
+
             logic = new LogicController();
             Logger.Log(Logger.Severity.Info, Logger.Framework.MemoryProvider, "Instanciated OsuMemoryProvider");
 
@@ -78,11 +78,11 @@ namespace osu1progressbar.Game.MemoryProvider
             Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, "OsuMemoryProvider Run call");
 
             sreader.InvalidRead += SreaderOnInvalidRead;
-            
+
             await Task.Run(async () =>
             {
-             
-                
+
+
                 Stopwatch stopwatch;
                 double readTimeMs, readTimeMsMin, readTimeMsMax;
                 sreader.WithTimes = true;
@@ -99,13 +99,13 @@ namespace osu1progressbar.Game.MemoryProvider
                         logic.BanchoTimeStopWatch.Reset();
                         logic.screenTimeStopWatch.Reset();
                         logic.timeSinceStartedPlaying.Reset();
-                        
+
                         //ReadDelay = throttledDelay;
                         await Task.Delay(ReadDelay);
                         continue;
                     }
-                    
-                    
+
+
                     stopwatch = Stopwatch.StartNew();
                     if (readUsingProperty)
                     {

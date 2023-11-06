@@ -55,11 +55,11 @@
 
             return modsString;
         }
-    
-    public static string ParseMods(int combinedFlags)
-    {
-        // Define a dictionary mapping mod names to their corresponding bit values
-        var modValues = new Dictionary<string, int>
+
+        public static string ParseMods(int combinedFlags)
+        {
+            // Define a dictionary mapping mod names to their corresponding bit values
+            var modValues = new Dictionary<string, int>
             {
                 { "NoFail", 1 },
                 { "Easy", 2 },
@@ -78,20 +78,20 @@
                 { "ScoreV2", 536870912 },
             };
 
-        var modList = new List<string>();
+            var modList = new List<string>();
 
-        foreach (var kvp in modValues)
-        {
-            if ((combinedFlags & kvp.Value) != 0)
+            foreach (var kvp in modValues)
             {
-                modList.Add(kvp.Key);
+                if ((combinedFlags & kvp.Value) != 0)
+                {
+                    modList.Add(kvp.Key);
+                }
             }
+
+            string modsString = string.Join(", ", modList);
+
+            return modsString;
         }
-
-        string modsString = string.Join(", ", modList);
-
-        return modsString;
-    }
 
         public static string PPCalcMods(int combinedFlags)
         {
@@ -119,7 +119,8 @@
                 }
             }
 
-            if (modList.Count > 0) { 
+            if (modList.Count > 0)
+            {
                 string modsString = string.Join(" -m ", modList);
                 return "-m " + modsString;
             }

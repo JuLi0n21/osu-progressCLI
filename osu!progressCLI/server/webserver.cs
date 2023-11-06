@@ -184,7 +184,8 @@ namespace osu_progressCLI.server
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/run call");
                 helper.run(request, response);
             }
-            else if (path == "/api/upload" && request.HttpMethod == "POST") {
+            else if (path == "/api/upload" && request.HttpMethod == "POST")
+            {
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $"/api/upload call");
                 helper.upload(request, response);
             }

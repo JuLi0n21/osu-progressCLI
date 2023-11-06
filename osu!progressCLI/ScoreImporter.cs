@@ -7,17 +7,18 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace osu_progressCLI
-    {
+{
     internal class ScoreImporter
     {
-        public async static Task<bool> ImportScores(string filepath) {
+        public async static Task<bool> ImportScores(string filepath)
+        {
 
             //filepath = @"upload/score.csv";
-            Stopwatch stopwatch = new Stopwatch();  
+            Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Trying to Parse {filepath}");
 
-            using (var reader = new StreamReader(filepath)) 
+            using (var reader = new StreamReader(filepath))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 try
@@ -66,7 +67,7 @@ namespace osu_progressCLI
 
                     await Task.WhenAll(tasks);
 
-                    Console.WriteLine($"Scores Successfully imported! ({count} Skipped:{scores.Count()-count}) in {stopwatch.Elapsed.Hours}:{stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}");
+                    Console.WriteLine($"Scores Successfully imported! ({count} Skipped:{scores.Count() - count}) in {stopwatch.Elapsed.Hours}:{stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}");
 
                     return true;
 
@@ -77,7 +78,7 @@ namespace osu_progressCLI
                     return false;
                 }
             }
-                return true;
+            return true;
         }
     }
 
