@@ -14,8 +14,7 @@ namespace osu_progressCLI.server
     {
         DatabaseController controller;
 
-        public reqreshelper()
-
+        public Reqreshelper()
         {
             controller = new DatabaseController();
         }
@@ -130,7 +129,7 @@ namespace osu_progressCLI.server
                 string osufolder = Credentials.Instance.GetConfig().osufolder;
                 string songfolder = Credentials.Instance.GetConfig().songfolder;
 
-                Credentials.updateOsuMissAnalyzer(osufolder, songfolder);
+                Credentials.Instance.updateOsuMissAnalyzer(osufolder, songfolder);
 
                 if (parameters == null)
                 {
