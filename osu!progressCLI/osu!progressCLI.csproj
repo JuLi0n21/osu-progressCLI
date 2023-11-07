@@ -49,9 +49,10 @@
 	  <None Remove="public\css\importer.css" />
 	  <None Remove="public\css\style.css" />
 	  <None Remove="public\html\import.html" />
-	  <None Remove="public\html\scores.html" />
+	  <None Remove="public\html\score.html" />
 	  <None Remove="public\html\tags.html" />
 	  <None Remove="public\js\configmenu.js" />
+	  <None Remove="public\js\difficulities.js" />
 	  <None Remove="public\js\importer.js" />
 	  <None Remove="public\js\jsconfig1.json" />
 	  <None Remove="public\js\savebutton.js" />
@@ -70,14 +71,11 @@
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="DeepCopy" Version="1.0.3" />
     <PackageReference Include="Fleck" Version="1.2.0" />
+    <PackageReference Include="Fluid.Core" Version="2.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OsuMemoryDataProvider" Version="0.10.0" />
     <PackageReference Include="OsuParsers" Version="1.7.1" />
+    <PackageReference Include="SocketIOSharp" Version="2.0.3" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
   </ItemGroup>
-	
-	
-	<ItemGroup>
-	  <Folder Include="public\img\" />
-	</ItemGroup>
 </Project>
