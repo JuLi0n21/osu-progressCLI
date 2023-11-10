@@ -5,6 +5,7 @@ using System.Diagnostics.Metrics;
 using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using WebSocketSharp;
 
 namespace osu_progressCLI
 {
@@ -200,6 +201,11 @@ namespace osu_progressCLI
         public async Task<JObject> getuser(string userid, string mode)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Misc, $"Requesting User info for: {userid}, {mode}");
+
+            if(userid.IsNullOrEmpty())
+            {
+                return null;
+            }
             if (usercache == null || userTimestamp <= DateTime.Now.AddMinutes(-5))
             {
                 userTimestamp = DateTime.Now;
@@ -222,23 +228,18 @@ namespace osu_progressCLI
                     string responseBody = await reponse.Content.ReadAsStringAsync();
                     //Console.WriteLine(responseBody);
                     usercache = JObject.Parse(responseBody);
-                   
-                   await Task.Run(() => Credentials.Instance.UpdateConfig(
-                        null,
-                        null,
-                        null,
-                        usercache["username"]?.ToString(),
-                        null,
-                        usercache["statistics"]["global_rank"]?.ToString(),
-                        usercache["statistics"]["country_rank"]?.ToString(),
-                        usercache["country"]["name"]?.ToString(),
-                        usercache["country"]["code"]?.ToString().ToLower(),
-                        null,
-                        usercache["cover_url"]?.ToString(),
-                        usercache["avatar_url"]?.ToString(),
-                        null)
-                   );
-                  
+                    if(Credentials.Instance.GetConfig().Local == "False")
+                    {
+                        await Task.Run(() => Credentials.Instance.UpdateConfig(
+                      username: usercache["username"]?.ToString(),
+                      rank: usercache["statistics"]["global_rank"]?.ToString(),
+                      countryrank: usercache["statistics"]["country_rank"]?.ToString(),
+                      country: usercache["country"]["name"]?.ToString(),
+                      countrycode: usercache["country"]["code"]?.ToString().ToLower(),
+                      cover_url: usercache["cover_url"]?.ToString(),
+                      avatar_url: usercache["avatar_url"]?.ToString()));
+
+                    }
                         
                 }
                 else
