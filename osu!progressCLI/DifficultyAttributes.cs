@@ -262,6 +262,10 @@ namespace osu_progressCLI
 
         }
 
+        public static void Startshell(string command) {
+            cmdOutput("", command);
+        }
+
         public static void StartMissAnalyzer(int id)
         {
 
