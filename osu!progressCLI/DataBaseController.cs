@@ -1125,9 +1125,9 @@ namespace osu1progressbar.Game.Database
         }
 
 
-        public Dictionary<string, object> GetScore(int id)
+        public Score GetScore(int id)
         {
-            Dictionary<string, object> score = new Dictionary<string, object>();
+            Score score;
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -1142,64 +1142,16 @@ namespace osu1progressbar.Game.Database
 
                     command.ExecuteNonQuery();
 
+                    using (SQLiteDataReader reader = command.ExecuteReader())
                     {
-                        using (SQLiteDataReader reader = command.ExecuteReader())
+                        while (reader.Read())
                         {
-
-                            while (reader.Read())
-                            {
-
-                                score.Add("id", reader["id"]);
-                                score.Add("Date", reader["Date"]);
-                                score.Add("BeatmapSetid", reader["BeatmapSetid"]);
-                                score.Add("Beatmapid", reader["Beatmapid"]);
-                                score.Add("Osufilename", reader["Osufilename"]);
-                                score.Add("Foldername", reader["Foldername"]);
-                                score.Add("Replay", reader["Replay"]);
-                                score.Add("Playtype", reader["Playtype"]);
-                                score.Add("Ar", reader["Ar"]);
-                                score.Add("Cs", reader["Cs"]);
-                                score.Add("Hp", reader["Hp"]);
-                                score.Add("Od", reader["Od"]);
-                                score.Add("Status", reader["Status"]);
-                                score.Add("SR", reader["SR"]);
-                                score.Add("Bpm", reader["Bpm"]);
-                                score.Add("Artist", reader["Artist"]);
-                                score.Add("Creator", reader["Creator"]);
-                                score.Add("Username", reader["Username"]);
-                                score.Add("Acc", reader["Acc"]);
-                                score.Add("MaxCombo", reader["MaxCombo"]);
-                                score.Add("Score", reader["Score"]);
-                                score.Add("Combo", reader["Combo"]);
-                                score.Add("Hit50", reader["Hit50"]);
-                                score.Add("Hit100", reader["Hit100"]);
-                                score.Add("Hit300", reader["Hit300"]);
-                                score.Add("Ur", reader["Ur"]);
-                                score.Add("HitMiss", reader["HitMiss"]);
-                                score.Add("Mode", reader["Mode"]);
-                                score.Add("Mods", reader["Mods"]);
-                                score.Add("ModsString", ModParser.ParseMods(int.Parse(reader["Mods"].ToString())));
-                                score.Add("Version", reader["Version"]);
-                                score.Add("Tags", reader["Tags"]);
-                                score.Add("CoverList", reader["CoverList"]);
-                                score.Add("Cover", reader["Cover"]);
-                                score.Add("Preview", reader["Preview"]);
-                                score.Add("Time", reader["Time"]);
-                                score.Add("PP", reader["PP"]);
-                                score.Add("AIM", reader["AIM"]);
-                                score.Add("SPEED", reader["SPEED"]);
-                                score.Add("ACCURACYATT", reader["ACCURACYATT"]);
-                                score.Add("Grade", reader["Grade"]);
-                                score.Add("FCPP", reader["FCPP"]);
-
-
-                            }
+                           return new Score(reader);
                         }
                     }
                 }
             }
-
-            return score;
+            return null;
         }
 
         public List<KeyValuePair<string, double>> GetTimeWasted(DateTime from, DateTime to)
