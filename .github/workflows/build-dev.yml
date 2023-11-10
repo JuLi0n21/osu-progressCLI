@@ -5,6 +5,11 @@ on:
     branches:
       - dev
       - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
 jobs:
   build:
     runs-on: windows-latest
