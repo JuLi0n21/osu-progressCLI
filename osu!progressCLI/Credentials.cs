@@ -133,7 +133,7 @@ namespace osu_progressCLI
         /// <param name="port"></param>
         /// <param name="userid"></param>
         /// <returns></returns>
-        public bool UpdateConfig(string osufolder = "C:\\", string songfolder = "C:\\", string localconfig = "False", string username = "", string userid = "", string rank = "", string countryrank = "", string country = "", string countrycode = "", string mode = "", string cover_url = "", string avatar_url = "", string port = "4200")
+        public bool UpdateConfig(string osufolder = "", string songfolder = "", string localconfig = "False", string username = "", string userid = "", string rank = "", string countryrank = "", string country = "", string countrycode = "", string mode = "", string cover_url = "", string avatar_url = "", string port = "4200")
         {
             if (config == null)
             {
