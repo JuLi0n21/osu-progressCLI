@@ -26,6 +26,7 @@ namespace osu_progressCLI.Webserver.Server
 
             //parsing parameters
             string path = request.Url.AbsolutePath;
+            Console.WriteLine(path);
 
             var queryparams = HttpUtility.ParseQueryString(request.Url.Query);
 
@@ -137,7 +138,8 @@ namespace osu_progressCLI.Webserver.Server
             }
             else if (path == "/api/upload" && request.HttpMethod == "POST")
             {
-
+                DifficultyAttributes.Startshell("start explorer.exe imports");
+                Webserver.Instance().WriteResponse(response, $"<span>{ScoreImporter.Instance.GetStatus().running} {ScoreImporter.Instance.GetStatus().Finishedimports}/{ScoreImporter.Instance.GetStatus().ToImportScores}  </span>", "text/html");
             }
 
             response.StatusCode = 404;

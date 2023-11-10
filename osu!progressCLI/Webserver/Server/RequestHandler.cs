@@ -19,6 +19,8 @@ namespace osu_progressCLI.Webserver.Server
             string path = request.Url.AbsolutePath;
             var queryparams = HttpUtility.ParseQueryString(request.Url.Query);
 
+            Console.WriteLine(path);
+
             if (path == "/")
             {
                 var template = FluidRenderer.templates.Find(item => item.Key.Equals("Homepage.liquid"));
@@ -37,7 +39,7 @@ namespace osu_progressCLI.Webserver.Server
                 context.SetValue("List", controller.GetScoresInTimeSpan(DateTime.Now.AddDays(-100), DateTime.Now));
 
                 Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
-            } else if (path =="/score"){
+            } else if (path == "/score") {
 
                 var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scorepage.liquid"));
 
@@ -46,6 +48,13 @@ namespace osu_progressCLI.Webserver.Server
                 var context = new TemplateContext(score);
                 context.SetValue("score", score);
                 context.SetValue("player", await ApiController.Instance.getuser(Credentials.Instance.GetConfig().userid, Credentials.Instance.GetConfig().mode));
+
+                Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+            } else if (path == "/importer") {
+
+                var template = FluidRenderer.templates.Find(item => item.Key.Equals("Importer.liquid"));
+
+                var context = new TemplateContext();
 
                 Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
             }
