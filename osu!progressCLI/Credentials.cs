@@ -144,8 +144,13 @@ namespace osu_progressCLI
             {
                 string filePath = "config.json";
 
-                if (!string.IsNullOrEmpty(localconfig))
-                    config.Localconfig = localconfig;
+                if (string.IsNullOrEmpty(localconfig) || localconfig == "False")
+                {
+                    config.Local = "False";
+                }
+                else { 
+                    config.Local = "True";
+                }
 
                 if (!string.IsNullOrEmpty(port))
                     config.port = port;
@@ -249,7 +254,7 @@ namespace osu_progressCLI
 
     public class JsonConfig
     {
-        public string? Localconfig { get; set; } = "False";
+        public string? Local { get; set; } = "False";
         public string? port { get; set; } = "4200";
         public string? username { get; set; } = String.Empty;
         public string? rank { get; set; } = String.Empty;

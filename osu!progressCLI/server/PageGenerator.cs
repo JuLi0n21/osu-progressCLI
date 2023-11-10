@@ -48,7 +48,7 @@ namespace osu_progressCLI.server
                 string BanchoStatus = week.Status;
                 string playtimethisweek = (week.ThisWeek / 3600).ToString().PadRight(5).Substring(0, 5);
                 string diffrencetolastweek = ((week.ThisWeek - week.LastWeek) / week.LastWeek * 100).ToString().PadRight(6).Substring(0, 6);
-                if (config.Localconfig == "False" || user == null)
+                if (config.Local == "False" || user == null)
                 {
                     try
                     {

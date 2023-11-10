@@ -24,7 +24,7 @@ namespace osu_progressCLI.Webserver.Server
                     throw new InvalidOperationException($"Failed to parse template: {error}", new FileNotFoundException("The specified template file was not found or could not be read."));
                 }
 
-                await ApiController.Instance.getuser(Credentials.Instance.GetConfig().username, Credentials.Instance.GetConfig().mode);
+                await ApiController.Instance.getuser(Credentials.Instance.GetConfig().userid, Credentials.Instance.GetConfig().mode);
                 WeekCompare week = controller.GetWeekCompare();
 
                 string playtimethisweek = (week.ThisWeek / 3600).ToString().PadRight(5).Substring(0, 5);
