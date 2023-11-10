@@ -1,0 +1,9 @@
+﻿<div id="scorecontainer">
+	{% if List.size == 0 %}
+	<p>No Score Found!</p>
+	{% else %}
+	{% for score in List %}
+	{% include 'score.liquid' %}
+	{% endfor %}
+	{% endif %}
+</div>
