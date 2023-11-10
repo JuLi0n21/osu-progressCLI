@@ -1,15 +1,8 @@
 using CsvHelper;
 using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
-using Newtonsoft.Json.Linq;
-using osu_progressCLI.server;
 using osu1progressbar.Game.Database;
-using OsuParsers.Database.Objects;
-using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection.Metadata.Ecma335;
 
 namespace osu_progressCLI
 {
@@ -17,14 +10,14 @@ namespace osu_progressCLI
     {
 
         private static ScoreImporter instance;
-        List<Score> scores;
-        List<Score> alreadyimportedscores;
+        List<ImportScore> scores;
+        List<ImportScore> alreadyimportedscores;
         private string DEFAULTFILEPATH = "imports/Alreadyimportedscores.csv";
         private readonly object objectlock = new object();
 
         private ScoreImporter()
         {
-            scores = new List<Score>();
+            scores = new List<ImportScore>();
             alreadyimportedscores = FetchAlreadyImported();
         }
 
@@ -40,7 +33,7 @@ namespace osu_progressCLI
             }
         }
 
-        public async Task<bool> TrackImportedScore(Score score)
+        public async Task<bool> TrackImportedScore(ImportScore score)
         {
             lock (objectlock) // Lock the critical section
             {
@@ -58,24 +51,25 @@ namespace osu_progressCLI
                 using (var writer = new StreamWriter(stream)) // Append to the file
                 using (var csv = new CsvWriter(writer, config))
                 {
-                    csv.WriteRecordsAsync(new List<Score> { score });
+                    csv.WriteRecordsAsync(new List<ImportScore> { score });
                 }
             }
 
             return true;
         }
 
-        public List<Score> FetchAlreadyImported() {
+        public List<ImportScore> FetchAlreadyImported()
+        {
 
             if (!File.Exists(DEFAULTFILEPATH))
             {
-                return new List<Score>();
+                return new List<ImportScore>();
             }
 
             using (var reader = new StreamReader(DEFAULTFILEPATH))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                var records = csv.GetRecords<Score>();
+                var records = csv.GetRecords<ImportScore>();
                 alreadyimportedscores = records.ToList();
                 Console.WriteLine(alreadyimportedscores.Count);
             }
@@ -83,11 +77,12 @@ namespace osu_progressCLI
             return alreadyimportedscores;
         }
 
-        public bool WriteScore(string filePath, List<Score> score)
+        public bool WriteScore(string filePath, List<ImportScore> score)
         {
-            try {
+            try
+            {
 
-                using (var writer = new StreamWriter(filePath, false)) 
+                using (var writer = new StreamWriter(filePath, false))
                 using (var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)))
                 {
                     csv.WriteRecords(score);
@@ -101,16 +96,17 @@ namespace osu_progressCLI
             return true;
         }
 
-        private void removedoubleentrys(string filepath) {
+        private void removedoubleentrys(string filepath)
+        {
 
-            List<Score> filteredscores = new List<Score>();
+            List<ImportScore> filteredscores = new List<ImportScore>();
             try
             {
                 using (var reader = new StreamReader(filepath))
                 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 {
-               
-                    var records = csv.GetRecords<Score>();
+
+                    var records = csv.GetRecords<ImportScore>();
                     scores = records.ToList();
 
                     string prev = "random string";
@@ -149,12 +145,12 @@ namespace osu_progressCLI
             {
                 try
                 {
-                    scores = csv.GetRecords<Score>().ToList();
+                    scores = csv.GetRecords<ImportScore>().ToList();
 
-                    List<Score> Filterdscores = new List<Score>();
+                    List<ImportScore> Filterdscores = new List<ImportScore>();
 
                     ScoreComparer comparer = new ScoreComparer();
-                    List<Score> filteredScores = scores.Where(score =>
+                    List<ImportScore> filteredScores = scores.Where(score =>
                     {
                         bool matchFound = alreadyimportedscores.Any(existingscore => comparer.Compare(score, existingscore) == 0);
                         return !matchFound;
@@ -175,7 +171,7 @@ namespace osu_progressCLI
                                 await DatabaseController.ImportScore(item);
                                 await TrackImportedScore(item);
                                 alreadyimportedscores.Add(item);
-                                Task.Run(async () => await Webserver.Instance().SendData("ScoreCount", alreadyimportedscores.Count));
+                                //Task.Run(async () => await Webserver.Instance().SendData("ScoreCount", alreadyimportedscores.Count));
                                 Interlocked.Increment(ref count);
                             }
                             catch (Exception ex)
@@ -207,7 +203,7 @@ namespace osu_progressCLI
         }
     }
 
-    public class Score
+    public class ImportScore
     {
         public int user_id { get; set; }
         public int beatmap_id { get; set; }
@@ -274,12 +270,12 @@ namespace osu_progressCLI
         public double modded_hp { get; set; }
         public string packs { get; set; }
 
-       
+
     }
 
-    public class ScoreComparer : IComparer<Score>
+    public class ScoreComparer : IComparer<ImportScore>
     {
-        public int Compare(Score x, Score y)
+        public int Compare(ImportScore x, ImportScore y)
         {
             // Define your custom comparison logic here
             // For example, compare by Property1 first, and then by Property2

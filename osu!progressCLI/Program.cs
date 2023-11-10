@@ -1,5 +1,5 @@
 ﻿using osu_progressCLI;
-using osu_progressCLI.server;
+using osu_progressCLI.Webserver.Server;
 using osu1progressbar.Game.MemoryProvider;
 
 class Program
@@ -33,6 +33,7 @@ class Program
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
 
+        /*
         Task listenTask = Task.Run(async () =>
         {
             while (true)
@@ -41,6 +42,9 @@ class Program
             }
         });
         await listenTask;
+        */
+
+        await Webserver.Instance().start();
 
         memoryProvider.Stop();
     }

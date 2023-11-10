@@ -203,7 +203,7 @@ namespace osu_progressCLI
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
-                CreateNoWindow = true
+                CreateNoWindow = true,
             };
 
             Process process = new Process { StartInfo = psi };

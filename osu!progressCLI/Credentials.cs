@@ -105,7 +105,7 @@ namespace osu_progressCLI
                     ApiController.Instance.updateapitokken(dataHelper.client_id, dataHelper.client_secret);
                 }
 
-                File.WriteAllText(credentialsFilePath, JsonConvert.SerializeObject(dataHelper));
+                File.WriteAllText(credentialsFilePath, JsonConvert.SerializeObject(dataHelper, Formatting.Indented));
 
                 return true;
             }
@@ -133,7 +133,7 @@ namespace osu_progressCLI
         /// <param name="port"></param>
         /// <param name="userid"></param>
         /// <returns></returns>
-        public bool UpdateConfig(string osufolder = "C:\\", string songfolder = "C:\\", string localconfig = "False", string username = "", string rank = "", string country = "", string cover_url = "", string avatar_url = "", string port = "4200", string userid = "")
+        public bool UpdateConfig(string osufolder = "C:\\", string songfolder = "C:\\", string localconfig = "False", string username = "", string userid = "", string rank = "", string countryrank = "", string country = "", string countrycode = "", string mode = "", string cover_url = "", string avatar_url = "", string port = "4200")
         {
             if (config == null)
             {
@@ -162,8 +162,17 @@ namespace osu_progressCLI
                 if (!string.IsNullOrEmpty(rank))
                     config.rank = rank;
 
+                if (!string.IsNullOrEmpty(countryrank))
+                    config.country_rank = countryrank;
+
+                if (!string.IsNullOrEmpty(countrycode))
+                    config.country_code = countrycode;
+
                 if (!string.IsNullOrEmpty(country))
                     config.country = country;
+
+                if (!string.IsNullOrEmpty(mode))
+                    config.mode = mode;
 
                 if (!string.IsNullOrEmpty(cover_url))
                     config.cover_url = cover_url;
@@ -174,7 +183,7 @@ namespace osu_progressCLI
                 if (!string.IsNullOrEmpty(userid))
                     config.userid = userid;
 
-                File.WriteAllText(filePath, JsonConvert.SerializeObject(config));
+                File.WriteAllText(filePath, JsonConvert.SerializeObject(config, Formatting.Indented));
 
                 if (!string.IsNullOrEmpty(osufolder) && !string.IsNullOrEmpty(songfolder))
                     updateOsuMissAnalyzer(osufolder, songfolder);
@@ -244,7 +253,10 @@ namespace osu_progressCLI
         public string? port { get; set; } = "4200";
         public string? username { get; set; } = String.Empty;
         public string? rank { get; set; } = String.Empty;
+        public string? country_rank{ get; set; } = String.Empty;
         public string? country { get; set; } = String.Empty;
+        public string? country_code { get; set; } = String.Empty;
+        public string? mode { get; set; } = "osu";
         public string? cover_url { get; set; } = String.Empty;
         public string? avatar_url { get; set; } = String.Empty;
         public string? userid { get; set; } = "2";

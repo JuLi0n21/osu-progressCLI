@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
@@ -212,7 +213,6 @@ namespace osu_progressCLI
                 client.DefaultRequestHeaders.Add("key", "username");
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-
                 HttpResponseMessage reponse = await client.GetAsync(searchEndpoint);
 
                 if (reponse.IsSuccessStatusCode)
@@ -221,8 +221,25 @@ namespace osu_progressCLI
 
                     string responseBody = await reponse.Content.ReadAsStringAsync();
                     //Console.WriteLine(responseBody);
-
                     usercache = JObject.Parse(responseBody);
+                   
+                   await Task.Run(() => Credentials.Instance.UpdateConfig(
+                        null,
+                        null,
+                        null,
+                        usercache["username"]?.ToString(),
+                        null,
+                        usercache["statistics"]["global_rank"]?.ToString(),
+                        usercache["statistics"]["country_rank"]?.ToString(),
+                        usercache["country"]["name"]?.ToString(),
+                        usercache["country"]["code"]?.ToString().ToLower(),
+                        null,
+                        usercache["cover_url"]?.ToString(),
+                        usercache["avatar_url"]?.ToString(),
+                        null)
+                   );
+                  
+                        
                 }
                 else
                 {
@@ -301,7 +318,7 @@ namespace osu_progressCLI
             client.Dispose();
             return beatmaps;
         }
-      
+
         /// <summary>
         /// Downloads Beatmap
         /// </summary>

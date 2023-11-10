@@ -22,6 +22,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="Webserver\Fluid\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+
+	<ItemGroup>
 		<Content Include="Start.vbs">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
@@ -55,11 +62,15 @@
 	  <None Remove="public\js\difficulities.js" />
 	  <None Remove="public\js\importer.js" />
 	  <None Remove="public\js\jsconfig1.json" />
+	  <None Remove="public\js\onload.js" />
 	  <None Remove="public\js\savebutton.js" />
 	  <None Remove="public\js\scoreexample.js" />
 	  <None Remove="public\js\scoresite.ts" />
 	  <None Remove="public\js\sidebar.txt" />
 	  <None Remove="public\js\TextFile1.txt" />
+	  <None Remove="Webserver\Fluid\score.liquid" />
+	  <None Remove="Webserver\Fluid\Scores.liquid" />
+	  <None Remove="Webserver\Fluid\Settings.liquid" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -72,6 +83,8 @@
     <PackageReference Include="DeepCopy" Version="1.0.3" />
     <PackageReference Include="Fleck" Version="1.2.0" />
     <PackageReference Include="Fluid.Core" Version="2.5.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OsuMemoryDataProvider" Version="0.10.0" />
     <PackageReference Include="OsuParsers" Version="1.7.1" />
