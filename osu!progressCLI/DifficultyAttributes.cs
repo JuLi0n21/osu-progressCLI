@@ -1,4 +1,5 @@
-﻿using osu1progressbar.Game.Database;
+﻿using osu_progressCLI.Datatypes;
+using osu1progressbar.Game.Database;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -267,9 +268,9 @@ namespace osu_progressCLI
             Logger.Log(Logger.Severity.Info, Logger.Framework.Calculator, $"Starting OsuMissAnalyzer for scoreid: {id}");
             DatabaseController database = new DatabaseController();
 
-            Dictionary<string, object> score = database.GetScore(id);
+            Score score = database.GetScore(id);
 
-            string command = $"OsuMissAnalyzer.exe \"{Credentials.Instance.GetConfig().osufolder}\\Data\\r\\{score["Replay"]}\" \"{Credentials.Instance.GetConfig().songfolder}\\{score["Foldername"]}\"";
+            string command = $"OsuMissAnalyzer.exe \"{Credentials.Instance.GetConfig().osufolder}\\Data\\r\\{score.Replay}\" \"{Credentials.Instance.GetConfig().songfolder}\\{score.FolderName}\"";
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"MissAnalyzer Command: {command}");
             Task.Run(() =>
             {
