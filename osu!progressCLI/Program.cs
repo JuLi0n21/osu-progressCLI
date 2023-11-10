@@ -19,7 +19,7 @@ class Program
             }
         }
 
-        //Task.Run(() =>  ScoreImporter.ImportScores("imports/shit.csv"));
+        Task.Run(() =>  ScoreImporter.Instance.ImportScores("imports/shit.csv"));
 
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
@@ -32,17 +32,6 @@ class Program
 
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
-
-        /*
-        Task listenTask = Task.Run(async () =>
-        {
-            while (true)
-            {
-                await Webserver.Instance().listen();
-            }
-        });
-        await listenTask;
-        */
 
         await Webserver.Instance().start();
 

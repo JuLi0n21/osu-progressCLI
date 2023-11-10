@@ -14,6 +14,7 @@ namespace osu_progressCLI
         List<ImportScore> alreadyimportedscores;
         private string DEFAULTFILEPATH = "imports/Alreadyimportedscores.csv";
         private readonly object objectlock = new object();
+        private dumbobject status = new();
 
         private ScoreImporter()
         {
@@ -71,7 +72,7 @@ namespace osu_progressCLI
             {
                 var records = csv.GetRecords<ImportScore>();
                 alreadyimportedscores = records.ToList();
-                Console.WriteLine(alreadyimportedscores.Count);
+                status.Finishedimports = alreadyimportedscores.Count;
             }
 
             return alreadyimportedscores;
@@ -122,7 +123,7 @@ namespace osu_progressCLI
                     }
                 }
                 Logger.Log(Logger.Severity.Debug, Logger.Framework.Scoreimporter, $"Scores to Import {filteredscores.Count()}");
-
+                status.ToImportScores = filteredscores.Count;
                 WriteScore(filepath, filteredscores);
             }
             catch (Exception ex)
@@ -146,9 +147,9 @@ namespace osu_progressCLI
                 try
                 {
                     scores = csv.GetRecords<ImportScore>().ToList();
+                    status.ToImportScores = scores.Count;
 
                     List<ImportScore> Filterdscores = new List<ImportScore>();
-
                     ScoreComparer comparer = new ScoreComparer();
                     List<ImportScore> filteredScores = scores.Where(score =>
                     {
@@ -156,8 +157,8 @@ namespace osu_progressCLI
                         return !matchFound;
                     }).ToList();
 
-                    Console.WriteLine("Potential Beatmaps to Download: " + filteredScores.Count + "/" + scores.Count);
-
+                    Console.WriteLine("Potential Beatmaps to Download: " + filteredScores.Count + "/" + status.ToImportScores);
+                    status.running = true;
                     int count = 0;
 
                     var tasks = new List<Task>();
@@ -171,7 +172,7 @@ namespace osu_progressCLI
                                 await DatabaseController.ImportScore(item);
                                 await TrackImportedScore(item);
                                 alreadyimportedscores.Add(item);
-                                //Task.Run(async () => await Webserver.Instance().SendData("ScoreCount", alreadyimportedscores.Count));
+                                status.Finishedimports = alreadyimportedscores.Count;
                                 Interlocked.Increment(ref count);
                             }
                             catch (Exception ex)
@@ -187,7 +188,7 @@ namespace osu_progressCLI
                     }
 
                     await Task.WhenAll(tasks);
-
+                    status.running = false;
                     Console.WriteLine($"Scores Successfully imported! ({count} Skipped:{alreadyimportedscores.Count()}) in {stopwatch.Elapsed.Hours}:{stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}");
 
                     return true;
@@ -201,6 +202,19 @@ namespace osu_progressCLI
             }
             return true;
         }
+
+        public dumbobject GetStatus()
+        {
+            return status;
+        }
+    }
+
+    public class dumbobject
+    {
+        public bool running { get; set; }
+        public int Finishedimports { get; set; }
+
+        public int ToImportScores { get; set; }
     }
 
     public class ImportScore
