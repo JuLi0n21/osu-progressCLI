@@ -4,6 +4,11 @@ using osu_progressCLI.Datatypes;
 using System.Net;
 using System.Web;
 using WebSocketSharp;
+using System.Collections.Specialized;
+using CsvHelper.Configuration;
+using System.Runtime.ConstrainedExecution;
+using System.Data.Entity.Migrations.Design;
+using OsuMemoryDataProvider.OsuMemoryModels.Direct;
 
 namespace osu_progressCLI.Webserver.Server
 {
@@ -19,29 +24,38 @@ namespace osu_progressCLI.Webserver.Server
         public async void Route(HttpListenerRequest request, HttpListenerResponse response, FluidParser parser)
         {
 
+            //parsing parameters
             string path = request.Url.AbsolutePath;
 
             var queryparams = HttpUtility.ParseQueryString(request.Url.Query);
 
-            if (path == "/api/dogfood")
+            string requestData;
+            using (Stream bodystream = request.InputStream)
+            using (StreamReader reader = new StreamReader(bodystream))
             {
-                
-                
+                requestData = reader.ReadToEnd();
             }
-            else if (path == "/api/beatmaps" && request.HttpMethod == "GET")
+            NameValueCollection PostData = HttpUtility.ParseQueryString(requestData);
+
+            foreach (string key in PostData.AllKeys)
             {
-                DateTime to = DateTime.Now;
-                DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
+                string value = PostData[key];
+                Console.WriteLine($"Key: {key}, Value: {value}");
+            }
 
-                if (queryparams["from"] != null && queryparams["to"] != null)
-                {
-                    if (!DateTime.TryParse(queryparams["to"].ToString(), out to) || !DateTime.TryParse(queryparams["from"].ToString(), out from))
-                    {
-                        Webserver.Instance().WriteResponse(response, "Something went wrong check parameters from and to", "text/plain");
-                        return;
-                    }
-                }
+            DateTime to = DateTime.Now;
+            DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
+            if (queryparams["from"] != null && queryparams["to"] != null)
+            {
+                if (!DateTime.TryParse(queryparams["to"].ToString(), out to) || !DateTime.TryParse(queryparams["from"].ToString(), out from));
+
+            }
+
+            //routing
+            if (path == "/api/beatmaps" && request.HttpMethod == "GET")
+            {
+                
                 List<Score> scores = controller.GetScoresInTimeSpan(from, to);
                 var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scores.liquid"));
 
@@ -51,30 +65,6 @@ namespace osu_progressCLI.Webserver.Server
             }
             else if (path == "/api/beatmaps/search" && request.HttpMethod == "GET")
             {
-
-                using (Stream body = request.InputStream)
-                {
-                    using (StreamReader reader = new StreamReader(body, request.ContentEncoding))
-                    {
-                        string bodyData = reader.ReadToEnd();
-                        Console.WriteLine("Received data: " + bodyData);
-                    }
-                }
-
-
-                DateTime to = DateTime.Now;
-                DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
-
-                Console.WriteLine(queryparams["query"]);
-
-                if (!queryparams["from"].IsNullOrEmpty() && !queryparams["to"].IsNullOrEmpty())
-                {
-                    if (!DateTime.TryParse(queryparams["to"].ToString(), out to) || !DateTime.TryParse(queryparams["from"].ToString(), out from))
-                    {
-                        Webserver.Instance().WriteResponse(response, "Something went wrong check parameters from and to", "text/plain");
-                        return;
-                    }
-                }
 
                 List<Score> scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()));
                 var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scores.liquid"));
@@ -109,6 +99,30 @@ namespace osu_progressCLI.Webserver.Server
             }
             else if (path == "/api/save" && request.HttpMethod == "POST")
             {
+                try
+                {
+                    Credentials.Instance.UpdateConfig(
+                        osufolder: PostData["osufolder"],
+                        songfolder: PostData["songfolder"],
+                        localconfig: PostData["localconfig"],
+                        username: PostData["username"],
+                        userid: PostData["userid"],
+                        rank: PostData["rank"],
+                        countryrank: PostData["countryrank"],
+                        country: PostData["country"],
+                        countrycode: PostData["countrycode"],
+                        avatar_url: PostData["avatarurl"],
+                        cover_url: PostData["coverurl"],
+                        port: PostData["port"],
+                        mode: PostData["mode"]
+                    );
+                }
+                catch { 
+                    Webserver.Instance().WriteResponse(response, "<span class=\"text-red-500 hide-me\">Something Went Wrong!</span>", "text/html");
+                    return;
+                }
+
+                Webserver.Instance().WriteResponse(response, "<span class=\"text-green-600 hide-me\">Settings Updated!</span>", "text/html");
 
             }
             else if (path == "/api/run" && request.HttpMethod == "POST")

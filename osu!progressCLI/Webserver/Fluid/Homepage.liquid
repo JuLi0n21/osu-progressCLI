@@ -100,12 +100,14 @@
                       class="mb-4 flex justify-center">
                 
                     <div class="flex justify-center rounded-lg">
-                        <input type="text" id="searchInput" name="query" placeholder="Search for stuff" class="text--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500 w-1/2 rounded-lg mx-auto border block" onkeydown="if (event.key === 'Enter') event.preventDefault();">
+                        <input type="text" id="searchInput" name="query" placeholder="Search for stuff" title="Suported terms pp, sr, ar, hp, od, pp, fcpp ... and conditions -> fcpp > 300" 
+                            class="text--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500 w-1/2 rounded-lg mx-auto border block" 
+                            onkeydown="if (event.key === 'Enter') event.preventDefault();">
 
-                        <input type="date" id="fromDate" name="from" class="text--yellow w-1/5 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
+                        <input type="date" id="fromDate" name="from" class="text--yellow w-1/6 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
 
                         <label for="toDate">-</label>
-                        <input type="date" id="toDate" name="to" class="text--yellow w-1/5 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
+                        <input type="date" id="toDate" name="to" class="text--yellow w-1/6 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
                     </div>
 
                 </form>
