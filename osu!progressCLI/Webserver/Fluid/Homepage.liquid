@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>osu!progress</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+    <title>osu!progress</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.11.0/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+    </style>
+</head>
+<body>
+
+
+    <!-- Reload button -->
+    <div class="fixed top-10 right-20 z-40">
+        <button id="loadDataButton" class="text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 backdrop--light">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Refresh_font_awesome.svg" alt="Refresh" style="width: 24px; height: 24px; filter: invert(100%);" />
+        </button>
+    </div>
+
+   {% include 'Settings.liquid' %}
+
+    <!-- Recap -->
+    <!-- Live Status-->
+    <div id="status-bar" class="z-10 sticky top-0 w-full h-20 backdrop--medium text-white text-center p-2 hidden">
+        <span id="status-text"></span>
+        <div id="audio-bar">
+            <div id="audio-time"></div>
+            <div id="audio-text"></div>
+
+        </div>
+
+    </div>
+    <!-- Main page-->
+    <div class="flex justify-center items-center">
+
+        <div class="content w-1/2 rounded-lg backdrop--medium--dark text-white">
+
+            <!-- header -->
+            <div id="header" class="backdrop--medium justify-center items-center flex p-4 m-2">
+                <h1>Play History</h1>
+            </div>
+
+            <div class="backdrop--light">
+                <div style="background-size: cover; background-position: center center;background-image: url(&quot; {{ config.cover_url }} &quot;); height: 250px">
+
+                </div>
+
+                <div class="flex">
+                    <div class="ml-60 text-left pt-6 pb-6">
+                        <p class="usernameplaceholder">{{ config.username }} </p>
+                        <p class="rankplaceholder">#{{ config.rank }} (# {{ config.country_rank }})</p>
+                        <p class="countryplaceholder">  <span class="fi fi-{{ config.country_code }}"></span>{{ config.country }}</p>
+                    </div>
+
+                    <div class="ml-60 text-left pt-6 pb-6">
+                        <p class="WastedTime">
+                            ⏰ {{ thisweek }}H
+                            {% if thisweek < 2400 %}
+                            ({{ lastweek }}%)
+                            {% endif %}
+                            [{{ week.Status }}]
+                        </p>
+
+                        <p class="mostplayedscreen">💻 {{ week.Screen }}</p>
+                    </div>
+                </div>
+
+                <div style="position: relative;" class="mb-7"
+                    <a href="https://osu.ppy.sh/users/{{ config.userid }}" class=" hover:border-yellow-500  hover:border" target="_blank" rel="noopener noreferrer">
+                        <img src="{{ config.avatar_url }}" style="position: absolute; top: -150px; left: 60px; right: 0; height:120px; width:120px" class="rounded-lg" />
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Recent Scores -->
+            <div class="rounded-t-lg justify-center backdrop--medium pb-4">
+
+               <div class="flex justify-center">
+                <h1 class="m-4">Recent Scores</h1>
+               </div>
+
+                <form hx-get="/api/beatmaps/search"
+                      hx-trigger="input delay:500ms" 
+                      hx-target="#scorecontainer" 
+                      hx-swap="innerHTML" 
+                      hx-indicator="#loading"
+                      class="mb-4 flex justify-center">
+                
+                    <div class="flex justify-center rounded-lg">
+                        <input type="text" id="searchInput" name="query" placeholder="Search for stuff" class="text--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500 w-1/2 rounded-lg mx-auto border block" onkeydown="if (event.key === 'Enter') event.preventDefault();">
+
+                        <input type="date" id="fromDate" name="from" class="text--yellow w-1/5 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
+
+                        <label for="toDate">-</label>
+                        <input type="date" id="toDate" name="to" class="text--yellow w-1/5 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div id="scorecontainer" class="flex-col overflow-y-scroll backdrop--medium page-width max-h-96  min-h-96"
+                 hx-get="/api/beatmaps"
+                 hx-trigger="load delay:1s"
+                 hx-swap="innerHTML"
+                 hx-poll="10s">
+                Loading scores...
+            </div>
+
+
+            <div id="chart1" class="flex backdrop--medium mt-4 mb-3" style="height: 500px">
+                <div class="w-1/2 rounded-l-lg backdrop--light flex-col justify-center items-center flex mt-4 m-2">
+                    <h2>BanchoTime</h2>
+                    <canvas id="BanchoTimeChart" height="440" width="450"></canvas>
+                </div>
+                <div class="w-1/2 rounded-r-lg backdrop--light flex-col justify-center items-center flex mt-4 m-2">
+                    <h2>TimeWasted</h2>
+                    <canvas id="TimeWastedChart" height="440" width="450"></canvas>
+                </div>
+            </div>
+
+            <div id="chart2" class="border-b rounded-lg backdrop--light mb-4 p-4">
+                <div class="flex-col justify-center items-center flex">
+                    <h1>Difficulties</h1>
+                </div>
+                <div style="height: 460px">
+                    <canvas id="averageschart"></canvas>
+                </div>
+
+            </div>
+
+            <div id="chart3" class="flex backdrop--medium" style="height: 280px">
+                <div class="w-1/2 rounded-l-lg backdrop--light flex-col justify-center items-center flex m-4">
+                    <h2>BanchoTime</h2>
+                    <canvas id="pieBanchoTimeChart" height="250" width="450"></canvas>
+                </div>
+                <div class="w-1/2 rounded-r-lg backdrop--light flex-col justify-center items-center flex m-4">
+                    <h2>TimeWasted</h2>
+                    <canvas id="pieTimeWastedChart" height="250" width="450"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
+    <script>
+        flatpickr("#fromDate");
+         flatpickr("#toDate", {
+            defaultDate: "today",
+            dateFormat: "Y-m-d",
+        });
+        document.getElementById('toDate').valueAsDate = new Date();
+    </script>
+    <script src="recentscores.js"></script>
+    <script src="configmenu.js"></script>
+    <script src="difficulities.js"></script>
+    <script src="savebutton.js"></script>
+    <script src="scoreexample.js"></script>
+    <script src="searchbar.js"></script>
+    <script src="timespend.js"></script>
+    <script src="timespendtotal.js"></script>
+    <script src="websocket.js"></script>
+    <script src="onload.js"></script>
+</body>
+</html>
