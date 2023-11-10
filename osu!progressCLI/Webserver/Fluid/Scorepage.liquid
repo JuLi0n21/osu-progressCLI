@@ -1,0 +1,389 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <title>Osu! Beatmap Viewer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.11.0/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body id="scorebody">
+    <div class="fixed top-0 left-0">
+        <a href="/">
+            <button id="loadDataButton"
+                class="text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 score-backdrop--medium--light">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/Home-icon.svg" alt="home"
+                    style="width: 24px; height: 24px; filter: invert(100%)" />
+            </button>
+        </a>
+    </div>
+
+    <div class="flex justify-center items-center">
+        <div class="content w-1/2 rounded-lg score-backdrop--medium--light text-white">
+            <div id="beatmapData">
+                <!-- Beatmap data will be displayed here -->
+
+                <p class="relative top-6 left-4">{{ Score.Status }}</p>
+                <div class="flex justify-center ml-4 mb-4 mr-4 text-xl">
+
+                    <h2>{{ score.OsuFilename }}</h2>
+
+                </div>
+
+                <div>
+                    <div id="image-container" style="min-height: 280px; min-width: 1000px; position: relative;">
+                        <img class="absolute top-0 left-0 w-40" src="{{ score.Grade }}.png" alt="{{ score.Grade }}">
+                        <a href="https://osu.ppy.sh/users/{{ data.Creator }}"
+                            class="absolute bottom-10 right-0 score-backdrop--dark rounded-lg m-3 p-1 text--pink hover:text-white">
+                            {{ data.Version }} by {{ score.Creator }}</a>
+                        <p class="absolute bottom-0 right-0 score-backdrop--dark rounded-lg m-3 p-1">
+                            {{ data.Username }} at {{ score.Date }}</p>
+                        <div class="relative">
+                            <button id="playButton"
+                                class="absolute left-2 top-52 score-backdrop--dark text--pink hover:text-white">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <audio id="audioPlayer">
+                                <source src="https:{{ score.Preview }}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+
+                        </div>
+
+                        <div class="relative">
+                            <div class="abs-div" id="absDiv"></div>
+
+
+                        </div>
+
+                        <div>
+                            <a href="https://osu.ppy.sh/beatmapsets/{{ score.BeatmapSetId }}#{{ score.Mode }}/{{ score.BeatmapId }}"
+                                target="_blank">
+                                <img src="{{ score.CoverList }}"
+                                    style="min-height: 280px; min-width: 1000px; max-height: 280px; object-fit: cover">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="flex justify-evenly h-64 text-base">
+                    <div class="flex flex-col justify-evenly">
+                        <div class="m-8">
+
+
+                            <div class="flex justify-evenly">
+                                <div class="flex-col mb-4 flex-1">
+                                    <div
+                                        class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                        ★
+                                    </div>
+                                    <div class="flex justify-evenly">
+                                        <p>{{ score.SR }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex-col flex-1">
+                                    <div
+                                        class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                        AR
+                                    </div>
+                                    <div class="flex justify-evenly">
+                                        <p>{{ score.Ar }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex-col flex-1">
+                                    <div
+                                        class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                        CS
+                                    </div>
+                                    <div class="flex justify-evenly">
+                                        <p>{{ score.Cs }}</p>
+                                    </div>
+
+                                </div>
+                                <div class="flex-col flex-1">
+                                    <div
+                                        class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                        HP
+                                    </div>
+                                    <div class="flex justify-evenly">
+                                        <p>{{ score.Hp }}</p>
+                                    </div>
+
+                                </div>
+                                <div class="flex-col flex-1">
+                                    <div
+                                        class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                        OD
+                                    </div>
+                                    <div class="flex justify-evenly">
+                                        <p>{{ score.Od }}</p>
+                                    </div>
+
+                                </div>
+                                <div class="flex-col flex-1">
+                                    <div
+                                        class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                        BPM
+                                    </div>
+                                    <div class="flex justify-evenly">
+                                        <p>{{ score.Bpm }}</p>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <a href="https://osu.ppy.sh/users/{{ player.id }}" class="relative">
+                                <div class="h-28 bg-cover rounded-lg relative"
+                                    style="background-image: url({{ player.cover_url }})">
+                                    <div class="absolute inset-0 bg-black opacity-50 rounded-lg">
+                                  
+
+                                    <img src="{{ player.avatar_url }}" class="h-16 absolute rounded-lg top-2 left-2">
+                                </div>
+                                <div class=" absolute rounded-lg top-2 left-24">
+                                    <span class="fi fi-{{ player.country.code | downcase }}"></span>
+                                </div>
+                                <div class=" absolute rounded-lg top-2 left-32 text--pink">
+                                    {% if player.support_level == "1" %}
+                                    <i class="fas fa-heart"></i>
+                                    {% elsif player.support_level == "2" %}
+                                    <i class="fas fa-heart"></i>
+                                    <i class="fas fa-heart"></i>
+                                    {% elsif player.support_level == "3" %}
+                                    <i class="fas fa-heart"></i>
+                                    <i class="fas fa-heart"></i>
+                                    <i class="fas fa-heart"></i>
+                                    {% endif %}
+
+                                </div>
+                                <div class=" absolute rounded-lg top-10 left-24">{{ player.username }} </div>
+                                {% if player.is_active == "True" %} 
+                                     <div class="absolute rounded-lg top-20 left-6">
+                                          <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+              
+                                           <circle cx="15" cy="15" r="13" fill="transparent" stroke="white" stroke-width="1"/>
+                                           <circle cx="15" cy="15" r="8" fill="transparent" stroke="white" stroke-width="1"/>
+                                           <circle cx="15" cy="15" r="10" fill="transparent" stroke="green" stroke-width="4" />
+                                        </svg> 
+                                    </div>
+                                {% assign status = "Online" %}
+                                {% else %}
+                                     <div class="absolute rounded-lg top-20 left-6">
+                               <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+                   
+                               <circle cx="15" cy="15" r="13" fill="transparent" stroke="white" stroke-width="1"/>
+                               <circle cx="15" cy="15" r="8" fill="transparent" stroke="white" stroke-width="1"/>
+                               <circle cx="15" cy="15" r="10" fill="transparent" stroke="black" stroke-width="4" />
+
+                                </svg>
+                                    </div>
+                                {% assign status = "Offline" %}
+                                {% endif %}
+
+                                <div class=" absolute rounded-lg top-20 left-24">{{ status }}</div>
+                                  </div>
+                            </a>
+
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-evenly w-2/5">
+                        <div class="w-92 m-8">
+                            <div class="flex justify-evenly"></div>
+                            <div class="flex-col">
+                                <div class="flex justify-evenly">
+                                    <!-- Accuracy Section -->
+                                    <div class="flex-col mb-4">
+                                        <div
+                                            class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                            ACCURACY
+                                        </div>
+                                        <div class="flex justify-evenly">
+                                            <p class="text--yellow">{{ score.Acc }}%</p>
+                                        </div>
+                                    </div>
+                                    <!-- Max Combo Section -->
+                                    <div class="flex-col flex-1">
+                                        <div
+                                            class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                            MAXCOMBO
+                                        </div>
+                                        <div class="flex justify-evenly">
+                                            <p>{{ score.Combo }} ({{ score.MaxCombo }})</p>
+                                        </div>
+                                    </div>
+                                    <!-- Playtime Section -->
+                                    <div class="flex-col flex-1">
+                                        <div
+                                            class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                            Playtime
+                                        </div>
+                                        <div class="flex justify-evenly">
+                                            {{ score.Time }}s <p class="text--gray"> ({{ score.PlayType }}) </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex-col">
+                                <div class="flex justify-evenly">
+                                    <!-- Accuracy Section -->
+                                    <div class="flex-col mb-4">
+                                        <div
+                                            class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                            PP
+                                        </div>
+                                        <div class="flex justify-evenly">
+                                            <p class="text--pink"> {{ score.PP }}</p>
+                                        </div>
+                                    </div>
+                                      <!-- Accuracy Section -->
+                                  <div class="flex-col mb-4">
+                                      <div
+                                          class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                          ACC
+                                      </div>
+                                      <div class="flex justify-evenly">
+                                          <p class="">{{ score.ACCURACYATT }}</p>
+                                      </div>
+                                  </div>
+                                                                      <!-- Accuracy Section -->
+                                  <div class="flex-col mb-4">
+                                      <div
+                                          class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                          SPEED
+                                      </div>
+                                      <div class="flex justify-evenly">
+                                          <p class=""> {{ score.SPEED }}</p>
+                                      </div>
+                                  </div>
+                                    <!-- Max Combo Section -->
+                                    <div class="flex-col flex-1">
+                                        <div
+                                            class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                            AIM
+                                        </div>
+                                        <div class="flex justify-evenly">
+                                            <p> {{ score.AIM }}</p>
+                                        </div>
+                                    </div>
+                                    <!-- Playtime Section -->
+                                    <div class="flex-col flex-1">
+                                        <div
+                                            class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                            FC
+                                        </div>
+                                        <div class="flex justify-evenly">
+                                            <p class="text--pink--dark">  {{ score.FCPP }} </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                          <!-- New Rows (300, 100, 50, MISS) -->
+                        <div class="flex">
+                            <div class="flex-col flex-1">
+                                <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                    300
+                                </div>
+                                <div class="flex justify-evenly">
+                                    <pre class="text-blue-500">{{ score.Hit300 }}</pre>
+                                </div>
+                            </div>
+                            <div class="flex-col flex-1">
+                                <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                    100
+                                </div>
+                                <div class="flex justify-evenly">
+                                    <pre class="text-green-500">{{ score.Hit100 }}</pre>
+                                </div>
+                            </div>
+                            <div class="flex-col flex-1">
+                                <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
+                                    50
+                                </div>
+                                <div class="flex justify-evenly">
+                                    <p class="text--orange">{{ score.Hit50 }}</p>
+                                </div>
+                            </div>
+                            <div class="flex-col flex-1">
+                                <div class="flex justify-evenly rounded-full score-backdrop--dark text-white">
+                                    MISS
+                                </div>
+                               {% if score.Replay != null and score.Replay != "" %}
+                                    <div class="flex justify-evenly">
+                                 <button id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600 hover:text-white">{{ score.HitMiss }}↩</pre> </button>
+                                 <a href="{{ score.Replay }}" target="_blank" title="Download Replay"><span class="fa fa-fw"><span class="fas fa-download"></span></span></a>
+                                 </div>
+                                {% else %}
+                                <div class="flex justify-evenly">
+                                 <button id="">  <pre title="No Replay Saved!" class="text-red-600">{{ score.HitMiss }}⚠️</pre> </button>
+                                 </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="flex flex-col score-backdrop--dark">
+                    <div class="flex justify-center score-backdrop--dark mt-4 mb-4">
+                        <h2>Map Progression</h2>
+                    </div>
+
+                    <canvas id="mapprogress"></canvas>
+                </div>
+
+                    <form hx-get="/api/beatmaps/search"
+                      hx-trigger="every 5s" 
+                      hx-target="#scorecontainer" 
+                      hx-swap="innerHTML" 
+                      class="mb-4 flex justify-center">
+    
+                    <div class="flex justify-center rounded-lg">
+                        <input type="text" id="searchInput" name="query" placeholder="Search for stuff" title="Suported terms pp, sr, ar, hp, od, pp, fcpp ... and conditions -> fcpp > 300" 
+                            class="text--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500 w-1/2 rounded-lg mx-auto border block" 
+                            onkeydown="if (event.key === 'Enter') event.preventDefault();">
+
+                        <input type="date" id="fromDate" name="from" class="text--yellow w-1/6 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
+
+                        <label for="toDate">-</label>
+                        <input type="date" id="toDate" name="to" class="text--yellow w-1/6 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
+                        <input type="text" class="hidden" name="Beatmapid" value="{{ score.BeatmapId }}">
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div id="scorecontainer" class="flex-col overflow-y-scroll backdrop--medium page-width"
+                Loading scores...
+            </div>
+            </div>
+        </div>
+     <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
+ <script>
+      flatpickr("#fromDate");
+      flatpickr("#toDate", {
+         defaultDate: "today",
+         dateFormat: "Y-m-d",
+     });
+     document.getElementById('toDate').valueAsDate = new Date();
+ </script>
+</body>
+
+</html>
