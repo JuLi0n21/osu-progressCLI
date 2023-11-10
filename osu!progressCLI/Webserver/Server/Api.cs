@@ -52,6 +52,11 @@ namespace osu_progressCLI.Webserver.Server
 
             }
 
+            if (!queryparams["Beatmapid"].IsNullOrEmpty()) {
+                queryparams["query"] += $" BeatmapId=={queryparams["Beatmapid"]}";
+                Console.WriteLine(queryparams["query"]);
+            }
+
             //routing
             if (path == "/api/beatmaps" && request.HttpMethod == "GET")
             {
@@ -67,6 +72,7 @@ namespace osu_progressCLI.Webserver.Server
             {
 
                 List<Score> scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()));
+                Console.WriteLine(scores.Count);
                 var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scores.liquid"));
 
                 var context = new TemplateContext(scores);
@@ -75,27 +81,27 @@ namespace osu_progressCLI.Webserver.Server
             }
             else if (path == "/api/beatmaps/averages" && request.HttpMethod == "GET")
             {
-
-            }
-            else if (path == "/api/beatmaps/scores" && request.HttpMethod == "GET")
-            {
-
-            }
-            else if (path == "/api/beatmaps/search" && request.HttpMethod == "GET")
-            {
-
+                Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreAveragesbyDay(from, to)), "application/json");
             }
             else if (path == "/api/banchotime" && request.HttpMethod == "GET")
             {
-                //optional arguement for "bancho time by day"
+                Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTime(from, to)), "application/json");
+            }
+            else if (path == "/api/banchotimebyday" && request.HttpMethod == "GET")
+            {
+                Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTimebyDay(from, to)), "application/json");
             }
             else if (path == "/api/timewasted" && request.HttpMethod == "GET")
             {
-                //optional arguement for "time wasted by day"
+                Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWasted(from, to)), "application/json");
+            }
+            else if (path == "/api/timewastedbyday" && request.HttpMethod == "GET")
+            {
+                Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWastedByDay(from, to)), "application/json");
             }
             else if (path == "/api/user" && request.HttpMethod == "GET")
             {
-
+                Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize( await ApiController.Instance.getuser(queryparams["userid"], queryparams["mode"])), "application/json");
             }
             else if (path == "/api/save" && request.HttpMethod == "POST")
             {
