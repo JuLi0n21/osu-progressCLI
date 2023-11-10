@@ -18,11 +18,7 @@ namespace osu_progressCLI.Webserver.Server
               
             if(path == "/")
             {
-                Console.WriteLine(path);
-                if (!parser.TryParse(await File.ReadAllTextAsync(Webserver.DEFAULT_FLUID + "Homepage.liquid"), out var template, out var error)) 
-                {
-                    throw new InvalidOperationException($"Failed to parse template: {error}", new FileNotFoundException("The specified template file was not found or could not be read."));
-                }
+                var template = FluidRenderer.templates.Find(item => item.Key.Equals("Homepage.liquid"));
 
                 await ApiController.Instance.getuser(Credentials.Instance.GetConfig().userid, Credentials.Instance.GetConfig().mode);
                 WeekCompare week = controller.GetWeekCompare();
@@ -37,8 +33,9 @@ namespace osu_progressCLI.Webserver.Server
                 context.SetValue("config", Credentials.Instance.GetConfig());
                 context.SetValue( "List", controller.GetScoresInTimeSpan(DateTime.Now.AddDays(-100), DateTime.Now));
 
-                Webserver.Instance().WriteResponse(response, template.Render(context), "text/html");
+                Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
             }
+
             response.StatusCode = 404;
             response.OutputStream.Close();
             return;
