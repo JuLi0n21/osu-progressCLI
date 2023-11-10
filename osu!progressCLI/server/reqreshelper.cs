@@ -253,7 +253,7 @@ namespace osu_progressCLI.server
 
         private string GetBeatmapData(DateTime from, DateTime to)
         {
-           return System.Text.Json.JsonSerializer.Serialize(controller.GetScoresInTimeSpan(from, to));
+            return System.Text.Json.JsonSerializer.Serialize(controller.GetScoresInTimeSpan(from, to));
         }
 
         private string GetBanchoTime(DateTime from, DateTime to)
@@ -273,7 +273,7 @@ namespace osu_progressCLI.server
 
         private string GetScore(int id)
         {
-           return System.Text.Json.JsonSerializer.Serialize(controller.GetScore(id));
+            return System.Text.Json.JsonSerializer.Serialize(controller.GetScore(id));
         }
 
         public void serveimage(HttpListenerRequest request, HttpListenerResponse response, string filepath)

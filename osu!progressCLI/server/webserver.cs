@@ -296,10 +296,5 @@ namespace osu_progressCLI.server
         {
             listener.Stop();
         }
-
-        ~Webserver()
-        {
-            listener.Stop();
-        }
     }
 }
