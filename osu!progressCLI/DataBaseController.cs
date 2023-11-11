@@ -2,6 +2,8 @@
 using osu_progressCLI;
 using osu_progressCLI.Datatypes;
 using OsuMemoryDataProvider.OsuMemoryModels;
+using OsuParsers.Beatmaps.Objects;
+using System;
 using System.Data.SQLite;
 using System.Text;
 
@@ -99,7 +101,8 @@ namespace osu1progressbar.Game.Database
                     SPEED REAL,
                     ACCURACYATT REAL,
                     Grade TEXT,
-                    FCPP REAL
+                    FCPP REAL,
+                    CONSTRAINT duplicate_score UNIQUE (Beatmapid, Date, Score)
                 );
             ";
 
@@ -573,7 +576,7 @@ namespace osu1progressbar.Game.Database
 
 
                     string insertQuery = @"
-                        INSERT INTO ScoreData (
+                        INSERT OR IGNORE INTO ScoreData (
                                 Date,
                                 BeatmapSetid,
                                 Beatmapid,
