@@ -138,8 +138,25 @@ namespace osu_progressCLI.Webserver.Server
             }
             else if (path == "/api/upload" && request.HttpMethod == "POST")
             {
-                DifficultyAttributes.Startshell("start explorer.exe imports");
-                Webserver.Instance().WriteResponse(response, $"<span>{ScoreImporter.Instance.GetStatus().running} {ScoreImporter.Instance.GetStatus().Finishedimports}/{ScoreImporter.Instance.GetStatus().ToImportScores}  </span>", "text/html");
+                bool allAreFalse = ScoreImporter.Instance.GetotherStatus().All(obj => obj.running == false);
+
+                if (allAreFalse)
+                {
+                    Webserver.Instance().WriteResponse(response, "<span> All Scores Imported </span>", "text/html");
+                }
+                else
+                {
+                    string output = $"<div class=\"flex flex-col justify-center\"><span>{ScoreImporter.Instance.GetStatus().running} {ScoreImporter.Instance.GetStatus().Finishedimports}/{ScoreImporter.Instance.GetStatus().ToImportScores}  </span>";
+                    foreach (seconddumbobject list in ScoreImporter.Instance.GetotherStatus())
+                    {
+                        output += $"<span>{list.running} {list.index + 1}/{list.scorecount}</span>";
+                    }
+                    output += "</div>";
+                    //DifficultyAttributes.Startshell("start explorer.exe imports");
+                    //Webserver.Instance().WriteResponse(response, $"<span>{ScoreImporter.Instance.GetStatus().running} {ScoreImporter.Instance.GetStatus().Finishedimports}/{ScoreImporter.Instance.GetStatus().ToImportScores}  </span> " + $"<span>{ScoreImporter.Instance.GetotherStatus().running} {ScoreImporter.Instance.GetotherStatus().index}/{ScoreImporter.Instance.GetotherStatus().scorecount} | {ScoreImporter.Instance.GetotherStatus().currentscoredb}/{ScoreImporter.Instance.GetotherStatus().dbocount} </span>", "text/html");
+                    Webserver.Instance().WriteResponse(response, output, "text/html");
+                }
+              
             }
 
             response.StatusCode = 404;
