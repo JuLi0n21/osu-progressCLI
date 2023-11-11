@@ -3,6 +3,8 @@ using CsvHelper.Configuration;
 using osu1progressbar.Game.Database;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
+using System.Text.Json;
 
 namespace osu_progressCLI
 {
@@ -15,6 +17,8 @@ namespace osu_progressCLI
         private string DEFAULTFILEPATH = "imports/Alreadyimportedscores.csv";
         private readonly object objectlock = new object();
         private dumbobject status = new();
+        private static List<seconddumbobject> otherstatus = new();
+        private static readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
         private ScoreImporter()
         {
@@ -147,7 +151,6 @@ namespace osu_progressCLI
                 try
                 {
                     scores = csv.GetRecords<ImportScore>().ToList();
-                    status.ToImportScores = scores.Count;
 
                     List<ImportScore> Filterdscores = new List<ImportScore>();
                     ScoreComparer comparer = new ScoreComparer();
@@ -203,17 +206,145 @@ namespace osu_progressCLI
             return true;
         }
 
-        public dumbobject GetStatus()
+        public async void ImportScores()
+        {
+
+            startup();
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, "Starting Score beatmap pair finding" + DateTime.Now);
+            if (File.Exists("databases/osu!.db"))
+            {
+                OsuParsers.Database.OsuDatabase osudb = OsuParsers.Decoders.DatabaseDecoder.DecodeOsu("databases/osu!.db");
+
+
+                string[] scores = Directory.GetFiles("databases");
+
+                List<Task> tasks = new List<Task>();
+
+                List<OsuParsers.Database.ScoresDatabase> scoresDatabases = new();
+
+                foreach (var item in scores)
+                {
+                    if (Path.GetFileName(item).StartsWith("scores.db"))
+                    {
+                        scoresDatabases.Add(OsuParsers.Decoders.DatabaseDecoder.DecodeScores(item));
+                    }
+                }
+
+                if (otherstatus.Count == 0)
+                {
+                    for (int k = 0; k < scoresDatabases.Count; k++)
+                    {
+                        otherstatus.Add(new seconddumbobject()
+                        {
+                            index = 0,
+                            currentscoredb = k,
+                            scorecount = scoresDatabases.ElementAt(k).Scores.Count,
+                            running = false
+                        });
+                    }
+                }
+
+                for (int i = 0; i < scoresDatabases.Count; i++)
+                {
+                    var scoreDatabase = scoresDatabases[i];
+
+                    int currentIndex = i; // Capture the current value of i
+
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        otherstatus.ElementAt(currentIndex).running = true;
+                        for (int j = otherstatus.ElementAt(currentIndex).index; j < scoreDatabase.Scores.Count; j++)
+                        {
+                            int currentScoreIndex = j; // Capture the current value of j
+
+                            otherstatus.ElementAt(currentIndex).index = currentScoreIndex;
+
+                            var beatmapMD5Hash = scoreDatabase.Scores[currentScoreIndex].Item2.FirstOrDefault()?.BeatmapMD5Hash;
+
+                            if (beatmapMD5Hash != null)
+                            {
+                                var matchedBeatmap = osudb.Beatmaps.FirstOrDefault(beatmap => beatmap.MD5Hash == beatmapMD5Hash);
+
+                                if (matchedBeatmap != null)
+                                {
+                                    var score = scoreDatabase.Scores[currentScoreIndex].Item2.FirstOrDefault();
+                                    if (score != null)
+                                    {
+                                        await DatabaseController.ImportScore(beatmap: matchedBeatmap, score: score);
+                                        await save();
+                                    }
+                                    else
+                                    {
+                                        // Handle the case when score is null
+                                    }
+                                }
+                            }
+                        }
+                        otherstatus.ElementAt(currentIndex).running = false;
+                    }));
+                }
+
+                await Task.WhenAll(tasks);
+            }
+            else {
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, $"osu!.db was not found in the Import folder please make sure its there");
+                return;
+            }
+        }
+
+            public dumbobject GetStatus()
         {
             return status;
         }
+
+        public List<seconddumbobject> GetotherStatus()
+        {
+            return otherstatus;
+        }
+
+        public static void progress(object sender, EventArgs e)
+        {
+            File.WriteAllText("progress.json", System.Text.Json.JsonSerializer.Serialize(otherstatus));
+        }
+
+        public static async Task save()
+        {
+            await semaphore.WaitAsync();
+
+            try
+            {
+                string jsonText = JsonSerializer.Serialize(otherstatus, new JsonSerializerOptions { WriteIndented = true });
+
+                await File.WriteAllTextAsync("progress.json", jsonText, Encoding.UTF8);
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        }
+
+        private static void startup() {
+            if(File.Exists("progress.json"))
+                otherstatus = System.Text.Json.JsonSerializer.Deserialize<List<seconddumbobject>>(File.ReadAllText("progress.json"));
+        }
+    }
+  
+    public class seconddumbobject
+    {
+        public bool running { get; set; } 
+        public int currentscoredb { get; set; } = 1;
+        public int index { get; set; } = 1;
+        public int scorecount { get; set; } = 0;
     }
 
-    public class dumbobject
-    {
+   
+
+    public class dumbobject {
         public bool running { get; set; }
         public int Finishedimports { get; set; }
-
         public int ToImportScores { get; set; }
     }
 
