@@ -260,6 +260,260 @@ namespace osu1progressbar.Game.Database
             }
         }
 
+        public async static Task<bool> ImportScore(OsuParsers.Database.Objects.DbBeatmap beatmap, OsuParsers.Database.Objects.Score score)
+        {
+            if (beatmap == null || score == null) {
+                return false;
+            }
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Insert Score {beatmap.MD5Hash} {score.ScoreId}");
+
+            using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
+            {
+                connection.Open();
+
+                double bpm = -1;
+                if (beatmap.TimingPoints.Count > 0)
+                {
+                    bpm = beatmap.TimingPoints.GroupBy(tp => tp.BPM)
+                        .OrderByDescending(group => group.Count())
+                        .Select(group => group.Key)
+                        .First();
+                }
+
+                string background = Util.getBackground(beatmap.FolderName, beatmap.FileName);
+
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
+                    Select * from BeatmapHelper WHERE id = @id";
+                    command.Parameters.AddWithValue("@id", beatmap.BeatmapSetId);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if (!reader.Read() && beatmap.BeatmapSetId == 0) //prevent Default Id to saved only once!
+                        {
+                            using (SQLiteCommand insertCommand = new SQLiteCommand(connection))
+                            {
+
+                                insertCommand.CommandText = @"
+                                 INSERT OR IGNORE INTO BeatmapHelper (id, sr, bpm, creator, artist, status, coverlist, cover, preview, version, tags)
+                                 VALUES (@id, @sr, @bpm, @creator, @artist, @status, @coverlist, @cover, @preview , @version, @tags)"
+                                ;
+
+                                insertCommand.Parameters.AddWithValue("@id", beatmap.BeatmapSetId);
+
+                                switch (score.Ruleset)
+                                {
+                                    case OsuParsers.Enums.Ruleset.Standard:
+
+                                        insertCommand.Parameters.AddWithValue("@sr", beatmap.StandardStarRating);
+                                        break;
+
+                                    case OsuParsers.Enums.Ruleset.Taiko:
+
+                                        insertCommand.Parameters.AddWithValue("@sr", beatmap.TaikoStarRating);
+                                        break;
+                                    case OsuParsers.Enums.Ruleset.Fruits:
+
+                                        insertCommand.Parameters.AddWithValue("@sr", beatmap.CatchStarRating);
+                                        break;
+                                    case OsuParsers.Enums.Ruleset.Mania:
+
+                                        insertCommand.Parameters.AddWithValue("@sr", beatmap.ManiaStarRating);
+                                        break;
+                                }
+                                insertCommand.Parameters.AddWithValue("@bpm", bpm);
+                                insertCommand.Parameters.AddWithValue("@creator", beatmap.Creator);
+                                insertCommand.Parameters.AddWithValue("@artist", beatmap.Artist);
+                                insertCommand.Parameters.AddWithValue("@status", beatmap.RankedStatus);
+                                insertCommand.Parameters.AddWithValue("@coverlist", background);
+                                insertCommand.Parameters.AddWithValue("@cover", background);
+                                insertCommand.Parameters.AddWithValue("@version", beatmap.Difficulty);
+                                insertCommand.Parameters.AddWithValue("@tags", beatmap.Tags);
+                                insertCommand.Parameters.AddWithValue("@preview", beatmap.AudioFileName);
+
+                                int rowsInserted = insertCommand.ExecuteNonQuery();
+
+                                if (rowsInserted > 0)
+                                {
+                                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"New BeatmapHelper score with id: {beatmap.BeatmapSetId} created.");
+
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
+                       INSERT OR IGNORE INTO ScoreData (
+                                Date,
+                                BeatmapSetid,
+                                Beatmapid,
+                                Osufilename,
+                                Foldername,
+                                Replay,
+                                Playtype,
+                                Ar,
+                                Cs,
+                                Hp,
+                                Od,
+                                Status,
+                                SR,
+                                Bpm,
+                                Creator,
+                                Artist,
+                                Username,
+                                Acc,
+                                MaxCombo,
+                                Score,
+                                Combo,
+                                Hit50,
+                                Hit100,
+                                Hit300,
+                                Ur,
+                                HitMiss,
+                                Mode,
+                                Mods,
+                                Version,
+                                Tags,
+                                Cover,
+                                Coverlist,
+                                Preview, 
+                                Time,
+                                pp,
+                                fcpp,
+                                aim,
+                                speed,
+                                accuracyatt,
+                                grade
+                                    ) VALUES (
+                                        @Date,
+                                        @BeatmapSetid,
+                                        @Beatmapid,
+                                        @Osufilename,
+                                        @Foldername,
+                                        @Replay,
+                                        @Playtype,
+                                        @Ar,
+                                        @Cs,
+                                        @Hp,
+                                        @Od,
+                                        @Status,
+                                        @SR,
+                                        @Bpm,
+                                        @Creator,
+                                        @Artist,
+                                        @Username,
+                                        @Acc,
+                                        @MaxCombo,
+                                        @Score,
+                                        @Combo,
+                                        @Hit50,
+                                        @Hit100,
+                                        @Hit300,
+                                        @Ur,
+                                        @HitMiss,
+                                        @Mode,
+                                        @Mods,
+                                        @Version,
+                                        @Tags,
+                                        @Cover,
+                                        @Coverlist,
+                                        @Preview,
+                                        @Time,
+                                        @pp,
+                                        @fcpp,
+                                        @aim,
+                                        @speed,
+                                        @accuracyatt,
+                                        @grade
+                                            );
+                    ";
+
+                        command.Parameters.AddWithValue("@Date", score.ScoreTimestamp.ToString("yyyy-MM-dd HH:mm"));
+                        command.Parameters.AddWithValue("@BeatmapSetid", beatmap.BeatmapSetId);
+                        command.Parameters.AddWithValue("@Beatmapid", beatmap.BeatmapId);
+                        command.Parameters.AddWithValue("@Osufilename", beatmap.FileName);
+                        command.Parameters.AddWithValue("@Foldername", beatmap.FolderName);
+                        command.Parameters.AddWithValue("@Replay", null);
+                        command.Parameters.AddWithValue("@Playtype", "Pass");
+                        command.Parameters.AddWithValue("@Ar", beatmap.ApproachRate);
+                        command.Parameters.AddWithValue("@Cs", beatmap.CirclesCount); //needs mod recalculation
+                        command.Parameters.AddWithValue("@Hp", beatmap.HPDrain); //needs mod recalculation
+                        command.Parameters.AddWithValue("@Od", beatmap.OverallDifficulty);
+                        command.Parameters.AddWithValue("@Status", beatmap.RankedStatus);
+
+                    switch (score.Ruleset)
+                    {
+                        case OsuParsers.Enums.Ruleset.Standard:
+
+                            command.Parameters.AddWithValue("@SR", beatmap.StandardStarRating);
+                            break;
+
+                        case OsuParsers.Enums.Ruleset.Taiko:
+
+                            command.Parameters.AddWithValue("@SR", beatmap.TaikoStarRating);
+                            break;
+                        case OsuParsers.Enums.Ruleset.Fruits:
+
+                            command.Parameters.AddWithValue("@SR", beatmap.CatchStarRating);
+                            break;
+                        case OsuParsers.Enums.Ruleset.Mania:
+
+                            command.Parameters.AddWithValue("@SR", beatmap.ManiaStarRating);
+                            break;
+                    }
+                        command.Parameters.AddWithValue("@Bpm", bpm);
+                        command.Parameters.AddWithValue("@Creator", beatmap.Creator);
+                        command.Parameters.AddWithValue("@Artist", beatmap.Artist);
+                        command.Parameters.AddWithValue("@Username", score.PlayerName);
+                    double acc = (double)(score.Count300 * 300 + score.Count100 * 100 + score.Count50 * 50 + score.CountMiss * 0) /
+                        ((score.Count300 + score.Count100 + score.Count50 + score.CountMiss) * 300) * 100;
+                    command.Parameters.AddWithValue("@Acc", acc);
+                       
+                            
+                        command.Parameters.AddWithValue("@MaxCombo", score.PerfectCombo);
+                        command.Parameters.AddWithValue("@Score", score.ReplayScore);
+                        command.Parameters.AddWithValue("@Combo", score.Combo);
+                        command.Parameters.AddWithValue("@Hit50", score.Count50);
+                        command.Parameters.AddWithValue("@Hit100", score.Count100);
+                        command.Parameters.AddWithValue("@Hit300", score.Count300);
+                        command.Parameters.AddWithValue("@Ur", 0);
+                        command.Parameters.AddWithValue("@HitMiss", score.CountMiss);
+                        command.Parameters.AddWithValue("@Mode", (int)score.Ruleset);
+                        command.Parameters.AddWithValue("@Mods", score.Mods);
+                        command.Parameters.AddWithValue("@Version", beatmap.Difficulty);
+                        command.Parameters.AddWithValue("@Cover", background);
+                        command.Parameters.AddWithValue("@Coverlist", background);
+                        command.Parameters.AddWithValue("@Preview", beatmap.AudioFileName);
+                        command.Parameters.AddWithValue("@Tags", beatmap.Tags);
+                        command.Parameters.AddWithValue("@Time", beatmap.DrainTime);
+                        command.Parameters.AddWithValue("@pp", 0);
+                        command.Parameters.AddWithValue("@fcpp", 0);
+                        command.Parameters.AddWithValue("@aim", 0);
+                        command.Parameters.AddWithValue("@speed", 0);
+                        command.Parameters.AddWithValue("@accuracyatt", 0);
+                        command.Parameters.AddWithValue("@grade", DifficultyAttributes.CalculateGrade(score.Count300, score.Count100, score.Count50, score.CountMiss));
+                    Console.WriteLine("try insershio!");
+                    try
+                    {
+                        int rows = command.ExecuteNonQuery();
+                    } catch(Exception ex) { 
+                        Console.WriteLine(ex.Message);
+                    }
+
+                    connection.Close();
+                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Saved Score: {beatmap.Title}");
+                    return true;
+
+                }
+            }
+        }
+
         public async static Task<bool> ImportScore(object importscore)
         {
             ImportScore score = (ImportScore)importscore;
