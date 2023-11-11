@@ -221,7 +221,7 @@ namespace osu_progressCLI
             return output;
         }
 
-        private static string CalculateGrade(int total300s, int total100s, int total50s, int misses)
+        public static string CalculateGrade(int total300s, int total100s, int total50s, int misses)
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"Calculating Grade: 300:{total300s} 100:{total100s} 50:{total50s} X:{misses}");
             try
