@@ -7,6 +7,8 @@ class Program
 
     static async Task Main(string[] args)
     {
+        AppDomain.CurrentDomain.ProcessExit += ScoreImporter.progress;
+
         Logger.SetConsoleLogLevel(Logger.Severity.Warning);
         if (args.Length > 0)
         {
@@ -20,6 +22,7 @@ class Program
         }
 
         Task.Run(() =>  ScoreImporter.Instance.ImportScores("imports/shit.csv"));
+        Task.Run(() => ScoreImporter.Instance.ImportScores());
 
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
