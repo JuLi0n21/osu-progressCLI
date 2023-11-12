@@ -476,7 +476,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Username", score.PlayerName);
                     double acc = (double)(score.Count300 * 300 + score.Count100 * 100 + score.Count50 * 50 + score.CountMiss * 0) /
                         ((score.Count300 + score.Count100 + score.Count50 + score.CountMiss) * 300) * 100;
-                    command.Parameters.AddWithValue("@Acc", acc);
+                    command.Parameters.AddWithValue("@Acc", Math.Round(acc,2));
                        
                             
                         command.Parameters.AddWithValue("@MaxCombo", score.PerfectCombo);
@@ -487,7 +487,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Hit300", score.Count300);
                         command.Parameters.AddWithValue("@Ur", 0);
                         command.Parameters.AddWithValue("@HitMiss", score.CountMiss);
-                        command.Parameters.AddWithValue("@Mode", (int)score.Ruleset);
+                        command.Parameters.AddWithValue("@Mode", score.Ruleset);
                         command.Parameters.AddWithValue("@Mods", score.Mods);
                         command.Parameters.AddWithValue("@Version", beatmap.Difficulty);
                         command.Parameters.AddWithValue("@Cover", background);

@@ -9,6 +9,8 @@ using CsvHelper.Configuration;
 using System.Runtime.ConstrainedExecution;
 using System.Data.Entity.Migrations.Design;
 using OsuMemoryDataProvider.OsuMemoryModels.Direct;
+using System.Text;
+using System;
 
 namespace osu_progressCLI.Webserver.Server
 {
@@ -61,7 +63,7 @@ namespace osu_progressCLI.Webserver.Server
             //routing
             if (path == "/api/beatmaps" && request.HttpMethod == "GET")
             {
-                
+
                 List<Score> scores = controller.GetScoresInTimeSpan(from, to);
                 var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scores.liquid"));
 
@@ -102,7 +104,7 @@ namespace osu_progressCLI.Webserver.Server
             }
             else if (path == "/api/user" && request.HttpMethod == "GET")
             {
-                Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize( await ApiController.Instance.getuser(queryparams["userid"], queryparams["mode"])), "application/json");
+                Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(await ApiController.Instance.getuser(queryparams["userid"], queryparams["mode"])), "application/json");
             }
             else if (path == "/api/save" && request.HttpMethod == "POST")
             {
@@ -124,7 +126,7 @@ namespace osu_progressCLI.Webserver.Server
                         mode: PostData["mode"]
                     );
                 }
-                catch { 
+                catch {
                     Webserver.Instance().WriteResponse(response, "<span class=\"text-red-500 hide-me\">Something Went Wrong!</span>", "text/html");
                     return;
                 }
@@ -136,7 +138,7 @@ namespace osu_progressCLI.Webserver.Server
             {
 
             }
-            else if (path == "/api/upload" && request.HttpMethod == "POST")
+            else if (path == "/api/uploadstatus" && request.HttpMethod == "POST")
             {
                 bool allAreFalse = ScoreImporter.Instance.GetotherStatus().All(obj => obj.running == false);
 
@@ -146,18 +148,67 @@ namespace osu_progressCLI.Webserver.Server
                 }
                 else
                 {
-                    string output = $"<div class=\"flex flex-col justify-center\"><span>{ScoreImporter.Instance.GetStatus().running} {ScoreImporter.Instance.GetStatus().Finishedimports}/{ScoreImporter.Instance.GetStatus().ToImportScores}  </span>";
+                    int percentage = (ScoreImporter.Instance.GetStatus().Finishedimports + 1)  * 100 / (ScoreImporter.Instance.GetStatus().ToImportScores + 1);
+
+                    string output = $"<div class=\"flex flex-col justify-center\">" +
+                        $"<div class=\"bg-pink-900 border\" style=\"width:{percentage}%\">{percentage}%</div>";
                     foreach (seconddumbobject list in ScoreImporter.Instance.GetotherStatus())
                     {
-                        output += $"<span>{list.running} {list.index + 1}/{list.scorecount}</span>";
+                        percentage = (list.index + 1) * 100 / list.scorecount;
+                        output += $"<div class=\" text-center text-green-200 m-2\">" +
+                            $"<p>{list.name}</p>" +
+                            $"<div class=\"bg-pink-900 border\" style=\"width:{percentage}%\">{percentage}%</div>" +
+                            $"</div>";
                     }
                     output += "</div>";
                     //DifficultyAttributes.Startshell("start explorer.exe imports");
                     //Webserver.Instance().WriteResponse(response, $"<span>{ScoreImporter.Instance.GetStatus().running} {ScoreImporter.Instance.GetStatus().Finishedimports}/{ScoreImporter.Instance.GetStatus().ToImportScores}  </span> " + $"<span>{ScoreImporter.Instance.GetotherStatus().running} {ScoreImporter.Instance.GetotherStatus().index}/{ScoreImporter.Instance.GetotherStatus().scorecount} | {ScoreImporter.Instance.GetotherStatus().currentscoredb}/{ScoreImporter.Instance.GetotherStatus().dbocount} </span>", "text/html");
                     Webserver.Instance().WriteResponse(response, output, "text/html");
                 }
-              
+
+            } else if (path =="/api/import" && request.HttpMethod == "POST"){
+
+                DifficultyAttributes.Startshell("start explorer.exe imports");
+                Webserver.Instance().WriteResponse(response, "<span></span>", "text/html");
+
             }
+            else if (path == "/api/importfiles" && request.HttpMethod == "POST")
+            {
+
+                try
+                {
+                    string output = "<div class=\"flex flex-col\">";
+                    string[] files = Directory.GetFiles("imports");
+
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        output += $"<span>{Path.GetFileName(files[i])}</span>";
+                    }
+                    output += "</div>";
+
+                    Webserver.Instance().WriteResponse(response, output, "text/html");
+                }
+                catch (Exception e)
+                {
+                    Webserver.Instance().WriteResponse(response, $"<span> {e.Message} </span>", "text/html");
+                }
+            }
+            else if (path == "/api/startimport" && request.HttpMethod == "POST"){
+                string[] files = Directory.GetFiles("imports");
+
+                for (int i = 0; i < files.Length; i++)
+                {
+                    if (File.Exists("imports/osu!.db")) { 
+                        File.Move("imports/osu!.db", "importcache/osu!.db");
+
+                    }
+                }
+
+                if (files.Length > 0) {
+                    ScoreImporter.Instance.ImportScores();
+                }
+            }
+
 
             response.StatusCode = 404;
             response.OutputStream.Close();

@@ -14,11 +14,12 @@ namespace osu_progressCLI
         private static ScoreImporter instance;
         List<ImportScore> scores;
         List<ImportScore> alreadyimportedscores;
-        private string DEFAULTFILEPATH = "imports/Alreadyimportedscores.csv";
+        private string DEFAULTFILEPATH = "importcache/Alreadyimportedscores.csv";
         private readonly object objectlock = new object();
         private dumbobject status = new();
         private static List<seconddumbobject> otherstatus = new();
         private static readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+        OsuParsers.Database.OsuDatabase osudb = null;
 
         private ScoreImporter()
         {
@@ -138,6 +139,16 @@ namespace osu_progressCLI
 
         public async Task<bool> ImportScores(string filepath)
         {
+            string[] files = Directory.GetFiles("imports");
+            foreach (string file in files)
+            {
+                if (Path.GetExtension(file) == "csv")
+                {
+                    filepath = Path.GetFileName(file);
+                }
+            }
+
+
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Scoreimporter, "Removing Doubles");
             removedoubleentrys(filepath);
 
@@ -214,27 +225,34 @@ namespace osu_progressCLI
             stopwatch.Start();
 
             Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, "Starting Score beatmap pair finding" + DateTime.Now);
-            if (File.Exists("databases/osu!.db"))
+            if (File.Exists("importcache/osu!.db"))
             {
-                OsuParsers.Database.OsuDatabase osudb = OsuParsers.Decoders.DatabaseDecoder.DecodeOsu("databases/osu!.db");
+                if(osudb == null)
+                {
+                    osudb = OsuParsers.Decoders.DatabaseDecoder.DecodeOsu("importcache/osu!.db");
+                }
 
 
-                string[] scores = Directory.GetFiles("databases");
+                string[] scores = Directory.GetFiles("imports");
 
                 List<Task> tasks = new List<Task>();
 
                 List<OsuParsers.Database.ScoresDatabase> scoresDatabases = new();
+
+                string[] names = { };
 
                 foreach (var item in scores)
                 {
                     if (Path.GetFileName(item).StartsWith("scores.db"))
                     {
                         scoresDatabases.Add(OsuParsers.Decoders.DatabaseDecoder.DecodeScores(item));
+                        names = names.Append(Path.GetFileName(item)).ToArray();
                     }
                 }
 
-                if (otherstatus.Count == 0)
+                if (otherstatus.Count == 0 || scores.Length != otherstatus.Count)
                 {
+                    otherstatus.Clear();
                     for (int k = 0; k < scoresDatabases.Count; k++)
                     {
                         otherstatus.Add(new seconddumbobject()
@@ -242,7 +260,9 @@ namespace osu_progressCLI
                             index = 0,
                             currentscoredb = k,
                             scorecount = scoresDatabases.ElementAt(k).Scores.Count,
-                            running = false
+                            running = false,
+                            name = names[k]
+
                         });
                     }
                 }
@@ -284,6 +304,7 @@ namespace osu_progressCLI
                             }
                         }
                         otherstatus.ElementAt(currentIndex).running = false;
+                        File.Move("imports/" + otherstatus.ElementAt(currentIndex).name, "doneimports/" + otherstatus.ElementAt(currentIndex).name,true);
                     }));
                 }
 
@@ -327,7 +348,7 @@ namespace osu_progressCLI
         }
 
         private static void startup() {
-            if(File.Exists("progress.json"))
+            if(File.Exists("progress.json") && File.ReadAllText("progress.json").Length > 0)
                 otherstatus = System.Text.Json.JsonSerializer.Deserialize<List<seconddumbobject>>(File.ReadAllText("progress.json"));
         }
     }
@@ -338,6 +359,7 @@ namespace osu_progressCLI
         public int currentscoredb { get; set; } = 1;
         public int index { get; set; } = 1;
         public int scorecount { get; set; } = 0;
+        public string name { get; set; } = "";
     }
 
    

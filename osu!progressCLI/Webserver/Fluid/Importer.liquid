@@ -39,10 +39,42 @@
     </div>
 
     <!-- -->
+      <div id="Messagebox" class="flex justify-center"></div>
 
     <div class="flex justify-center items-center">
       <div class="p-4 rounded-lg shadow-lg backdrop--medium text--pink text-xl">
         <h1 class="text-3xl font-bold text-center mb-4">Import Scores!</h1>
+                     
+
+          <div class="flex justify-center ">   
+
+            <div class="backdrop--dark m-4 flex-1">
+
+                    <h3 class="flex font-bold text-center mb-4">Upload Status:</h3>
+                    <div id="importForm" hx-post="/api/uploadstatus" hx-trigger="every 1s" hx-swap="innerHTML"></div>
+                 
+            </div>
+
+               <div class="flex flex-col backdrop--dark m-4 h-96 flex-1 justify-between">
+                   
+                  
+                    <h3 class="text-xl font-bold text-center mb-4">Files to Import:</h3>
+                        <form class="flex-1" hx-Post="/api/importfiles" hx-trigger="every 1s" hx-swap="innerHTML"></form>
+
+                  
+                        <form class="text-center m-4 " hx-Post="/api/import" hx-target="#Messagebox" hx-swap="innerHTML">
+                         <button class="backdrop--light rounded-lg" type="submit">*Click Me to Add more Files*</button>
+                      </form>
+
+            </div>
+
+                <form class="text-center m-4 " hx-Post="/api/startimport" hx-target="#Messagebox" hx-swap="innerHTML">
+                   <button class="backdrop--light rounded-lg" type="submit">*Start Importing*</button>
+                </form>
+      
+    </div>    
+
+
 
         <div class="text-center mb-6">
           <p class="text-lg">
@@ -98,48 +130,12 @@
           </ol>
         </div>
 
-        <div class="mb-6 ml-6">
-          <label for="fileInput" class="text-lg">Your Scores .csv</label>
-          <input
-            type="file"
-            id="fileInput"
-            class="text--pink--dark hover:text-white"
-            accept="application/csv, .csv"/>
-        </div>
 
-         <div id="status">
-    <!-- Loading indicator content (e.g., spinner) -->
-            Loading...
-        </div>
+          
 
 
-      <form id="importForm" hx-post="/api/upload" hx-trigger="every 1s" hx-target="#status">
+    
 
-    <div class="flex justify-center">
-      <div class="flex flex-col">
-        <div class="text--pink">
-          <label for="downloadBeatmaps" class="mb-2">
-            <input type="checkbox" id="download" name="download" checked >
-            Download Beatmaps
-          </label>
-        </div>
-
-        <div class="text--pink">
-          <label for="importScores" class="mb-2">
-            <input type="checkbox" id="import" name="import" checked >
-            Import Scores
-          </label>
-        </div>
-      </div>
-
-       <button
-        id="startImportButton"
-        class="backdrop--light ml-5 px-4 py-2 rounded-lg hover:text-white transition duration-200">
-        Start Import
-        </button>
-    </div>
-
-  </form>
      <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
 
   </body>

@@ -21,7 +21,7 @@ class Program
             }
         }
 
-        Task.Run(() =>  ScoreImporter.Instance.ImportScores("imports/shit.csv"));
+        Task.Run(() =>  ScoreImporter.Instance.ImportScores(""));
         Task.Run(() => ScoreImporter.Instance.ImportScores());
 
         Console.WriteLine("Welcome to osu!progress");
