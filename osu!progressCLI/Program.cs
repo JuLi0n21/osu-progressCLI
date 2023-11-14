@@ -7,7 +7,7 @@ class Program
 
     static async Task Main(string[] args)
     {
-        AppDomain.CurrentDomain.ProcessExit += ScoreImporter.progress;
+        AppDomain.CurrentDomain.ProcessExit += ScoreImportera.progress;
 
         Logger.SetConsoleLogLevel(Logger.Severity.Warning);
         if (args.Length > 0)
@@ -21,8 +21,8 @@ class Program
             }
         }
 
-        Task.Run(() =>  ScoreImporter.Instance.ImportScores(""));
-        Task.Run(() => ScoreImporter.Instance.ImportScores());
+        Task.Run(() =>  ScoreImporter.Instance.StartImporting());
+        //Task.Run(() => ScoreImportera.Instance.ImportScores());
 
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
