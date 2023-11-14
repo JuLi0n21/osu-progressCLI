@@ -70,6 +70,7 @@ namespace osu_progressCLI.Webserver.Server
                 var context = new TemplateContext(scores);
                 context.SetValue("List", scores);
                 Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+                return;
             }
             else if (path == "/api/beatmaps/search" && request.HttpMethod == "GET")
             {
@@ -81,6 +82,7 @@ namespace osu_progressCLI.Webserver.Server
                 var context = new TemplateContext(scores);
                 context.SetValue("List", scores);
                 Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+                return;
             }
             else if (path == "/api/beatmaps/averages" && request.HttpMethod == "GET")
             {
@@ -140,7 +142,7 @@ namespace osu_progressCLI.Webserver.Server
             }
             else if (path == "/api/uploadstatus" && request.HttpMethod == "POST")
             {
-                bool allAreFalse = ScoreImporter.Instance.GetotherStatus().All(obj => obj.running == false);
+                bool allAreFalse = ScoreImporter.Instance.getScoreFileTracker().All(obj => obj.running == false);
 
                 if (allAreFalse)
                 {
@@ -148,29 +150,31 @@ namespace osu_progressCLI.Webserver.Server
                 }
                 else
                 {
-                    int percentage = (ScoreImporter.Instance.GetStatus().Finishedimports + 1)  * 100 / (ScoreImporter.Instance.GetStatus().ToImportScores + 1);
 
-                    string output = $"<div class=\"flex flex-col justify-center\">" +
-                        $"<div class=\"bg-pink-900 border\" style=\"width:{percentage}%\">{percentage}%</div>";
-                    foreach (seconddumbobject list in ScoreImporter.Instance.GetotherStatus())
+                    string output = $"<div>";
+
+                    if (ScoreImporter.Instance.getScoreFileTracker() != null)
                     {
-                        percentage = (list.index + 1) * 100 / list.scorecount;
-                        output += $"<div class=\" text-center text-green-200 m-2\">" +
-                            $"<p>{list.name}</p>" +
-                            $"<div class=\"bg-pink-900 border\" style=\"width:{percentage}%\">{percentage}%</div>" +
-                            $"</div>";
+                        foreach (ScoreFileTracker list in ScoreImporter.Instance.getScoreFileTracker())
+                        {
+                            int percentage = (list.index + 1) * 100 / list.amountoffscores;
+                            output += $"<div class=\" text-center text-green-200 m-2\">" +
+                                $"<p>{list.filename}</p>" +
+                                $"<div class=\"bg-pink-900 border\" style=\"width:{percentage}%\">{percentage}%</div>" +
+                                $"</div>";
+                        }
+                        output += "</div>";
+                        //DifficultyAttributes.Startshell("start explorer.exe imports");
+                        //Webserver.Instance().WriteResponse(response, $"<span>{ScoreImporter.Instance.GetStatus().running} {ScoreImporter.Instance.GetStatus().Finishedimports}/{ScoreImporter.Instance.GetStatus().ToImportScores}  </span> " + $"<span>{ScoreImporter.Instance.GetotherStatus().running} {ScoreImporter.Instance.GetotherStatus().index}/{ScoreImporter.Instance.GetotherStatus().scorecount} | {ScoreImporter.Instance.GetotherStatus().currentscoredb}/{ScoreImporter.Instance.GetotherStatus().dbocount} </span>", "text/html");
+                        Webserver.Instance().WriteResponse(response, output, "text/html");
                     }
-                    output += "</div>";
-                    //DifficultyAttributes.Startshell("start explorer.exe imports");
-                    //Webserver.Instance().WriteResponse(response, $"<span>{ScoreImporter.Instance.GetStatus().running} {ScoreImporter.Instance.GetStatus().Finishedimports}/{ScoreImporter.Instance.GetStatus().ToImportScores}  </span> " + $"<span>{ScoreImporter.Instance.GetotherStatus().running} {ScoreImporter.Instance.GetotherStatus().index}/{ScoreImporter.Instance.GetotherStatus().scorecount} | {ScoreImporter.Instance.GetotherStatus().currentscoredb}/{ScoreImporter.Instance.GetotherStatus().dbocount} </span>", "text/html");
-                    Webserver.Instance().WriteResponse(response, output, "text/html");
                 }
 
             } else if (path =="/api/import" && request.HttpMethod == "POST"){
 
-                DifficultyAttributes.Startshell("start explorer.exe imports");
-                Webserver.Instance().WriteResponse(response, "<span></span>", "text/html");
-
+                Webserver.Instance().WriteResponse(response, "<span  class=\" text--pink \"> Folder to Put in the score.db or score.csv file should open!</span>", "text/html");
+                DifficultyAttributes.Startshell(@"start explorer.exe Importer\imports");
+                return;
             }
             else if (path == "/api/importfiles" && request.HttpMethod == "POST")
             {
@@ -178,7 +182,7 @@ namespace osu_progressCLI.Webserver.Server
                 try
                 {
                     string output = "<div class=\"flex flex-col\">";
-                    string[] files = Directory.GetFiles("imports");
+                    string[] files = Directory.GetFiles("Importer/imports");
 
                     for (int i = 0; i < files.Length; i++)
                     {
@@ -198,15 +202,19 @@ namespace osu_progressCLI.Webserver.Server
 
                 for (int i = 0; i < files.Length; i++)
                 {
-                    if (File.Exists("imports/osu!.db")) { 
-                        File.Move("imports/osu!.db", "importcache/osu!.db");
+                    if (File.Exists("Importer/imports/osu!.db")) { 
+                        File.Move("Importer/imports/osu!.db", "Importer/cache/osu!.db");
 
                     }
                 }
 
                 if (files.Length > 0) {
-                    ScoreImporter.Instance.ImportScores();
+                    Webserver.Instance().WriteResponse(response, $"<span class=\" text--pink \"> Starting Scoreimporter it will Take a few Seconds to Update! </span>", "text/html");
+                    ScoreImporter.Instance.StartImporting();
+                    return;
                 }
+                Webserver.Instance().WriteResponse(response, $"<span class=\" text--pink \"> Please Add Scores to Import </span>", "text/html");
+                return;
             }
 
 
