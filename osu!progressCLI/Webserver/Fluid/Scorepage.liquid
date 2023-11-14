@@ -349,7 +349,7 @@
                 </div>
 
                     <form hx-get="/api/beatmaps/search"
-                      hx-trigger="every 5s" 
+                      hx-trigger="load, every 5s, input" 
                       hx-target="#scorecontainer" 
                       hx-swap="innerHTML" 
                       class="mb-4 flex justify-center">

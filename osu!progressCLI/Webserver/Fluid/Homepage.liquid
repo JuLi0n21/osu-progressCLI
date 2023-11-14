@@ -116,9 +116,8 @@
 
             <div id="scorecontainer" class="flex-col overflow-y-scroll backdrop--medium page-width max-h-96  min-h-96"
                  hx-get="/api/beatmaps"
-                 hx-trigger="load delay:1s"
-                 hx-swap="innerHTML"
-                 hx-poll="10s">
+                 hx-trigger="load"
+                 hx-swap="innerHTML">
                 Loading scores...
             </div>
 
