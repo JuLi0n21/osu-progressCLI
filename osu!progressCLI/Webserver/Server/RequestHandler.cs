@@ -39,17 +39,22 @@ namespace osu_progressCLI.Webserver.Server
                 context.SetValue("List", controller.GetScoresInTimeSpan(DateTime.Now.AddDays(-100), DateTime.Now));
 
                 Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+
             } else if (path == "/score") {
 
                 var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scorepage.liquid"));
 
                 Score score = controller.GetScore(int.Parse(queryparams["id"]));
 
+                if (score != null) { 
+
                 var context = new TemplateContext(score);
                 context.SetValue("score", score);
                 context.SetValue("player", await ApiController.Instance.getuser(Credentials.Instance.GetConfig().userid, Credentials.Instance.GetConfig().mode));
 
-                Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+                Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html"); 
+                }
+
             } else if (path == "/importer") {
 
                 var template = FluidRenderer.templates.Find(item => item.Key.Equals("Importer.liquid"));
