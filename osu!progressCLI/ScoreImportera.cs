@@ -8,10 +8,10 @@ using System.Text.Json;
 
 namespace osu_progressCLI
 {
-    internal class ScoreImporter
+    internal class ScoreImportera
     {
 
-        private static ScoreImporter instance;
+        private static ScoreImportera instance;
         List<ImportScore> scores;
         List<ImportScore> alreadyimportedscores;
         private string DEFAULTFILEPATH = "importcache/Alreadyimportedscores.csv";
@@ -21,19 +21,19 @@ namespace osu_progressCLI
         private static readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
         OsuParsers.Database.OsuDatabase osudb = null;
 
-        private ScoreImporter()
+        private ScoreImportera()
         {
             scores = new List<ImportScore>();
             alreadyimportedscores = FetchAlreadyImported();
         }
 
-        public static ScoreImporter Instance
+        public static ScoreImportera Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = new ScoreImporter();
+                    instance = new ScoreImportera();
                 }
                 return instance;
             }
@@ -370,7 +370,7 @@ namespace osu_progressCLI
         public int ToImportScores { get; set; }
     }
 
-    public class ImportScore
+    public class ImportScorea
     {
         public int user_id { get; set; }
         public int beatmap_id { get; set; }
