@@ -2,6 +2,7 @@
 using osu_progressCLI;
 using osu_progressCLI.Datatypes;
 using OsuMemoryDataProvider.OsuMemoryModels;
+using OsuParsers.Beatmaps;
 using OsuParsers.Beatmaps.Objects;
 using System;
 using System.Data.SQLite;
@@ -268,6 +269,7 @@ namespace osu1progressbar.Game.Database
             if (beatmap == null || score == null) {
                 return false;
             }
+
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Insert Score {beatmap.MD5Hash} {score.ScoreId}");
 
             using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
@@ -477,9 +479,11 @@ namespace osu1progressbar.Game.Database
                     double acc = (double)(score.Count300 * 300 + score.Count100 * 100 + score.Count50 * 50 + score.CountMiss * 0) /
                         ((score.Count300 + score.Count100 + score.Count50 + score.CountMiss) * 300) * 100;
                     command.Parameters.AddWithValue("@Acc", Math.Round(acc,2));
-                       
-                            
-                        command.Parameters.AddWithValue("@MaxCombo", score.PerfectCombo);
+
+                    PerfomanceAttributes pp = DifficultyAttributes.CalculatePP(beatmap.FolderName, beatmap.FileName, score.ReplayScore,
+                      (int)score.Mods, score.CountMiss, score.Count50, score.Count100, score.Count300, 0, score.Combo, (int)score.Ruleset);
+
+                    command.Parameters.AddWithValue("@MaxCombo", pp.Maxcombo);
                         command.Parameters.AddWithValue("@Score", score.ReplayScore);
                         command.Parameters.AddWithValue("@Combo", score.Combo);
                         command.Parameters.AddWithValue("@Hit50", score.Count50);
@@ -495,20 +499,31 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Preview", beatmap.AudioFileName);
                         command.Parameters.AddWithValue("@Tags", beatmap.Tags);
                         command.Parameters.AddWithValue("@Time", beatmap.DrainTime);
-                        command.Parameters.AddWithValue("@pp", 0);
-                        command.Parameters.AddWithValue("@fcpp", 0);
-                        command.Parameters.AddWithValue("@aim", 0);
-                        command.Parameters.AddWithValue("@speed", 0);
-                        command.Parameters.AddWithValue("@accuracyatt", 0);
+
+                  
+                        command.Parameters.AddWithValue("@pp", pp.pp);
+
+                    PerfomanceAttributes fcpp = DifficultyAttributes.CalculatePP(beatmap.FolderName, beatmap.FileName, score.ReplayScore,
+                       (int)score.Mods, 0, score.Count50, score.Count100, score.Count300, 0, score.Combo, (int)score.Ruleset);
+                        
+                        command.Parameters.AddWithValue("@fcpp", pp.pp);
+
+                        command.Parameters.AddWithValue("@aim", pp.aim);
+                        command.Parameters.AddWithValue("@speed", pp.speed);
+                        command.Parameters.AddWithValue("@accuracyatt", pp.accuracy);
                         command.Parameters.AddWithValue("@grade", DifficultyAttributes.CalculateGrade(score.Count300, score.Count100, score.Count50, score.CountMiss));
-                    Console.WriteLine("try insershio!");
+
+                    /*
                     try
                     {
                         int rows = command.ExecuteNonQuery();
                     } catch(Exception ex) { 
                         Console.WriteLine(ex.Message);
                     }
+                    */
 
+                    int rows = command.ExecuteNonQuery();
+                    Console.WriteLine("rows inserted: " + rows);
                     connection.Close();
                     Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Saved Score: {beatmap.Title}");
                     return true;
@@ -701,6 +716,9 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Tags", score.tags);
                         command.Parameters.AddWithValue("@Time", score.drain);
                         command.Parameters.AddWithValue("@pp", score.pp);
+                       
+                        //add pp calc here
+
                         command.Parameters.AddWithValue("@fcpp", 0);
                         command.Parameters.AddWithValue("@aim", 0);
                         command.Parameters.AddWithValue("@speed", 0);
@@ -1045,7 +1063,7 @@ namespace osu1progressbar.Game.Database
                         "FROM ScoreData " +
                         "WHERE datetime(Date) BETWEEN @from AND @to " +
                         "ORDER BY Date DESC " +
-                        "LIMIT 1000;";
+                        "LIMIT 100;";
                     //";";
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
