@@ -48,33 +48,36 @@
 
           <div class="flex justify-center ">   
 
-            <div class="backdrop--dark m-4 flex-1">
+            <div class="backdrop--dark m-4 flex-1 overflow-x-hidden overflow-scroll h-96 max-h-96">
 
                     <h3 class="flex font-bold text-center mb-4">Upload Status:</h3>
                     <div id="importForm" hx-post="/api/uploadstatus" hx-trigger="every 1s" hx-swap="innerHTML"></div>
                  
             </div>
 
-               <div class="flex flex-col backdrop--dark m-4 h-96 flex-1 justify-between">
+               <div class="flex flex-col backdrop--dark m-4 overflow-x-hidden overflow-scroll h-96 max-h-96 flex-1 justify-between">
                    
                   
                     <h3 class="text-xl font-bold text-center mb-4">Files to Import:</h3>
                         <form class="flex-1" hx-Post="/api/importfiles" hx-trigger="every 1s" hx-swap="innerHTML"></form>
 
                   
-                        <form class="text-center m-4 " hx-Post="/api/import" hx-target="#Messagebox" hx-swap="innerHTML">
-                         <button class="backdrop--light rounded-lg" type="submit">*Click Me to Add more Files*</button>
-                      </form>
-
+                       
             </div>
 
-                <form class="text-center m-4 " hx-Post="/api/startimport" hx-target="#Messagebox" hx-swap="innerHTML">
-                   <button class="backdrop--light rounded-lg" type="submit">*Start Importing*</button>
-                </form>
-      
-    </div>    
+        </div>    
 
+          <div class="flex justify-evenly">
+        
+           <form class="text-center m-4 " hx-Post="/api/startimport" hx-target="#Messagebox" hx-swap="innerHTML">
+              <button class="backdrop--light rounded-lg" type="submit">*Start Importing*</button>
+           </form>
 
+           <form class="text-center m-4 " hx-Post="/api/import" hx-target="#Messagebox" hx-swap="innerHTML">
+               <button class="backdrop--light rounded-lg" type="submit">*Click Me to Add more Files*</button>
+            </form>
+
+         </div>
 
         <div class="text-center mb-6">
           <p class="text-lg">
