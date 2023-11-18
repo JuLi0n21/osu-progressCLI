@@ -51,8 +51,8 @@ namespace osu_progressCLI.Webserver.Server
                 var context = new TemplateContext(score);
                 context.SetValue("score", score);
                 context.SetValue("player", await ApiController.Instance.getuser(Credentials.Instance.GetConfig().userid, Credentials.Instance.GetConfig().mode));
-
-                Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html"); 
+                 
+                    Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html"); 
                 }
 
             } else if (path == "/importer") {

@@ -1,17 +1,10 @@
 ﻿using Fluid;
-using osu1progressbar.Game.Database;
 using osu_progressCLI.Datatypes;
+using osu1progressbar.Game.Database;
+using System.Collections.Specialized;
 using System.Net;
 using System.Web;
 using WebSocketSharp;
-using System.Collections.Specialized;
-using CsvHelper.Configuration;
-using System.Runtime.ConstrainedExecution;
-using System.Data.Entity.Migrations.Design;
-using OsuMemoryDataProvider.OsuMemoryModels.Direct;
-using System.Text;
-using System;
-using System.Xml;
 
 namespace osu_progressCLI.Webserver.Server
 {
