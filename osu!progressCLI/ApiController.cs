@@ -392,6 +392,7 @@ namespace osu_progressCLI
                             if (unzip)
                             {
                                 ZipFile.ExtractToDirectory(filePath, dirPath);
+                                File.Delete(filePath);
                             }
 
                             Logger.Log(Logger.Severity.Info, Logger.Framework.Scoreimporter, $"Beatmap Set with ID: {beatmapsetid} Downloaded Succesfully in {time.Elapsed.TotalSeconds}");
