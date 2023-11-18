@@ -142,49 +142,49 @@ namespace osu_progressCLI
                     if (match.Groups["speed"].Success && double.TryParse(match.Groups["speed"].Value.Replace(".", "").Replace(",", ""), out double speed))
                     {
                         attributes.speed = speed / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"speed {attributes.speed}");
+                      //  Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"speed {attributes.speed}");
                     }
 
                     if (match.Groups["maxcombo"].Success && int.TryParse(match.Groups["maxcombo"].Value.Replace(".", "").Replace(",", ""), out int maxCombo))
                     {
                         attributes.Maxcombo = maxCombo / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"maxcombo: {attributes.Maxcombo}");
+                      //  Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"maxcombo: {attributes.Maxcombo}");
                     }
 
                     if (match.Groups["pp"].Success && double.TryParse(match.Groups["pp"].Value.Replace(".", "").Replace(",", ""), out double pp))
                     {
                         attributes.pp = pp / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"pp: {attributes.pp}");
+                       // Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"pp: {attributes.pp}");
                     }
 
                     if (match.Groups["accuracy"].Success && double.TryParse(match.Groups["accuracy"].Value.Replace(".", "").Replace(",", ""), out double accuracy))
                     {
                         attributes.accuracy = accuracy / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"accuracy: {attributes.accuracy}");
+                       // Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"accuracy: {attributes.accuracy}");
                     }
 
                     if (match.Groups["aim"].Success && double.TryParse(match.Groups["aim"].Value.Replace(".", "").Replace(",", ""), out double aim))
                     {
                         attributes.aim = aim / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"aim: {attributes.aim}");
+                       // Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"aim: {attributes.aim}");
                     }
 
                     if (match.Groups["appraochrate"].Success && double.TryParse(match.Groups["appraochrate"].Value.Replace(".", "").Replace(",", ""), out double ar))
                     {
                         attributes.ar = ar / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"appraochrate: {attributes.ar}");
+                       // Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"appraochrate: {attributes.ar}");
                     }
 
                     if (match.Groups["overalldifficulty"].Success && double.TryParse(match.Groups["overalldifficulty"].Value.Replace(".", "").Replace(",", ""), out double od))
                     {
                         attributes.od = od / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"overalldifficulty: {attributes.od}");
+                       // Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"overalldifficulty: {attributes.od}");
                     }
 
                     if (match.Groups["starrating"].Success && double.TryParse(match.Groups["starrating"].Value.Replace(".", "").Replace(",", ""), out double sr))
                     {
                         attributes.starrating = sr / 100;
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"starrating: {attributes.starrating}");
+                       // Logger.Log(Logger.Severity.Debug, Logger.Framework.Calculator, $"starrating: {attributes.starrating}");
                     }
 
                 }
