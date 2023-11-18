@@ -1,702 +1,184 @@
-﻿let beatmapid, rowid, myChart;
+﻿let beatmapid ,rowid, myChart;
 function fetchOsuBeatmap() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const beatmapId = urlParams.get("id");
+    const urlParams = new URLSearchParams(window.location.search);
+    const rowid = urlParams.get("id");
 
-  if (!beatmapId) {
-    document.getElementById("beatmapData").innerHTML =
-      "Beatmap ID not provided.";
-    return;
-  }
-
-  rowid = beatmapId;
-  const beatmapUrl = `/api/beatmaps/score?id=${beatmapId}`;
-
-  fetch(beatmapUrl)
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      beatmapid = data.Beatmapid;
-      document.title = data.Osufilename;
-      let missanalyzerdiv;
-      if (Object.keys(data.Replay).length != 0) {
-        missanalyzerdiv = `<div class="flex justify-evenly">
-                                   <button id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600 hover:text-white">${data.HitMiss}↩</pre> </button>
-                                   <a href="${data.Replay}" target="_blank" title="Download Replay"><span class="fa fa-fw"><span class="fas fa-download"></span></span></a>
-                                   </div>
-                                   `;
-      } else {
-        missanalyzerdiv = `<div class="flex justify-evenly">
-                                   <button id="">  <pre title="No Replay Saved!" class="text-red-600">${data.HitMiss}⚠️</pre> </button>
-                                   </div>`;
-      }
-
-      document.getElementById("beatmapData").innerHTML = `
-           <p class="relative top-6 left-4">${data.Status}</p>
-            <div class="flex justify-center ml-4 mb-4 mr-4 text-xl">
-              
-        <h2>${data.Osufilename}</h2>
-
-            </div>
-         
-<div>
-  <div id="image-container" style="min-height: 280px; min-width: 1000px; position: relative;">
-    <img class="absolute top-0 left-0 w-40" src="${data.Grade}.png" alt="${
-        data.Grade
-      }">
-    <a href="https://osu.ppy.sh/users/${
-      data.Creator
-    }" class="absolute bottom-10 right-0 score-backdrop--dark rounded-lg m-3 p-1 text--pink hover:text-white">${
-        data.Version
-      } by ${data.Creator}</a>
-    <p class="absolute bottom-0 right-0 score-backdrop--dark rounded-lg m-3 p-1">${
-      data.Username
-    } at ${data.Date}</p>
-    <div class="relative">
-      <button id="playButton" class="absolute left-2 top-52 score-backdrop--dark text--pink hover:text-white">
-        <i class="fas fa-play"></i>
-      </button>
-      <audio id="audioPlayer">
-        <source src="https:${data.Preview}" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
-
-    </div>
-
-    <div class="relative">
-      <div class="abs-div" id="absDiv"></div>
-
-      
-    </div>
-  
-    <div>
-    <a href="https://osu.ppy.sh/beatmapsets/${data.BeatmapSetid}#${data.Mode}/${
-        data.Beatmapid
-      }" target="_blank">
-        <img src="${
-          data.CoverList
-        }" style="min-height: 280px; min-width: 1000px; max-height: 280px; object-fit: cover">
-        </a>
-    </div>
-  </div>
-</div>
-
-       
-<div class="flex justify-evenly h-64 text-base">
-  <div class="flex flex-col justify-evenly">
-    <div class="m-8">
-
-
-            <div class="flex justify-evenly">
-          <div class="flex-col mb-4 flex-1">
-            <div class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
-              ★
-            </div>
-            <div class="flex justify-evenly">
-              <p>${data.SR.toFixed(2)}</p>
-            </div>
-          </div>
-             <div class="flex-col flex-1">
-            <div class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
-              AR
-            </div>
-            <div class="flex justify-evenly">
-              <p>${data.Ar.toFixed(2)}</p>
-            </div>
-          </div>
-             <div class="flex-col flex-1">
-            <div class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
-              CS
-            </div>
-            <div class="flex justify-evenly">
-              <p>${data.Cs.toFixed(2)}</p>
-            </div>
-              
-          </div>
-                       <div class="flex-col flex-1">
-            <div class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
-              HP
-            </div>
-            <div class="flex justify-evenly">
-              <p>${data.Hp.toFixed(2)}</p>
-            </div>
-              
-          </div>
-                       <div class="flex-col flex-1">
-            <div class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
-              OD
-            </div>
-            <div class="flex justify-evenly">
-              <p>${data.Od.toFixed(2)}</p>
-            </div>
-              
-          </div>
-                       <div class="flex-col flex-1">
-            <div class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
-              BPM
-            </div>
-            <div class="flex justify-evenly">
-              <p>${data.Bpm.toFixed(0)}</p>
-            </div>
-              
-          </div>
-        </div>
-
-
-        <div id="playerdiv" class="">
-        Loading Player...
-        </div>
-         
-    </div>
-  </div>
-  <div class="flex flex-col justify-evenly w-2/5">
-    <div class="w-92 m-8">
-      <div class="flex justify-evenly"></div>
-      <div class="flex-col">
-        <div class="flex justify-evenly">
-          <div class="flex-col mb-4">
-            <div class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
-              ACCURACY
-            </div>
-            <div class="flex justify-evenly">
-              <p class="text--yellow">${data.Acc.toFixed(2)}%</p>
-            </div>
-          </div>
-          <div class="flex-col flex-1">
-            <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
-              MAXCOMBO
-            </div>
-            <div class="flex justify-evenly">
-                 <p>${data.Combo} {${data.MaxCombo}}</p>
-            </div>
-          </div>
-            <div class="flex-col flex-1">
-            <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
-              Playtime
-            </div>
-            <div class="flex justify-evenly">
-              ${data.Time}s  <p class="text--gray"> (${data.Playtype}) </p> 
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- New Row (PP, Speed, Aim) -->
-      <div class="flex justify-evenly">
-        <div class="flex-col mb-4">
-          <div class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
-            PP
-          </div>
-          <div class="flex justify-evenly">
-             <pre title="What the Play would have been Worth if it was ur best!" class="text--pink">${
-               data.PP
-             }</pre>
-          </div>
-        </div>
-         <div class="flex-col flex-1">
-          <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
-            ACC
-          </div>
-          <div class="flex justify-evenly">
-            ${data.ACCURACYATT}
-          </div>
-        </div>
-        <div class="flex-col flex-1">
-          <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
-            SPEED
-          </div>
-          <div class="flex justify-evenly">
-            ${data.SPEED}
-          </div>
-        </div>
-        <div class="flex-col flex-1">
-          <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
-            AIM
-          </div>
-          <div class="flex justify-evenly">
-            ${data.AIM}
-          </div>
-        </div>
-        <div class="flex-col mb-4">
-          <div class="flex justify-evenly flex-1 rounded-full score-backdrop--dark text-white pl-4 pr-4">
-            FC
-          </div>
-          <div class="flex justify-evenly">
-           <pre title="Full Combo (with given acc)" class="text--pink--dark">${
-             data.FCPP
-           }</pre>
-          </div>
-        </div>
-      </div>
-      <!-- New Rows (300, 100, 50, MISS) -->
-      <div class="flex">
-        <div class="flex-col flex-1">
-          <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
-            300
-          </div>
-          <div class="flex justify-evenly">
-                 <pre class="text-blue-500">${data.Hit300}</pre> 
-          </div>
-        </div>
-        <div class="flex-col flex-1">
-          <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
-            100
-          </div>
-          <div class="flex justify-evenly">
-                 <pre class="text-green-500">${data.Hit100}</pre>
-          </div>
-        </div>
-        <div class="flex-col flex-1">
-          <div class="flex justify-evenly rounded-full score-backdrop--dark text-white pl-4 pr-4">
-            50
-          </div>
-          <div class="flex justify-evenly">
-              <p class="text--orange">${data.Hit50}</p>
-          </div>
-        </div>
-        <div class="flex-col flex-1">
-          <div class="flex justify-evenly rounded-full score-backdrop--dark text-white">
-            MISS
-          </div>
-         ${missanalyzerdiv}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-`;
-
-      if (document.getElementById("MissAnalyzer")) {
-        document
-          .getElementById("MissAnalyzer")
-          .addEventListener("click", openAnalyzer);
-      }
-      const playButton = document.getElementById("playButton");
-      const audioPlayer = document.getElementById("audioPlayer");
-
-      playButton.addEventListener("click", function () {
+    beatmapid = document.getElementById("beatmapid").value;
+    const playButton = document.getElementById("playButton");
+    const audioPlayer = document.getElementById("audioPlayer");
+    audioPlayer.volume = 0.5;
+    playButton.addEventListener("click", function () {
         event.preventDefault();
         if (audioPlayer.paused) {
-          audioPlayer.play();
-          playButton.innerHTML = '<i class="fas fa-pause"></i>';
+            audioPlayer.play();
+            playButton.innerHTML = '<i class="fas fa-pause"></i>';
         } else {
-          audioPlayer.pause();
-          audioPlayer.currentTime = 0;
-          playButton.innerHTML = '<i class="fas fa-play"></i>';
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            playButton.innerHTML = '<i class="fas fa-play"></i>';
         }
-      });
-
-      const absDiv = document.getElementById("absDiv");
-      absDiv.classList.add("absolute", "top-0", "right-0", "flex");
-      const strings = data.ModsString.split(", ");
-      const index = 20;
-
-      strings.forEach((str, index) => {
-        const img = document.createElement("img");
-        img.src = `${str}.png`;
-        img.alt = str;
-        absDiv.appendChild(img);
-
-        const width = (index + 1) * 95;
-        absDiv.style.width = `${width}px`;
-      });
-
-      let apiUrl = `/api/beatmaps/search?searchquery=Beatmapid==${data.Beatmapid}`;
-
-      fetch(apiUrl)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          createScoreElements(data);
-          createLineChart("mapprogress", data, rowid);
-        })
-        .catch((error) => {
-          console.error("Error fetching recent score data:", error);
-          document.getElementById("scorecontainer").innerHTML =
-            "An error occurred while fetching Beatmap Data.";
-        });
-
-      apiUrl = `/api/user?userid=${data.Username}&mode=${data.Mode}`;
-      fetch(apiUrl)
-        .then((response) => response.json())
-        .then((player) => {
-          console.log(player);
-
-          let supporterlevel = `<div class="text--pink">`;
-          for (let i = 0; i < player.support_level; i++) {
-            supporterlevel += `<i class="fas fa-heart"></i>`;
-          }
-          supporterlevel += `</div>`;
-          let onlinediv = "";
-          let status = "";
-          if (player.is_active) {
-            onlinediv = `
-                        <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-                       
-                            <circle cx="15" cy="15" r="13" fill="transparent" stroke="white" stroke-width="1"/>
-                            <circle cx="15" cy="15" r="8" fill="transparent" stroke="white" stroke-width="1"/>
-                            <circle cx="15" cy="15" r="10" fill="transparent" stroke="green" stroke-width="4" />
-
-                        </svg> `;
-            status = "Online";
-          } else {
-            onlinediv = `
-                            <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-                            
-                            <circle cx="15" cy="15" r="13" fill="transparent" stroke="white" stroke-width="1"/>
-                            <circle cx="15" cy="15" r="8" fill="transparent" stroke="white" stroke-width="1"/>
-                            <circle cx="15" cy="15" r="10" fill="transparent" stroke="black" stroke-width="4" />
-
-                        </svg> `;
-            status = "Offline";
-          }
-
-          document.getElementById("playerdiv").innerHTML = `
-                    <a href="https://osu.ppy.sh/users/${
-                      player.id
-                    }" class="relative">
-                    <div class="h-28 bg-cover rounded-lg relative" style="background-image: url(${
-                      player.cover_url
-                    })">
-                        <div class="absolute inset-0 bg-black opacity-50 rounded-lg">
-                        </div>
-
-                        <img src="${
-                          player.avatar_url
-                        }" class="h-16 absolute rounded-lg top-2 left-2">
-                        </div>
-                            <div class=" absolute rounded-lg top-2 left-24">   
-                                <span class="fi fi-${player.country_code.toLowerCase()} "></span>
-                            </div>
-                            <div class=" absolute rounded-lg top-2 left-32">
-                            <p class="text-red-600"> ${supporterlevel} </p></div>
-                            <div class=" absolute rounded-lg top-10 left-24">${
-                              player.username
-                            } </div>
-                            <div class=" absolute rounded-lg top-20 left-6">${onlinediv} </div>
-                              <div class=" absolute rounded-lg top-20 left-24">${status} </div>
-                        </div>
-                    </a>
-
-                    `;
-        })
-        .catch((error) => {
-          console.error("Error fetching recent score data:", error);
-          document.getElementById("playerdiv").innerHTML =
-            "An error occurred while fetching data.";
-        });
-    })
-    .catch((error) => {
-      console.error("Error fetching beatmap data:", error);
-      document.getElementById("beatmapData").innerHTML =
-        "An error occurred while fetching Player data.";
     });
-}
 
-function openAnalyzer() {
-  console.log("MissAnalyzer Request");
-  const apiUrl = "/api/run";
+    let from = document.getElementById("fromDate").value;
+    let to = document.getElementById("toDate").value;
 
-  const postData = {
-    programm: "OsuMissAnalyzer",
-    id: rowid,
-  };
-
-  const requestOptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(postData),
-  };
-
-  fetch(apiUrl, requestOptions)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log("POST request successful. Response data:", data);
-    })
-    .catch((error) => {
-      console.error("Error making POST request:", error);
-    });
-  alert("Starting OsuMissAnalyzer!");
-}
-
-function createLineChart(canvasId, data, highlightedScoreId) {
-  const filteredData = data.filter((entry) => entry.Time > 5);
-
-  filteredData.reverse();
-
-  console.log(highlightedScoreId);
-  const dates = filteredData.map((entry) => entry.Date);
-  const accValues = filteredData.map((entry) => entry.Acc);
-  const ppValues = filteredData.map((entry) => entry.PP);
-  const comboValues = filteredData.map((entry) => entry.Combo);
-
-  const highlightedScoreIndex =
-    highlightedScoreId !== undefined
-      ? filteredData.findIndex((entry) => entry.id == highlightedScoreId)
-      : -1;
-
-  console.log(filteredData);
-  console.log(highlightedScoreId);
-  console.log(highlightedScoreIndex);
-
-  const ctx = document.getElementById(canvasId).getContext("2d");
-  ctx;
-  if (myChart) {
-    myChart.destroy();
-  }
-
-  myChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: dates,
-      datasets: [
-        {
-          label: "Acc",
-          data: accValues,
-          borderColor: "blue",
-          borderWidth: 2,
-          fill: false,
-          yAxisID: "y",
-        },
-        {
-          label: "PP",
-          data: ppValues,
-          borderColor: "green",
-          borderWidth: 2,
-          fill: false,
-          yAxisID: "y2",
-        },
-        {
-          label: "Combo",
-          data: comboValues,
-          borderColor: "red",
-          borderWidth: 2,
-          fill: false,
-          yAxisID: "y3",
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        annotation: {
-          annotations: [
-            {
-              type: "line",
-              mode: "vertical",
-              scaleID: "x",
-              value: highlightedScoreIndex,
-              borderColor: "rgba(255, 255, 255, 0.1)",
-              borderWidth: 3,
-              label: {
-                content: "Vertical Line",
-                enabled: true,
-                position: "top",
-              },
-            },
-          ],
-        },
-      },
-      legend: {
-        labels: {
-          color: "rgba(255, 102, 171, 1)",
-          font: {
-            size: 14,
-          },
-        },
-      },
-      scales: {
-        x: {
-          title: {
-            display: false,
-          },
-          ticks: {
-            color: "rgba(255, 102, 171, 1)",
-          },
-          grid: {
-            display: true,
-          },
-        },
-        y: {
-          position: "left",
-          title: {
-            display: true,
-            text: "Acc",
-            color: "blue",
-          },
-          ticks: {
-            color: "rgba(255, 102, 171, 1)",
-          },
-          grid: {
-            display: false,
-          },
-        },
-        y2: {
-          position: "right",
-          title: {
-            display: true,
-            text: "PP",
-            color: "green",
-          },
-          ticks: {
-            color: "rgba(255, 102, 171, 1)",
-          },
-          grid: {
-            display: false,
-          },
-        },
-        y3: {
-          position: "right",
-          title: {
-            display: true,
-            text: "Combo",
-            color: "red",
-          },
-          ticks: {
-            color: "rgba(255, 102, 171, 1)",
-          },
-          grid: {
-            display: true,
-          },
-        },
-      },
-    },
-  });
-}
-
-function createScoreElements(scores) {
-  const scoresContainer = document.getElementById("scorecontainer");
-  scoresContainer.innerHTML = "";
-
-  if (scores.length == 0) {
-    scoresContainer.innerHTML = "<p>No Score Found!</p>";
-  }
-  scores.forEach((score) => {
-    const scoreElement = document.createElement("a");
-    scoreElement.className = "flex justify-center mb-0";
-
-    score.Acc = score.Acc.toFixed(2);
-
-    scoreElement.href = `/score.html?id=${score.id}`;
-    scoreElement.target = "_blank";
-    scoreElement.rel = "noopener noreferrer";
-
-    scoreElement.innerHTML = `
-        <div class="flex score-backdrop--light h-16 rounded justify-between m-4 w-5/6 mb-1 mt-1">
-        <!-- Status and Grade-->
-        <div class="flex flex-col grade-rank-container rounded justify-evenly w-1/6">
-            <div class="flex justify-center">
-                <p class="text--gray">${score.Status}</p>
-            </div>
-            <div class="flex justify-center">
-
-                <img src="${score.Grade}.png" alt="${score.Grade}" class="w-20">
-            </div>
-        </div>
-        <div class="backdrop--dark icon rounded-lg flex-nowrap">
-            <img src="${score.Cover}" class="w-16 h-16" alt="?">
-        </div>
-
-        <!-- Name, Score/Combo, Grade Date -->
-        <div class="flex flex-col rounded justify-evenly scoreinfo-container">
-            <div>
-                <p class="text-white whitespace-nowrap overflow-hidden">${score.Osufilename}</p>
-            </div>
-            <div>
-                <p class="text-white whitespace-nowrap overflow-hidden">${score.Score} / ${score.Combo} {${score.MaxCombo}} ${score.ModsString}</p>
-            </div>
-            <div class="flex">
-                <p class="text--dark--yellow whitespace-nowrap overflow-hidden">${score.Version}</p>
-                <p class="text--gray ml-4">${score.Date} (${score.Playtype})</p>
-            </div>
-        </div>
-
-        <!-- ACC and Hits-->
-        <div class="flex acc-container">
-            <div class="flex flex-col justify-evenly justify-self-end rounded w-1/4 ml-3">
-                <div>
-                    <p class="text--yellow">${score.Acc}%</p>
-                </div>
-                <div class="flex">
-                    <p class="text-white">{</p>
-                    <p class="text-blue-500">${score.Hit300}</p>
-                    <p class="text-white">,</p>
-                    <p class="text-green-500">${score.Hit100}</p>
-                    <p class="text-white">,</p>
-                    <p class="text--orange">${score.Hit50}</p>
-                    <p class="text-white">,</p>
-                    <p class="text-red-600">${score.HitMiss}</p>
-                    <p class="text-white">}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- PP -->
-        <div class="flex flex-col justify-evenly rounded backdrop--medium--light w-1/6 pp-container">
-            <div class="flex justify-center">
-                <p class="text--pink">${score.PP}pp</p>
-            </div>
-            <div class="flex justify-center">
-                <p class="text--pink--dark justify-self-center">(${score.FCPP}pp)</p>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-`;
-
-    scoresContainer.appendChild(scoreElement);
-  });
-}
-
-const searchbar = document.getElementById("mapsearch");
-let throttleTimeout;
-let lastSearchText = "";
-
-searchbar.addEventListener("input", function () {
-  const searchText = searchbar.value.trim();
-
-  if (searchText.length > 3 && searchText !== lastSearchText) {
-    lastSearchText = searchText;
-
-    scorecontainer.innerHTML = "";
-
-    clearTimeout(throttleTimeout);
-    throttleTimeout = setTimeout(() => {
-      const apiUrl = "api/beatmaps/search";
-
-      fetch(`${apiUrl}?searchquery=${searchText} Beatmapid==${beatmapid}`)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          createScoreElements(data);
-          createLineChart("mapprogress", data, rowid);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }, 500);
-  }
-
-  if (searchText.length == 0) {
-    const apiUrl = `/api/beatmaps/search?searchquery=Beatmapid==${beatmapid}`;
+    let apiUrl = `/api/beatmaps/search?from=${from}&to=${to}&Beatmapid=${beatmapid}`;
 
     fetch(apiUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        createScoreElements(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-});
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
 
-window.onload = fetchOsuBeatmap;
+            createLineChart("mapprogress", data, rowid);
+        })
+        .catch((error) => {
+            console.error("Error fetching recent score data:", error);
+        });
+
+    function createLineChart(canvasId, data, highlightedScoreId) {
+        const filteredData = data.filter((entry) => entry.Time > 5);
+
+        filteredData.reverse();
+
+        console.log(highlightedScoreId);
+        const dates = filteredData.map((entry) => entry.Date);
+        const accValues = filteredData.map((entry) => entry.Acc);
+        const ppValues = filteredData.map((entry) => entry.PP);
+        const comboValues = filteredData.map((entry) => entry.Combo);
+
+        const highlightedScoreIndex =
+            highlightedScoreId !== undefined
+                ? filteredData.findIndex((entry) => entry.id == highlightedScoreId)
+                : -1;
+
+        console.log(filteredData);
+        console.log(highlightedScoreId);
+        console.log(highlightedScoreIndex);
+
+        const ctx = document.getElementById(canvasId).getContext("2d");
+        ctx;
+        if (myChart) {
+            myChart.destroy();
+        }
+
+        myChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: dates,
+                datasets: [
+                    {
+                        label: "Acc",
+                        data: accValues,
+                        borderColor: "blue",
+                        borderWidth: 2,
+                        fill: false,
+                        yAxisID: "y",
+                    },
+                    {
+                        label: "PP",
+                        data: ppValues,
+                        borderColor: "green",
+                        borderWidth: 2,
+                        fill: false,
+                        yAxisID: "y2",
+                    },
+                    {
+                        label: "Combo",
+                        data: comboValues,
+                        borderColor: "red",
+                        borderWidth: 2,
+                        fill: false,
+                        yAxisID: "y3",
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    annotation: {
+                        annotations: [
+                            {
+                                type: "line",
+                                mode: "vertical",
+                                scaleID: "x",
+                                value: highlightedScoreIndex,
+                                borderColor: "rgba(255, 255, 255, 0.1)",
+                                borderWidth: 3,
+                                label: {
+                                    content: "Vertical Line",
+                                    enabled: true,
+                                    position: "top",
+                                },
+                            },
+                        ],
+                    },
+                },
+                legend: {
+                    labels: {
+                        color: "rgba(255, 102, 171, 1)",
+                        font: {
+                            size: 14,
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: false,
+                        },
+                        ticks: {
+                            color: "rgba(255, 102, 171, 1)",
+                        },
+                        grid: {
+                            display: true,
+                        },
+                    },
+                    y: {
+                        position: "left",
+                        title: {
+                            display: true,
+                            text: "Acc",
+                            color: "blue",
+                        },
+                        ticks: {
+                            color: "rgba(255, 102, 171, 1)",
+                        },
+                        grid: {
+                            display: false,
+                        },
+                    },
+                    y2: {
+                        position: "right",
+                        title: {
+                            display: true,
+                            text: "PP",
+                            color: "green",
+                        },
+                        ticks: {
+                            color: "rgba(255, 102, 171, 1)",
+                        },
+                        grid: {
+                            display: false,
+                        },
+                    },
+                    y3: {
+                        position: "right",
+                        title: {
+                            display: true,
+                            text: "Combo",
+                            color: "red",
+                        },
+                        ticks: {
+                            color: "rgba(255, 102, 171, 1)",
+                        },
+                        grid: {
+                            display: true,
+                        },
+                    },
+                },
+            },
+        });
+    }
+}
+
+fetchOsuBeatmap();
