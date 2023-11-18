@@ -7,7 +7,7 @@ class Program
 
     static async Task Main(string[] args)
     {
-        AppDomain.CurrentDomain.ProcessExit += ScoreImportera.progress;
+    
 
         Logger.SetConsoleLogLevel(Logger.Severity.Warning);
         if (args.Length > 0)
