@@ -11,6 +11,7 @@ using System.Data.Entity.Migrations.Design;
 using OsuMemoryDataProvider.OsuMemoryModels.Direct;
 using System.Text;
 using System;
+using System.Xml;
 
 namespace osu_progressCLI.Webserver.Server
 {
@@ -69,19 +70,31 @@ namespace osu_progressCLI.Webserver.Server
 
                 var context = new TemplateContext(scores);
                 context.SetValue("List", scores);
-                Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+                try
+                {
+                    Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+                } catch (Exception ex)
+                {
+
+                    Webserver.Instance().WriteResponse(response, "Something went wrong" + ex.Message, "text/html");
+                }
                 return;
             }
             else if (path == "/api/beatmaps/search" && request.HttpMethod == "GET")
             {
+                if (request.Headers["HX-Request"] != null)
+                {
+                    List<Score> scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()));
+                    Console.WriteLine(scores.Count);
+                    var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scores.liquid"));
 
-                List<Score> scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()));
-                Console.WriteLine(scores.Count);
-                var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scores.liquid"));
-
-                var context = new TemplateContext(scores);
-                context.SetValue("List", scores);
-                Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+                    var context = new TemplateContext(scores);
+                    context.SetValue("List", scores);
+                    Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+                }
+                else {
+                    Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()))), "application/json");
+                }
                 return;
             }
             else if (path == "/api/beatmaps/averages" && request.HttpMethod == "GET")
@@ -158,21 +171,20 @@ namespace osu_progressCLI.Webserver.Server
                         foreach (ScoreFileTracker list in ScoreImporter.Instance.getScoreFileTracker())
                         {
                             int percentage = (list.index + 1) * 100 / list.amountoffscores;
-                            output += $"<div class=\" text-center text-green-200 m-2\">" +
-                                $"<p>{list.filename}</p>" +
+                            output += $"<div class=\" text--pink m-2 flex justify-between\">" +
+                                $"<p>{Path.GetFileName(list.filename)}</p> <p>{list.index + 1}|{list.amountoffscores}</p></div>" +
                                 $"<div class=\"bg-pink-900 border\" style=\"width:{percentage}%\">{percentage}%</div>" +
                                 $"</div>";
                         }
                         output += "</div>";
-                        //DifficultyAttributes.Startshell("start explorer.exe imports");
-                        //Webserver.Instance().WriteResponse(response, $"<span>{ScoreImporter.Instance.GetStatus().running} {ScoreImporter.Instance.GetStatus().Finishedimports}/{ScoreImporter.Instance.GetStatus().ToImportScores}  </span> " + $"<span>{ScoreImporter.Instance.GetotherStatus().running} {ScoreImporter.Instance.GetotherStatus().index}/{ScoreImporter.Instance.GetotherStatus().scorecount} | {ScoreImporter.Instance.GetotherStatus().currentscoredb}/{ScoreImporter.Instance.GetotherStatus().dbocount} </span>", "text/html");
+                       
                         Webserver.Instance().WriteResponse(response, output, "text/html");
                     }
                 }
 
             } else if (path =="/api/import" && request.HttpMethod == "POST"){
 
-                Webserver.Instance().WriteResponse(response, "<span  class=\" text--pink \"> Folder to Put in the score.db or score.csv file should open!</span>", "text/html");
+                Webserver.Instance().WriteResponse(response, "<span  class=\" text--pink text-3xl \"> Folder to Put in the score.db or score.csv file should open!</span>", "text/html");
                 DifficultyAttributes.Startshell(@"start explorer.exe Importer\imports");
                 return;
             }
@@ -202,18 +214,24 @@ namespace osu_progressCLI.Webserver.Server
 
                 for (int i = 0; i < files.Length; i++)
                 {
-                    if (File.Exists("Importer/imports/osu!.db")) { 
+                    if (File.Exists("Importer/imports/osu!.db"))
+                    {
                         File.Move("Importer/imports/osu!.db", "Importer/cache/osu!.db");
-
+                    }
+                    else if (File.Exists("Importer/cache/osu!.db")) { 
+                        //osudb exists dont do anything
+                    } else { 
+                        Webserver.Instance().WriteResponse(response, $"<span class=\" text-red-600 text-3xl hide-me\"> Add a Copy off your osu!.db into the Folder, scores will not be imported otherwise! </span>", "text/html");
+                        return;
                     }
                 }
 
                 if (files.Length > 0) {
-                    Webserver.Instance().WriteResponse(response, $"<span class=\" text--pink \"> Starting Scoreimporter it will Take a few Seconds to Update! </span>", "text/html");
-                    ScoreImporter.Instance.StartImporting();
+                    Webserver.Instance().WriteResponse(response, $"<span class=\" text--pink text-3xl hide-me\"> Starting Scoreimporter it will Take a few Seconds to Update! </span>", "text/html");
+                   Task.Run(() => ScoreImporter.Instance.StartImporting());
                     return;
                 }
-                Webserver.Instance().WriteResponse(response, $"<span class=\" text--pink \"> Please Add Scores to Import </span>", "text/html");
+                Webserver.Instance().WriteResponse(response, $"<span class=\" text-red-600 text-3xl hide-me\"> Please Add Scores to Import </span>", "text/html");
                 return;
             }
 
