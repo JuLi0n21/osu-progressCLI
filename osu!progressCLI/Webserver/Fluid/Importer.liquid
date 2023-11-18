@@ -43,14 +43,22 @@
 
     <div class="flex justify-center items-center">
       <div class="p-4 rounded-lg shadow-lg backdrop--medium text--pink text-xl">
-        <h1 class="text-3xl font-bold text-center mb-4">Import Scores!</h1>
+        <h1 class="text-3xl font-bold text-center mb-4">Score Importer!</h1>
                      
-
+             <div class="m-4">
+                <p class="text-2xl font-bold mb-2"> How to import Scores? </p>
+                <p>1. Click "Open Folder"</p>
+                <p>2. Copy your osu!.db and any amount off score.dbs into it </p>
+                <p>3. Click "Start Import"</p>
+                <p>4. Wait Patiently till all the Scores are imported (it will keep running in the background!) </p>
+             </div>
+        
+         
           <div class="flex justify-center ">   
 
             <div class="backdrop--dark m-4 flex-1 overflow-x-hidden overflow-scroll h-96 max-h-96">
 
-                    <h3 class="flex font-bold text-center mb-4">Upload Status:</h3>
+                    <h3 class="font-bold text-center mb-4">Upload Status:</h3>
                     <div id="importForm" hx-post="/api/uploadstatus" hx-trigger="every 1s" hx-swap="innerHTML"></div>
                  
             </div>
@@ -70,16 +78,17 @@
           <div class="flex justify-evenly">
         
            <form class="text-center m-4 " hx-Post="/api/startimport" hx-target="#Messagebox" hx-swap="innerHTML">
-              <button class="backdrop--light rounded-lg" type="submit">*Start Importing*</button>
+              <button class="backdrop--light rounded-lg" type="submit">Start Import*</button>
            </form>
 
            <form class="text-center m-4 " hx-Post="/api/import" hx-target="#Messagebox" hx-swap="innerHTML">
-               <button class="backdrop--light rounded-lg" type="submit">*Click Me to Add more Files*</button>
+               <button class="backdrop--light rounded-lg" type="submit">Open Folder</button>
             </form>
 
          </div>
 
         <div class="text-center mb-6">
+               <p class="text-3xl text-center font-bold">Alternative Way to get your Scores!<p/>
           <p class="text-lg">
             Thanks to the Glorious People over at osu!alternative, we can import
             all your previously set scores (not including fails and only
@@ -88,7 +97,7 @@
         </div>
 
         <div class="mb-6">
-          <p class="font-bold">Follow these steps:</p>
+          <p class="font-bold m-4 text-center">Follow these steps:</p>
           <ol class="list-decimal ml-6">
             <li class="mb-6 ml-6">
               Join osu!Alternative Discord
@@ -130,6 +139,9 @@
               Download the csv
               <img src="downloadscorescsv.png" />
             </li>
+               <li class="mb-6 ml-6">
+                Put the Csv into the Folder and Start the Import!
+             </li>
           </ol>
         </div>
 
