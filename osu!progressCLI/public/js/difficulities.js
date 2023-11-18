@@ -1,5 +1,5 @@
 function createchart(data) {
-  const threeMonthsAgo = moment().subtract(3, "months");
+  const threeMonthsAgo = moment().subtract(3, "years");
 
   // Filter data to include only data points from the last 3 months
   const filteredData = data.filter((item) =>
