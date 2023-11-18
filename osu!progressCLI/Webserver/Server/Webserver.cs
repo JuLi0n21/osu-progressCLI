@@ -98,7 +98,12 @@ namespace osu_progressCLI.Webserver.Server
                 }
             }
 
-            if (path.StartsWith("/api/"))
+            if (path.EndsWith(".ogg") || path.EndsWith(".mp3") || path.EndsWith(".wav"))
+            {
+                serveaudio(request,response,path);
+            }
+
+                if (path.StartsWith("/api/"))
             {
                 api.Route(request, response, parser);
             }
@@ -147,6 +152,21 @@ namespace osu_progressCLI.Webserver.Server
                 string responseString = $"404 - Not Found: File not found at {filePath}";
                 WriteResponse(response, responseString, "text/plain");
             }
+        }
+
+        private void serveaudio(HttpListenerRequest request, HttpListenerResponse response, string path) {
+
+            if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}{HttpUtility.UrlDecode(path)}")) {
+                response.ContentType = GetContentType(HttpUtility.UrlDecode(path));
+
+                using (FileStream fs = File.OpenRead($"{Credentials.Instance.GetConfig().songfolder}{HttpUtility.UrlDecode(path)}"))
+                {
+                    fs.CopyTo(response.OutputStream);
+                }
+                response.OutputStream.Close();
+            }
+            return;
+                
         }
 
         private void serveimage(HttpListenerRequest request, HttpListenerResponse response, string path)
@@ -203,6 +223,12 @@ namespace osu_progressCLI.Webserver.Server
                     return "image/bmp";
                 case ".ico":
                     return "image/x-icon";
+                case ".ogg":
+                    return "audio/ogg";
+                case ".mp3":
+                    return "audio/mpeg";
+                case ".wav":
+                    return "audio/wav";
                 default:
                     return "application/octet-stream";
             }
