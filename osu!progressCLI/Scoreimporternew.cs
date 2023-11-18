@@ -80,7 +80,14 @@ namespace osu_progressCLI
                 }
                 else
                 {
-                    throw new Exception($"AHH OSUDB NEEDS TO BE IN THE '{CACHE_LOCATION}' Folder");
+                    if (File.Exists(IMPORT_LOCATION + "osu!.db")) {
+                        File.Move(IMPORT_LOCATION + "osu!.db", CACHE_LOCATION + "osu!.db");
+                        Osudb = OsuParsers.Decoders.DatabaseDecoder.DecodeOsu(CACHE_LOCATION + "osu!.db");
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
 
 
@@ -95,7 +102,7 @@ namespace osu_progressCLI
             
             List<OsuParsers.Database.ScoresDatabase> scoresDatabases = new();
 
-            startup();
+            await startup();
 
                 if (tracker == null)
                 {
@@ -178,9 +185,9 @@ namespace osu_progressCLI
 
                         int counter = 0;
 
-                        Parallel.For(tracker.ElementAt(i).index, tracker.ElementAt(i).amountoffscores, j =>
+                        Parallel.For(tracker.ElementAt(i).index, tracker.ElementAt(i).amountoffscores, async j =>
                         {
-                            DatabaseController.ImportScore(filterd.ElementAt(j));
+                           await DatabaseController.ImportScore(filterd.ElementAt(j));
                             tracker.ElementAt(i).index = counter++;
                         });
 
@@ -193,39 +200,39 @@ namespace osu_progressCLI
                 List<OsuParsers.Database.ScoresDatabase> scoredatabase = new();
                 List<Task> tasks = new List<Task>();
 
-           
-                Parallel.For(0, tracker.Count, async i =>
+
+            Parallel.For(0, tracker.Count, async i =>
+            {
+            try
+            {
+                if (tracker.ElementAt(i).filename.Contains("score"))
                 {
-                try
-                {
-                    if (tracker.ElementAt(i).filename.Contains("score"))
+
+                    tracker.ElementAt(i).running = true;
+                    var scoredb = OsuParsers.Decoders.DatabaseDecoder.DecodeScores(tracker.ElementAt(i).filename);
+
+                    int db = i;
+
+
+                    for (int j = tracker.ElementAt(db).index; j < tracker.ElementAt(db).amountoffscores; j++)
                     {
-
-                        tracker.ElementAt(i).running = true;
-                        var scoredb = OsuParsers.Decoders.DatabaseDecoder.DecodeScores(tracker.ElementAt(i).filename);
-
-                        int db = i;
+                        int index = j;
 
 
-                        for (int j = tracker.ElementAt(db).index; j < tracker.ElementAt(db).amountoffscores; j++)
+                        tracker.ElementAt(db).index = index;
+                        var score = scoredb.Scores.ElementAt(index).Item2.FirstOrDefault();
+
+                        if (score != null)
                         {
-                            int index = j;
 
-
-                            tracker.ElementAt(db).index = index;
-                            var score = scoredb.Scores.ElementAt(index).Item2.FirstOrDefault();
-
-                            if (score != null)
+                            foreach (var beatmap in Osudb.Beatmaps.ToList())
                             {
 
-                                foreach (var beatmap in Osudb.Beatmaps.ToList())
+                                if (beatmap != null && beatmap != default)
                                 {
 
-                                    if (beatmap != null && beatmap != default)
+                                    if (score.BeatmapMD5Hash == beatmap.MD5Hash)
                                     {
-
-                                        if (score.BeatmapMD5Hash == beatmap.MD5Hash)
-                                        {
                                             await DatabaseController.ImportScore(beatmap, score);
                                             await save();
                                             continue;
