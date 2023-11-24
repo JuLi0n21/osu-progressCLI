@@ -168,7 +168,7 @@
     <script>
         flatpickr("#fromDate");
          flatpickr("#toDate", {
-            defaultDate: "today",
+             defaultDate: new Date().fp_incr(1),
             dateFormat: "Y-m-d",
         });
         document.getElementById('toDate').valueAsDate = new Date();
