@@ -114,6 +114,11 @@
 
             </div>
 
+               <div hx-ext="sse" sse-connect="/stream">
+                   <div sse-swap="score" hx-target="#scorecontainer" hx-swap="afterbegin">
+                   </div>
+               </div>
+
             <div id="scorecontainer" class="flex-col overflow-y-scroll backdrop--medium page-width max-h-96  min-h-96"
                  hx-get="/api/beatmaps"
                  hx-trigger="load"
@@ -159,6 +164,7 @@
     </div>
 
     <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
     <script>
         flatpickr("#fromDate");
          flatpickr("#toDate", {
