@@ -4,6 +4,7 @@ function fetchOsuBeatmap() {
     const rowid = urlParams.get("id");
 
     beatmapid = document.getElementById("beatmapid").value;
+    osufilename = document.getElementById("Osufilename").value;
     const playButton = document.getElementById("playButton");
     const audioPlayer = document.getElementById("audioPlayer");
     audioPlayer.volume = 0.5;
@@ -22,7 +23,7 @@ function fetchOsuBeatmap() {
     let from = document.getElementById("fromDate").value;
     let to = document.getElementById("toDate").value;
 
-    let apiUrl = `/api/beatmaps/search?from=${from}&to=${to}&Beatmapid=${beatmapid}`;
+    let apiUrl = `/api/beatmaps/search?query=&from=${from}&to=${to}&Beatmapid=${beatmapid}&Osufilename=${osufilename}`;
 
     fetch(apiUrl)
         .then((response) => response.json())

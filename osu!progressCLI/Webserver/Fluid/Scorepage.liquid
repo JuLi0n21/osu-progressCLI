@@ -382,6 +382,7 @@
                         <label for="toDate">-</label>
                         <input type="date" id="toDate" name="to" class="text--yellow w-1/6 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
                         <input type="text" class="hidden" name="Beatmapid" value="{{ score.BeatmapId }}" id="beatmapid">
+                        <input type="text" class="hidden" name="Osufilename" value="{{ score.OsuFilename }}" id="Osufilename">
                     </div>
 
                 </form>
@@ -397,7 +398,7 @@
  <script>
       flatpickr("#fromDate");
       flatpickr("#toDate", {
-         defaultDate: "today",
+          defaultDate: new Date().fp_incr(1),
          dateFormat: "Y-m-d",
      });
      document.getElementById('toDate').valueAsDate = new Date();

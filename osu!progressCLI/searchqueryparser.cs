@@ -61,8 +61,6 @@ public class QueryParser
     }
     public static string Filter(string queryString)
     {
-        //string queryString = " Ichinose cs<=4 sadadfsasf cs>=2 cs<=4 hp>=6";
-
         QueryParser parser = new QueryParser();
         parser.Parse(queryString);
 
@@ -94,4 +92,28 @@ public class QueryParser
         return commandBuilder.ToString();
     }
 
+    public static string Filter(string queryString, string filename)
+    {
+        QueryParser parser = new QueryParser();
+        parser.Parse(queryString);
+
+        StringBuilder commandBuilder = new StringBuilder();
+
+        if(filename is not null)
+        {
+            commandBuilder.Append($"AND Osufilename == \"{filename}\" ");
+        }
+
+        foreach (var kvp in parser.QueryParams)
+        {
+            foreach (string kv in kvp.Value)
+            {
+                commandBuilder.Append($"AND {kvp.Key} {kv} ");
+            }
+        }
+
+        // Print the generated SQL query
+        // Console.WriteLine(commandBuilder.ToString());
+        return commandBuilder.ToString();
+    }
 }

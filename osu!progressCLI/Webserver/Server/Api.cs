@@ -53,6 +53,11 @@ namespace osu_progressCLI.Webserver.Server
                 if (!queryparams["Beatmapid"].IsNullOrEmpty())
                 {
                     queryparams["query"] += $" BeatmapId=={queryparams["Beatmapid"]}";
+                }
+
+                if (!queryparams["Osufilename"].IsNullOrEmpty())
+                {
+                    queryparams["query"] += $" {queryparams["Osufilename"]}";
                     Console.WriteLine(queryparams["query"]);
                 }
 
@@ -80,7 +85,16 @@ namespace osu_progressCLI.Webserver.Server
                 {
                     if (request.Headers["HX-Request"] != null)
                     {
-                        List<Score> scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()));
+                        List<Score> scores = null;
+
+                        if (!queryparams["Osufilename"].IsNullOrEmpty())
+                        {
+                            scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString(), queryparams["Osufilename"].ToString())); ;
+                        }
+                        else { 
+                            scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()));
+                        }
+
                         Console.WriteLine(scores.Count);
                         var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scores.liquid"));
 
@@ -90,7 +104,14 @@ namespace osu_progressCLI.Webserver.Server
                     }
                     else
                     {
-                        Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()))), "application/json");
+                        if (!queryparams["Osufilename"].IsNullOrEmpty())
+                        {
+                            Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString(), queryparams["Osufilename"].ToString()))), "application/json");
+
+                        } else
+                        {
+                            Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()))), "application/json");
+                        }
                     }
                     return;
                 }
