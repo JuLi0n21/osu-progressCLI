@@ -48,6 +48,9 @@ namespace osu_progressCLI.Datatypes
         public string Grade { get; set; }
         public double FCPP { get; set; }
 
+        public Score() {
+        }
+
         public Score(SQLiteDataReader reader)
         {
             Id = Convert.ToInt32(reader["id"]);
