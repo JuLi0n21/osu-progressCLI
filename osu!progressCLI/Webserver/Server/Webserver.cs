@@ -19,6 +19,9 @@ namespace osu_progressCLI.Webserver.Server
         private static HttpListener listener;
         private Api api;
         private RequestHandler helper;
+        private SSEstream sse;
+     
+
 
         private Webserver()
         {
@@ -30,7 +33,7 @@ namespace osu_progressCLI.Webserver.Server
 
             api = new Api();
             helper = new RequestHandler();
-
+            sse = new SSEstream();
         }
 
         public static Webserver Instance()
@@ -68,7 +71,7 @@ namespace osu_progressCLI.Webserver.Server
 
             if (path.EndsWith(".jpg") || path.EndsWith(".jpeg") || path.EndsWith(".png") || path.EndsWith(".gif") || path.EndsWith(".bmp") || path.EndsWith(".tiff") || path.EndsWith(".ico") || path.EndsWith(".webp") || path.EndsWith(".svg"))
             {
-                serveimage(request, response, path);  
+                serveimage(request, response, path);
             }
 
             if (path.EndsWith(".css") || path.EndsWith(".html") || path.EndsWith(".js") || path.EndsWith(".osr"))
@@ -100,10 +103,16 @@ namespace osu_progressCLI.Webserver.Server
 
             if (path.EndsWith(".ogg") || path.EndsWith(".mp3") || path.EndsWith(".wav"))
             {
-                serveaudio(request,response,path);
+                serveaudio(request, response, path);
             }
 
-                if (path.StartsWith("/api/"))
+            if (path.Equals("/stream"))
+            {
+                sse.Setup(request, response, parser);
+                return;
+            }
+
+            if (path.StartsWith("/api/"))
             {
                 api.Route(request, response, parser);
             }
@@ -166,7 +175,7 @@ namespace osu_progressCLI.Webserver.Server
                 response.OutputStream.Close();
             }
             return;
-                
+
         }
 
         private void serveimage(HttpListenerRequest request, HttpListenerResponse response, string path)

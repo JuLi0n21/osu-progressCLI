@@ -4,7 +4,7 @@ namespace osu_progressCLI.Datatypes
 {
     public class Score
     {
-        public int Id { get; set; }
+        public int Id { get; set; }  
         public DateTime Date { get; set; }
         public int BeatmapSetId { get; set; }
         public int BeatmapId { get; set; }

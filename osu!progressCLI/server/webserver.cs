@@ -22,7 +22,7 @@ namespace osu_progressCLI.server
         private DateTime lastMessageSentTime = DateTime.MinValue;
 
         private Reqreshelper helper;
-        private ConcurrentBag<WebSocket> connectedSockets = new ConcurrentBag<WebSocket>();
+        private ConcurrentBag<System.Net.WebSockets.WebSocket> connectedSockets = new ConcurrentBag<System.Net.WebSockets.WebSocket>();
 
         private string ip = "127.0.0.1";
         private string port = Credentials.Instance.GetConfig().port;
@@ -216,7 +216,7 @@ namespace osu_progressCLI.server
         {
             HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
 
-            WebSocket webSocket = webSocketContext.WebSocket;
+            System.Net.WebSockets.WebSocket webSocket = webSocketContext.WebSocket;
             connectedSockets.Add(webSocket);
             try
             {

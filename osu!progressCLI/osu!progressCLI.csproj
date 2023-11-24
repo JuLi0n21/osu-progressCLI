@@ -70,6 +70,7 @@
 	  <None Remove="public\js\TextFile1.txt" />
 	  <None Remove="Webserver\Fluid\Importer.liquid" />
 	  <None Remove="Webserver\Fluid\score.liquid" />
+	  <None Remove="Webserver\Fluid\scoreoneliner.liquid" />
 	  <None Remove="Webserver\Fluid\Scorepage.liquid" />
 	  <None Remove="Webserver\Fluid\Scores.liquid" />
 	  <None Remove="Webserver\Fluid\Settings.liquid" />
@@ -85,6 +86,7 @@
     <PackageReference Include="DeepCopy" Version="1.0.3" />
     <PackageReference Include="Fleck" Version="1.2.0" />
     <PackageReference Include="Fluid.Core" Version="2.5.0" />
+    <PackageReference Include="MethodTimer.Fody" Version="3.2.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
