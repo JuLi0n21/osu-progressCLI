@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>osu!progress</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
     <title>osu!progress</title>
+     <script src="https://cdn.tailwindcss.com/"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -19,11 +19,29 @@
     <style>
     </style>
 </head>
-<body>
+<body hx-boost="false">
+
+   {% if isAuth %}
+    <Button class="fixed left-2 top-0 flex flex-grow items-center backdrop--light text-white rounded-full h-14 mt-4 mb-4 mr-3 p-3">
+        <img src="{{ config.avatar_url }}" class="h-12 ml-1 w-auto rounded-full" alt="{{ config.username }}"/>
+         <span class="" style="color: rgba(70, 57, 63, 1);">{{ config.username }}</span>
+        <span class="absolute z-10 left-1/2 transform -translate-x-1/2 text-xl p-2"  style="mix-blend-mode: difference;">{{ config.username }}</span>
+    </Button>
+   {% else %}
+     <a href="https://osu-progress-oauth-helper.vercel.app/authorize?port={{ config.port }}">
+     <Button class="fixed left-2 top-0 flex flex-grow items-center backdrop--light text-white rounded-full h-14 mr-3 mt-4 mb-4 p-3">
+         <img src="https://osu.ppy.sh/images/layout/avatar-guest.png" class="h-12 ml-1 w-auto rounded-full" alt="Guest"/>
+          <span class="text-nowrap" style="color: rgba(70, 57, 63, 1);">LOGIN WITH OSU!</span>
+         <span class="absolute z-10 left-1/2 transform -translate-x-1/2 text-xl p-2 text-nowrap"  style="mix-blend-mode: difference;">LOGIN WITH OSU!</span>
+     </Button>
+     </a>
+   {% endif %}
+
+
 
 
     <!-- Reload button -->
-    <div class="fixed top-10 right-20 z-40">
+    <div class="fixed top-0 right-20 z-40">
         <button id="loadDataButton" class="text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 backdrop--light">
             <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Refresh_font_awesome.svg" alt="Refresh" style="width: 24px; height: 24px; filter: invert(100%);" />
         </button>
@@ -44,7 +62,7 @@
     </div>
     <!-- Main page-->
     <div class="flex justify-center items-center">
-
+        
         <div class="content w-1/2 rounded-lg backdrop--medium--dark text-white">
 
             <!-- header -->
@@ -74,7 +92,8 @@
                         </p>
 
                         <p class="mostplayedscreen">💻 {{ week.Screen }}</p>
-                    </div>
+                        <p class="count">📂 {{ count }}</p>
+                        </div>
                 </div>
 
                 <div style="position: relative;" class="mb-7"
@@ -95,7 +114,7 @@
                 <form hx-get="/api/beatmaps/search"
                       hx-trigger="input delay:500ms" 
                       hx-target="#scorecontainer" 
-                      hx-swap="innerHTML" 
+                      hx-swap="innerHTML transition:true" 
                       hx-indicator="#loading"
                       class="mb-4 flex justify-center">
                 
@@ -119,7 +138,7 @@
                    </div>
                </div>
 
-            <div id="scorecontainer" class="flex-col overflow-y-scroll backdrop--medium page-width max-h-96  min-h-96"
+            <div id="scorecontainer" class="flex-col overflow-y-scroll backdrop--medium page-width h-96 max-h-96  min-h-96 transition"
                  hx-get="/api/beatmaps"
                  hx-trigger="load"
                  hx-swap="innerHTML">
@@ -149,15 +168,15 @@
             </div>
 
             <div id="chart3" class="flex backdrop--medium" style="height: 280px">
-                <div class="w-1/2 rounded-l-lg backdrop--light flex-col justify-center items-center flex m-4">
-                    <h2>BanchoTime</h2>
-                    <canvas id="pieBanchoTimeChart" height="250" width="450"></canvas>
-                </div>
-                <div class="w-1/2 rounded-r-lg backdrop--light flex-col justify-center items-center flex m-4">
-                    <h2>TimeWasted</h2>
-                    <canvas id="pieTimeWastedChart" height="250" width="450"></canvas>
-                </div>
-            </div>
+          <div class="w-1/2 rounded-l-lg backdrop--light flex-col justify-center items-center flex m-4">
+              <h2>BanchoTime</h2>
+              <canvas id="pieBanchoTimeChart" height="250" width="450"></canvas>
+          </div>
+          <div class="w-1/2 rounded-r-lg backdrop--light flex-col justify-center items-center flex m-4">
+              <h2>TimeWasted</h2>
+              <canvas id="pieTimeWastedChart" height="250" width="450"></canvas>
+          </div>
+      </div>
 
         </div>
 
