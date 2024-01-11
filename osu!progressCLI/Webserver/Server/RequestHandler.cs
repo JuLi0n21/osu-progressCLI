@@ -3,6 +3,7 @@ using osu_progressCLI.Datatypes;
 using osu1progressbar.Game.Database;
 using System.Net;
 using System.Web;
+using WebSocketSharp;
 
 namespace osu_progressCLI.Webserver.Server
 {
@@ -32,6 +33,9 @@ namespace osu_progressCLI.Webserver.Server
                 string diffrencetolastweek = ((week.ThisWeek - week.LastWeek) / week.LastWeek * 100).ToString().PadRight(6).Substring(0, 6);
 
                 var context = new TemplateContext(week);
+
+                context.SetValue("isAuth", !Credentials.Instance.GetAccessToken().IsNullOrEmpty());
+                context.SetValue("count", controller.scorecount());
                 context.SetValue("thisweek", playtimethisweek);
                 context.SetValue("lastweek", diffrencetolastweek);
                 context.SetValue("week", week);

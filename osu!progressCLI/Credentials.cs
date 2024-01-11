@@ -16,6 +16,7 @@ namespace osu_progressCLI
         private JsonConfig config { get; set; }
 
         string credentialsFilePath = "credentials.json";
+        public static string loginwithosuFilePath = "loginWithOsu!.json";
 
 
         private Credentials()
@@ -23,10 +24,39 @@ namespace osu_progressCLI
 
             try
             {
+                if (File.Exists(loginwithosuFilePath))
+                {
+                    LoginHelper helper = new LoginHelper();
+
+                    using (StreamReader configReader = new StreamReader(loginwithosuFilePath))
+                    {
+                        string jsonConfigString = configReader.ReadToEnd();
+                        helper = JsonConvert.DeserializeObject<LoginHelper>(jsonConfigString);
+                    }
+
+                    if (helper == null)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        if (helper.CreatedAt.Value > DateTime.Now.AddSeconds(-helper.expires_in.Value))
+                        {
+                            SetAccessToken(helper.access_token);
+                        }
+                        else
+                        {
+                            ApiController.Instance.getAccessToken(helper.refresh_token);
+                        }
+                    }
+
+
+                }
 
                 if (!File.Exists(credentialsFilePath))
                 {
                     UpdateApiCredentials("", "");
+                    
                 }
                 else
                 {
@@ -37,6 +67,8 @@ namespace osu_progressCLI
                     }
 
                 }
+
+                
 
                 string configFilePath = "config.json";
                 if (!File.Exists(configFilePath))
@@ -250,6 +282,14 @@ namespace osu_progressCLI
     {
         public string? client_id { get; set; } = String.Empty;
         public string? client_secret { get; set; } = String.Empty;
+    }
+
+    class LoginHelper
+    {
+        public string? access_token { get; set; } = String.Empty;
+        public string? refresh_token { get; set; } = String.Empty;
+        public double? expires_in { get; set; } = null;
+        public DateTime? CreatedAt { get; set; } = null;
     }
 
     public class JsonConfig

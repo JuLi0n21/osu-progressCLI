@@ -42,7 +42,8 @@ namespace osu_progressCLI
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Getting AccessToken");
 
-            string access_token = null;
+            if (!Credentials.Instance.GetAccessToken().IsNullOrEmpty())
+                return;
 
             string oauthTokenEndpoint = "https://osu.ppy.sh/oauth/token";
             string grantType = "client_credentials";
@@ -78,8 +79,49 @@ namespace osu_progressCLI
 
                 TokenResponse tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
                 Credentials.Instance.SetAccessToken(tokenResponse.access_token);
-
+                Console.WriteLine(tokenResponse.access_token);
                 //await getMostPlayedMaps("14100399",10150,50, true);
+            }
+            else
+            {
+                Logger.Log(Logger.Severity.Warning, Logger.Framework.Network, $"HTTP Error: {response.StatusCode}, beatmap info will only be limited available, Check if ur Clientcredentials are correct and u have a working Internet Connection!");
+
+            }
+
+            httpClient.Dispose();
+
+        }
+
+        public async void getAccessToken(string refresh_token)
+        {
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Getting AccessToken");
+
+            string oauthTokenEndpoint = $"https://osu-progress-oauth-helper.vercel.app/refresh?port={ Credentials.Instance.GetConfig().port }";
+
+            var httpClient = new HttpClient();
+            var requestContent = new FormUrlEncodedContent(new[]
+            {
+            new KeyValuePair<string, string>("refresh_token", refresh_token),
+            });
+
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await httpClient.PostAsync(oauthTokenEndpoint, requestContent);
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Network, $"HTTP Request Exception: {ex.Message}");
+
+                return;
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Network, "Recieved Accesstoken, expanded Beatmap data should be availabe now.");
+ 
+                //request successfull handeled in api...
             }
             else
             {

@@ -1,4 +1,5 @@
 ﻿using Fluid;
+using Newtonsoft.Json;
 using osu_progressCLI.Datatypes;
 using osu1progressbar.Game.Database;
 using System.Collections.Specialized;
@@ -91,7 +92,8 @@ namespace osu_progressCLI.Webserver.Server
                         {
                             scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString(), queryparams["Osufilename"].ToString())); ;
                         }
-                        else { 
+                        else
+                        {
                             scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()));
                         }
 
@@ -108,7 +110,8 @@ namespace osu_progressCLI.Webserver.Server
                         {
                             Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString(), queryparams["Osufilename"].ToString()))), "application/json");
 
-                        } else
+                        }
+                        else
                         {
                             Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()))), "application/json");
                         }
@@ -258,6 +261,30 @@ namespace osu_progressCLI.Webserver.Server
                         return;
                     }
                     Webserver.Instance().WriteResponse(response, $"<span class=\" text-red-600 text-3xl hide-me\"> Please Add Scores to Import </span>", "text/html");
+                    return;
+                }
+                else if (path == "/api/callback" && request.HttpMethod == "GET")
+                {
+                   
+                    if (!queryparams["access_token"].IsNullOrEmpty())
+                    {
+                        Credentials.Instance.SetAccessToken(queryparams["access_token"]);
+                        LoginHelper ton = new();
+                        ton.access_token = queryparams["access_token"];
+                        ton.expires_in = int.Parse(queryparams["expires_in"]);
+                        ton.refresh_token = queryparams["refresh_token"];
+                        ton.CreatedAt = DateTime.Now;
+
+                        try
+                        {
+                            await File.WriteAllTextAsync(Credentials.loginwithosuFilePath, JsonConvert.SerializeObject(ton, Formatting.Indented));
+                        } catch (Exception e) {
+                            Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, e.Message);
+                        }
+                    }
+                       
+
+                    Webserver.Instance().Redirect(response, "/");
                     return;
                 }
 

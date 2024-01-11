@@ -148,6 +148,32 @@ namespace osu_progressCLI.Webserver.Server
             }
         }
 
+        public void Redirect(HttpListenerResponse response, string redirectLocation, bool permanent = false)
+        {
+            try
+            {
+                int statusCode = permanent ? 301 : 302;
+
+                response.StatusCode = statusCode;
+                response.AddHeader("Location", redirectLocation);
+                response.ContentType = "text/html";
+
+                string html = $"<!DOCTYPE html><html><head><meta http-equiv='refresh' content='0;url={redirectLocation}'></head><body></body></html>";
+
+                byte[] buffer = Encoding.UTF8.GetBytes(html);
+                response.ContentLength64 = buffer.Length;
+
+                Stream output = response.OutputStream;
+                output.Write(buffer, 0, buffer.Length);
+                output.Close();
+            }
+            catch (Exception e)
+            {
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Server, e.Message);
+            }
+        }
+
+
         public void ServeStaticFile(HttpListenerResponse response, string filePath, string contentType)
         {
             if (File.Exists(filePath))
