@@ -94,6 +94,9 @@ function fetchOsuBeatmap() {
                 ],
             },
             options: {
+                interaction: {
+                    intersect: false
+                },
                 responsive: true,
                 plugins: {
                     annotation: {

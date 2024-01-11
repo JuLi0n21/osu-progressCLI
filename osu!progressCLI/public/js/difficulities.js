@@ -87,6 +87,9 @@ function createchart(data) {
           },
         },
       },
+      interaction: {
+         intersect: false
+      },
       scales: {
         x: {
           type: "time",
