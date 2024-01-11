@@ -58,12 +58,12 @@ namespace osu_progressCLI.Webserver.Server
         public static void SendScore(Score score)
         {
 
-            var template = FluidRenderer.templates.Find(item => item.Key.Equals("scoreoneliner.liquid"));
+            var template = FluidRenderer.templates.Find(item => item.Key.Equals("score.liquid"));
 
             var context = new TemplateContext(score);
             context.SetValue("score", score);
 
-            string eventMessage = $"event: score\ndata: {template.Value.Render(context)}\n\n";
+            string eventMessage = $"event: score\ndata: {template.Value.Render(context).Replace("\n","").Replace("\r","")}\n\n";
             
             byte[] buffer = Encoding.UTF8.GetBytes(eventMessage);
 
