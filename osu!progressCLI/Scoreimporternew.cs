@@ -70,24 +70,21 @@ namespace osu_progressCLI
 
             if (Osudb == null)
             {
-                Console.WriteLine("Parsing osu!.db");
-
-                if (File.Exists(CACHE_LOCATION + "osu!.db"))
+                
+                string filepath = $"{Credentials.Instance.GetConfig().osufolder}/osu!.db";
+                if (File.Exists(filepath))
                 {
-
-                    Osudb = OsuParsers.Decoders.DatabaseDecoder.DecodeOsu(CACHE_LOCATION + "osu!.db");
+                    using (FileStream fileStream = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, bufferSize: 4096, useAsync: true))
+                    {
+                        Console.WriteLine("Parsing osu!.db");
+                        Osudb = OsuParsers.Decoders.DatabaseDecoder.DecodeOsu($"{Credentials.Instance.GetConfig().osufolder}/osu!.db");
+                        Console.WriteLine("Parsed osu!.db");
+                    }
 
                 }
                 else
                 {
-                    if (File.Exists(IMPORT_LOCATION + "osu!.db")) {
-                        File.Move(IMPORT_LOCATION + "osu!.db", CACHE_LOCATION + "osu!.db");
-                        Osudb = OsuParsers.Decoders.DatabaseDecoder.DecodeOsu(CACHE_LOCATION + "osu!.db");
-                    }
-                    else
-                    {
-                        return;
-                    }
+                   return;
                 }
 
 
@@ -183,13 +180,12 @@ namespace osu_progressCLI
                         tracker.ElementAt(i).amountoffscores = filterd.Count();
                         tracker.ElementAt(i).running = true;
 
-                        int counter = 0;
-
-                        Parallel.For(tracker.ElementAt(i).index, tracker.ElementAt(i).amountoffscores, async j =>
+                        for(int j = tracker.ElementAt(i).index; j < tracker.ElementAt(i).amountoffscores; j++)
                         {
-                           await DatabaseController.ImportScore(filterd.ElementAt(j));
-                            tracker.ElementAt(i).index = counter++;
-                        });
+                            await DatabaseController.ImportScore(filterd.ElementAt(j));
+                            await save();
+                            tracker.ElementAt(i).index = j;
+                        }
 
                         tracker.ElementAt(i).running = false;
                         File.Move(tracker.ElementAt(i).filename, FINISHED_LOCATION + Path.GetFileName(tracker.ElementAt(i).filename));
@@ -203,58 +199,41 @@ namespace osu_progressCLI
 
             Parallel.For(0, tracker.Count, async i =>
             {
-            try
-            {
-                if (tracker.ElementAt(i).filename.Contains("score"))
+                try
                 {
-
-                    tracker.ElementAt(i).running = true;
-                    var scoredb = OsuParsers.Decoders.DatabaseDecoder.DecodeScores(tracker.ElementAt(i).filename);
-
-                    int db = i;
-
-
-                    for (int j = tracker.ElementAt(db).index; j < tracker.ElementAt(db).amountoffscores; j++)
+                    if (tracker.ElementAt(i).filename.Contains("score"))
                     {
-                        int index = j;
+
+                        tracker.ElementAt(i).running = true;
+                        var scoredb = OsuParsers.Decoders.DatabaseDecoder.DecodeScores(tracker.ElementAt(i).filename);
+
+                        int db = i;
 
 
-                        tracker.ElementAt(db).index = index;
-                        var score = scoredb.Scores.ElementAt(index).Item2.FirstOrDefault();
-
-                        if (score != null)
+                        for (int j = tracker.ElementAt(db).index; j < tracker.ElementAt(db).amountoffscores; j++)
                         {
+                            int index = j;
 
-                            foreach (var beatmap in Osudb.Beatmaps.ToList())
+                            tracker.ElementAt(db).index = index;
+                            var score = scoredb.Scores.ElementAt(index).Item2.FirstOrDefault();
+
+                            if (score != null)
                             {
-
-                                if (beatmap != null && beatmap != default)
-                                {
-
-                                    if (score.BeatmapMD5Hash == beatmap.MD5Hash)
-                                    {
-                                            await DatabaseController.ImportScore(beatmap, score);
-                                            await save();
-                                            continue;
-                                        }
-                                    }
-                                }
-
+                                await DatabaseController.ImportScore(score);
+                                await save();
+                                continue;  
                             }
                         }
 
                         tracker.ElementAt(db).running = false;
                         File.Move(tracker.ElementAt(db).filename, FINISHED_LOCATION + Path.GetFileName(tracker.ElementAt(db).filename));
                     }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, e.Message);
-                    }
-                });
-
-              
-            
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, e.Message);
+                }
+            });
         }
 
         public List<ScoreFileTracker> getScoreFileTracker() {

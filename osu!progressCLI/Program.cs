@@ -8,7 +8,6 @@ class Program
     static async Task Main(string[] args)
     {
     
-
         Logger.SetConsoleLogLevel(Logger.Severity.Warning);
         if (args.Length > 0)
         {
@@ -21,8 +20,7 @@ class Program
             }
         }
 
-        Task.Run(() =>  ScoreImporter.Instance.StartImporting());
-        //Task.Run(() => ScoreImportera.Instance.ImportScores());
+        //Task.Run(() =>  ScoreImporter.Instance.StartImporting());
 
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
