@@ -6,6 +6,7 @@ namespace osu_progressCLI.Datatypes
     {
         public int Id { get; set; }  
         public DateTime Date { get; set; }
+        public string Title { get; set; }
         public int BeatmapSetId { get; set; }
         public int BeatmapId { get; set; }
         public string OsuFilename { get; set; }
@@ -55,6 +56,7 @@ namespace osu_progressCLI.Datatypes
         {
             Id = Convert.ToInt32(reader["id"]);
             Date = Convert.ToDateTime(reader["Date"]);
+            Title = reader["title"].ToString();
             BeatmapSetId = Convert.ToInt32(reader["BeatmapSetid"]);
             BeatmapId = Convert.ToInt32(reader["Beatmapid"]);
             OsuFilename = reader["Osufilename"].ToString();
