@@ -28,8 +28,6 @@ class Program
         Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, "Initialzing Components");
 
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");
-        Credentials crendtials = Credentials.Instance;
-        ApiController apiController = ApiController.Instance;
 
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
