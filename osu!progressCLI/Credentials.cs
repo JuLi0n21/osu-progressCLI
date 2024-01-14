@@ -11,6 +11,7 @@ namespace osu_progressCLI
         private static Credentials instance;
 
         private string access_token { get; set; }
+        private LoginHelper helper { get; set; }
         private JsonCredentials dataHelper { get; set; }
 
         private JsonConfig config { get; set; }
@@ -24,9 +25,11 @@ namespace osu_progressCLI
 
             try
             {
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Database, "Loading Login with Osu!");
                 if (File.Exists(loginwithosuFilePath))
                 {
-                    LoginHelper helper = new LoginHelper();
+                    Logger.Log(Logger.Severity.Info, Logger.Framework.Database, "File found try Parsing");
+                    helper = new LoginHelper();
 
                     using (StreamReader configReader = new StreamReader(loginwithosuFilePath))
                     {
@@ -36,23 +39,24 @@ namespace osu_progressCLI
 
                     if (helper == null)
                     {
-                        return;
+                        Logger.Log(Logger.Severity.Info, Logger.Framework.Database, "Parsing Failed");
                     }
                     else
                     {
                         if (helper.CreatedAt.Value > DateTime.Now.AddSeconds(-helper.expires_in.Value))
                         {
+                            Logger.Log(Logger.Severity.Info, Logger.Framework.Database, "Token not Outdated (reusing)");
                             SetAccessToken(helper.access_token);
-                        }
-                        else
+                        } else
                         {
-                            ApiController.Instance.getAccessToken(helper.refresh_token);
+                            Logger.Log(Logger.Severity.Info, Logger.Framework.Database, "Token Outdated (requested when needed)");
                         }
                     }
 
 
                 }
 
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Database, "Loading Credentials.json");
                 if (!File.Exists(credentialsFilePath))
                 {
                     UpdateApiCredentials("", "");
@@ -67,8 +71,6 @@ namespace osu_progressCLI
                     }
 
                 }
-
-                
 
                 string configFilePath = "config.json";
                 if (!File.Exists(configFilePath))
@@ -88,6 +90,11 @@ namespace osu_progressCLI
             {
                 Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, $"{e.Message}");
             }
+        }
+
+        public LoginHelper GetLoginHelper()
+        {
+            return helper;
         }
 
         public void SetAccessToken(string token)
@@ -133,8 +140,6 @@ namespace osu_progressCLI
                     if (!string.IsNullOrEmpty(clientsecret))
                         dataHelper.client_secret = clientsecret;
 
-
-                    ApiController.Instance.updateapitokken(dataHelper.client_id, dataHelper.client_secret);
                 }
 
                 File.WriteAllText(credentialsFilePath, JsonConvert.SerializeObject(dataHelper, Formatting.Indented));
@@ -284,7 +289,7 @@ namespace osu_progressCLI
         public string? client_secret { get; set; } = String.Empty;
     }
 
-    class LoginHelper
+    public class LoginHelper
     {
         public string? access_token { get; set; } = String.Empty;
         public string? refresh_token { get; set; } = String.Empty;
