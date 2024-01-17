@@ -30,7 +30,8 @@ namespace osu_progressCLI.Webserver.Server
                 }
 
                 templates.Add(new KeyValuePair<string, IFluidTemplate>(filename, template));
-                Console.WriteLine($"{filename} succsefully parsed and added!");
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Server, $"{filename} succsefully parsed and added!");
+
             }
 
             //iterate over list of to cache tempaltes

@@ -155,8 +155,34 @@ namespace osu_progressCLI
                 {
                     string responseBody = await reponse.Content.ReadAsStringAsync();
                     TokenResponse tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseBody);
+                    if(tokenResponse.access_token != null)
+                    {
                     Credentials.Instance.SetAccessToken(tokenResponse.access_token);
-                    Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Request for Failed: {responseBody}");
+
+                    LoginHelper ton = new();
+                    ton.access_token = tokenResponse.access_token;
+                    ton.expires_in = tokenResponse.expires_in;
+                    ton.refresh_token = tokenResponse.refresh_token;
+                    ton.CreatedAt = DateTime.Now;
+
+                        Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Recieved new Access_Token");
+                        
+                        try
+                        {
+                            await File.WriteAllTextAsync(Credentials.loginwithosuFilePath, JsonConvert.SerializeObject(ton, Formatting.Indented));
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, e.Message);
+                        }
+                    }
+                    else
+                    {
+                        Logger.Log(Logger.Severity.Info, Logger.Framework.Network, $"Something went wrong please log in again!");
+                    }
+                   
+                    
+                    
                 }
                 else
                 {

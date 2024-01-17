@@ -24,7 +24,7 @@ namespace osu_progressCLI.Webserver.Server
             {
                 //parsing parameters
                 string path = request.Url.AbsolutePath;
-                Console.WriteLine(path);
+                Logger.Log(Logger.Severity.Info, Logger.Framework.Server, path);
 
                 var queryparams = HttpUtility.ParseQueryString(request.Url.Query);
 
@@ -269,15 +269,15 @@ namespace osu_progressCLI.Webserver.Server
                     if (!queryparams["access_token"].IsNullOrEmpty())
                     {
                         Credentials.Instance.SetAccessToken(queryparams["access_token"]);
-                        LoginHelper ton = new();
-                        ton.access_token = queryparams["access_token"];
-                        ton.expires_in = int.Parse(queryparams["expires_in"]);
-                        ton.refresh_token = queryparams["refresh_token"];
-                        ton.CreatedAt = DateTime.Now;
+
+                        Credentials.Instance.GetLoginHelper().access_token = queryparams["access_token"];
+                        Credentials.Instance.GetLoginHelper().expires_in = int.Parse(queryparams["expires_in"]);
+                        Credentials.Instance.GetLoginHelper().refresh_token = queryparams["refresh_token"];
+                        Credentials.Instance.GetLoginHelper().CreatedAt = DateTime.Now;
 
                         try
                         {
-                            await File.WriteAllTextAsync(Credentials.loginwithosuFilePath, JsonConvert.SerializeObject(ton, Formatting.Indented));
+                            await File.WriteAllTextAsync(Credentials.loginwithosuFilePath, JsonConvert.SerializeObject(Credentials.Instance.GetLoginHelper(), Formatting.Indented));
                         } catch (Exception e) {
                             Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, e.Message);
                         }

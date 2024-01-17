@@ -20,7 +20,7 @@ namespace osu_progressCLI.Webserver.Server
             string path = request.Url.AbsolutePath;
             var queryparams = HttpUtility.ParseQueryString(request.Url.Query);
 
-            Console.WriteLine(path);
+            Logger.Log(Logger.Severity.Info, Logger.Framework.Server, $"Requsted: {path}");
 
             if (path == "/")
             {
