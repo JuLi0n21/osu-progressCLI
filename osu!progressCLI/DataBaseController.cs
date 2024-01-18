@@ -678,6 +678,50 @@ namespace osu1progressbar.Game.Database
             {
                 score.Title = localbeatmap.Title;
                 score.Bpm = 0;
+                
+                double oldbpm = 1 / localbeatmap.TimingPoints[0].BPM * 1000 * 60; ;
+
+                int oldoffset = 0;
+                List<KeyValuePair<double, int>> bpmpairs = new List<KeyValuePair<double, int>>
+                {
+                    new KeyValuePair<double, int>(oldbpm, (int)localbeatmap.TimingPoints[0].Offset)
+                };
+                for (int i = 1; i < localbeatmap.TimingPoints.Count - 1; i++)
+                {
+
+                    if (localbeatmap.TimingPoints[i].Inherited == false)
+                    {
+
+                    double newbpm = 1 / localbeatmap.TimingPoints[i].BPM * 1000 * 60;
+
+                        if (newbpm != oldbpm)
+                        {
+                            KeyValuePair<double, int> existingPair = bpmpairs.FirstOrDefault(t => t.Key == oldbpm);
+
+
+                            int newoffset = (int)localbeatmap.TimingPoints[i].Offset;
+
+                            if (existingPair.Equals(default(KeyValuePair<double, int>)))
+                            {
+                                bpmpairs.Add(new KeyValuePair<double, int>(oldbpm, (newoffset - oldoffset)));
+
+                            }
+                            else
+                            {
+                                int updatedValue = existingPair.Value + (newoffset - oldoffset);
+                                bpmpairs.Remove(existingPair);
+                                bpmpairs.Add(new KeyValuePair<double, int>(oldbpm, updatedValue));
+                            }
+
+                            oldbpm = newbpm;
+                            oldoffset = newoffset;
+                        }
+                    }
+                }
+
+
+               score.Bpm = Math.Round(bpmpairs.OrderByDescending(kv => kv.Value).FirstOrDefault().Key);
+
                 score.BeatmapSetId = localbeatmap.BeatmapSetId;
                 score.OsuFilename = localbeatmap.FileName;
                 score.FolderName = localbeatmap.FolderName;
