@@ -723,6 +723,7 @@ namespace osu1progressbar.Game.Database
                score.Bpm = Math.Round(bpmpairs.OrderByDescending(kv => kv.Value).FirstOrDefault().Key);
 
                 score.BeatmapSetId = localbeatmap.BeatmapSetId;
+                score.BeatmapId = localbeatmap.BeatmapId;
                 score.OsuFilename = localbeatmap.FileName;
                 score.FolderName = localbeatmap.FolderName;
                 score.Ar = localbeatmap.ApproachRate;
