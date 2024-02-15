@@ -140,6 +140,14 @@
                    <div sse-swap="score" hx-target="#scorecontainer" hx-swap="afterbegin">
                    </div>
                </div>
+            
+            <div hx-get="/api/potentialfcs" 
+                 hx-trigger="load"
+                class="page-width flex-col overflow-y-scroll backdrop--dark">
+                <button>
+                    Load potential Plays 
+                </button>
+            </div>
 
             <div id="scorecontainer" class="flex-col overflow-y-scroll backdrop--medium page-width h-96 max-h-96  min-h-96 transition"
                  hx-get="/api/beatmaps"
