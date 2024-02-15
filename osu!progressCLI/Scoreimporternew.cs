@@ -27,7 +27,6 @@ namespace osu_progressCLI
         private static readonly string CACHE_LOCATION = "Importer/cache/";
         public List<ScoreFileTracker> tracker = new();
         private static readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
-        private OsuParsers.Database.OsuDatabase Osudb = null;
 
         public static ScoreImporter Instance
         {
@@ -66,35 +65,6 @@ namespace osu_progressCLI
                 }
             }
 
-            if (Osudb == null)
-            {
-                string filepath = $"{Credentials.Instance.GetConfig().osufolder}/osu!.db";
-                if (File.Exists(filepath))
-                {
-                    using (
-                        FileStream fileStream = new FileStream(
-                            filepath,
-                            FileMode.Open,
-                            FileAccess.Read,
-                            FileShare.ReadWrite,
-                            bufferSize: 4096,
-                            useAsync: true
-                        )
-                    )
-                    {
-                        Console.WriteLine("Parsing osu!.db");
-                        Osudb = OsuParsers.Decoders.DatabaseDecoder.DecodeOsu(
-                            $"{Credentials.Instance.GetConfig().osufolder}/osu!.db"
-                        );
-                        Console.WriteLine("Parsed osu!.db");
-                    }
-                }
-                else
-                {
-                    return;
-                }
-            }
-
             string[] files = Directory.GetFiles(IMPORT_LOCATION);
 
             if (files.Length == 0)
@@ -102,63 +72,21 @@ namespace osu_progressCLI
                 return;
             }
 
-            List<OsuParsers.Database.ScoresDatabase> scoresDatabases = new();
-
-            await startup();
+            //await startup();
 
             if (tracker == null)
             {
                 tracker = new List<ScoreFileTracker>();
             }
 
-            if (tracker.Count != files.Length)
+            if (files.Length > 0)
             {
-                for (int i = 0; i < files.Length; i++)
+                if (files[0].EndsWith(".csv"))
                 {
-                    bool AlreadyInList = tracker.Exists(file => file.filename == files[i]);
 
-                    if (!AlreadyInList)
-                    {
-                        if (Path.GetExtension(files[i]) != ".csv" && files[i].Contains("scores"))
-                        {
-                            scoresDatabases.Add(
-                                OsuParsers.Decoders.DatabaseDecoder.DecodeScores(files[i])
-                            );
-
-                            tracker.Add(
-                                new ScoreFileTracker()
-                                {
-                                    filename = files[i],
-                                    running = false,
-                                    amountoffscores = scoresDatabases.Last().Scores.Count(), //should be last becuase just asdded
-                                    index = 0
-                                }
-                            );
-                        }
-                        else if (Path.GetExtension(files[i]) == ".csv")
-                        {
-                            tracker.Add(
-                                new ScoreFileTracker()
-                                {
-                                    filename = files[i],
-                                    running = false,
-                                    amountoffscores = -1,
-                                    index = 0
-                                }
-                            );
-                        }
-                    }
-                }
-            }
-
-            for (int i = 0; i < tracker.Count; i++)
-            {
-                //Currently Overrides Latest Other ones ... cant be bothered
-                if (Path.GetExtension(tracker.ElementAt(i).filename) == ".csv")
-                {
                     List<ImportScore> scores = new();
                     List<ImportScore> filterd = new();
-                    using (var reader = new StreamReader(files[i]))
+                    using (var reader = new StreamReader(files[0]))
                     using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                     {
                         var records = csv.GetRecords<ImportScore>();
@@ -177,84 +105,17 @@ namespace osu_progressCLI
                         }
                     }
 
-                    tracker.ElementAt(i).amountoffscores = filterd.Count();
-                    tracker.ElementAt(i).running = true;
-
-                    for (
-                        int j = tracker.ElementAt(i).index;
-                        j < tracker.ElementAt(i).amountoffscores;
-                        j++
-                    )
+                    foreach (var score in filterd)
                     {
-                        await DatabaseController.ImportScore(filterd.ElementAt(j));
-                        await save();
-                        tracker.ElementAt(i).index = j;
+                        await DatabaseController.ImportScore(score);
                     }
-
-                    tracker.ElementAt(i).running = false;
-                    File.Move(
-                        tracker.ElementAt(i).filename,
-                        FINISHED_LOCATION + Path.GetFileName(tracker.ElementAt(i).filename)
-                    );
                 }
             }
-
-            List<OsuParsers.Database.ScoresDatabase> scoredatabase = new();
-            List<Task> tasks = new List<Task>();
-
-            Parallel.For(
-                0,
-                tracker.Count,
-                async i =>
-                {
-                    try
-                    {
-                        if (tracker.ElementAt(i).filename.Contains("score"))
-                        {
-                            tracker.ElementAt(i).running = true;
-                            var scoredb = OsuParsers.Decoders.DatabaseDecoder.DecodeScores(
-                                tracker.ElementAt(i).filename
-                            );
-
-                            int db = i;
-
-                            for (
-                                int j = tracker.ElementAt(db).index;
-                                j < tracker.ElementAt(db).amountoffscores;
-                                j++
-                            )
-                            {
-                                int index = j;
-
-                                tracker.ElementAt(db).index = index;
-                                var score = scoredb.Scores.ElementAt(index).Item2.FirstOrDefault();
-
-                                if (score != null)
-                                {
-                                    await DatabaseController.ImportScore(score);
-                                    await save();
-                                    continue;
-                                }
-                            }
-
-                            tracker.ElementAt(db).running = false;
-                            File.Move(
-                                tracker.ElementAt(db).filename,
-                                FINISHED_LOCATION + Path.GetFileName(tracker.ElementAt(db).filename)
-                            );
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log(
-                            Logger.Severity.Error,
-                            Logger.Framework.Scoreimporter,
-                            e.Message
-                        );
-                    }
-                }
-            );
         }
+          
+        
+                
+            
 
         public List<ScoreFileTracker> getScoreFileTracker()
         {
@@ -369,6 +230,6 @@ namespace osu_progressCLI
         public double modded_ar { get; set; }
         public double modded_cs { get; set; }
         public double modded_hp { get; set; }
-        public string packs { get; set; }
+        public string pack_id { get; set; }
     }
 }

@@ -283,7 +283,6 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        [Time]
         public static async Task<bool> ImportScore(OsuParsers.Database.Objects.Score score)
         {
             if (score == null)
@@ -490,7 +489,7 @@ namespace osu1progressbar.Game.Database
                         score.Count100,
                         score.Count300,
                         0,
-                        score.Combo,
+                        0,
                         (int)score.Ruleset
                     );
 
@@ -557,7 +556,7 @@ namespace osu1progressbar.Game.Database
                         Logger.Framework.Database,
                         $"Trying to Get Filename {score.beatmap_id}"
                     );
-                    osufilename = Util.osufile(foldername, score.diffname, "TESTFOLDERDELETEAFTER");
+                    osufilename = Util.osufile(foldername, score.diffname);
 
                     Logger.Log(
                         Logger.Severity.Debug,
@@ -665,7 +664,7 @@ namespace osu1progressbar.Game.Database
                         score.count100,
                         score.count300,
                         0,
-                        score.combo
+                        0
                     );
 
                     //YYYY-MM-DD HH:MM THIS FORMAT IS SUPPOSED TO BE USED
@@ -747,28 +746,37 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        public List<Score> GetPotentcialtopplays(
-            string from,
-            string to,
-            int combopercent,
-            int misscount,
-            bool pass
-        )
+        public List<Score> GetPotentcialtopplays()
         {
             List<Score> scores = new List<Score>();
 
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-
+                //play number 20 has 30% impact on topscore 
                 using (var command = connection.CreateCommand())
                 {
                     string insertquery =
-                        @" SELECT *, rowid AS id 
-                                            FROM ScoreData
-                                            WHERE Date BETWEEN @from AND @to
-                                            AND 
-                                             ";
+                        @"SELECT *, rowid AS id 
+                            FROM ScoreData
+                            WHERE COMBO >= MAXCOMBO * 0.5
+                            AND COMBO <= MAXCOMBO * 0.9
+                            AND HITMISS <= 5
+                            AND FCPP > 255;
+                                            ";
+
+                    command.CommandText = insertquery;
+
+                    command.ExecuteNonQuery( );
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Score score = new Score(reader);
+                            scores.Add(score);
+                        }
+                    }
                 }
             }
 
@@ -1063,7 +1071,7 @@ namespace osu1progressbar.Game.Database
                         + "FROM ScoreData "
                         + "WHERE datetime(Date) BETWEEN @from AND @to "
                         + "ORDER BY Date DESC "
-                        + "LIMIT 100;";
+                        + "LIMIT 1000;";
                     //";";
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
