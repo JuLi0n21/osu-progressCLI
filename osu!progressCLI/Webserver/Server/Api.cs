@@ -447,6 +447,21 @@ namespace osu_progressCLI.Webserver.Server
 
                     Webserver.Instance().Redirect(response, $"/");
                     return;
+                } else if(path == "/api/potentialfcs")
+                {
+                    List<Score> scores = null;
+
+                    scores = controller.GetPotentcialtopplays();
+                    
+                    var template = FluidRenderer.templates.Find(item =>
+                        item.Key.Equals("Scores.liquid")
+                    );
+
+                    var context = new TemplateContext(scores);
+                    context.SetValue("List", scores);
+                    Webserver
+                        .Instance()
+                        .WriteResponse(response, template.Value.Render(context), "text/html");
                 }
             }
             catch (Exception e) { }

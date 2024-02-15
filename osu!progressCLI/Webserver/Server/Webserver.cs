@@ -66,7 +66,7 @@ namespace osu_progressCLI.Webserver.Server
             HttpListenerResponse response = context.Response;
 
             string path = request.Url.AbsolutePath;
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, path);
+            //Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, path);
 
             if (
                 path.EndsWith(".jpg")
