@@ -1,13 +1,12 @@
-﻿using osu_progressCLI;
-using osu_progressCLI.Webserver.Server;
+﻿using Newtonsoft.Json.Linq;
 using osu1progressbar.Game.MemoryProvider;
+using osu_progressCLI;
+using osu_progressCLI.Webserver.Server;
 
 class Program
 {
-
     static async Task Main(string[] args)
     {
-    
         Logger.SetConsoleLogLevel(Logger.Severity.Warning);
         if (args.Length > 0)
         {
@@ -24,7 +23,9 @@ class Program
 
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
-        Console.WriteLine("Keep this Terminal Open or the Progamm will stop if u want it run in the background follow the guide on the github!");
+        Console.WriteLine(
+            "Keep this Terminal Open or the Progamm will stop if u want it run in the background follow the guide on the github!"
+        );
         Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, "Initialzing Components");
 
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");
@@ -32,6 +33,7 @@ class Program
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
 
+        //Console.WriteLine($"{job.ToString()}");
         await Webserver.Instance().start();
 
         memoryProvider.Stop();

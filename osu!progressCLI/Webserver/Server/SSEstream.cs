@@ -1,30 +1,30 @@
-﻿using Fluid;
-using osu_progressCLI.Datatypes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Fluid;
+using osu_progressCLI.Datatypes;
 
 namespace osu_progressCLI.Webserver.Server
 {
-
     internal class SSEstream
     {
         private static List<HttpListenerResponse> SSEconnections = new List<HttpListenerResponse>();
         private static object lockObject = new object();
         private static FluidRenderer renderer = new FluidRenderer();
 
-
-        public void Setup(HttpListenerRequest request, HttpListenerResponse response, FluidParser parser) {
-
-
+        public void Setup(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            FluidParser parser
+        )
+        {
             response.ContentType = "text/event-stream";
             response.Headers.Add("Cache-Control", "no-cache");
             response.Headers.Add("Connection", "keep-alive");
-
 
             lock (lockObject)
             {
@@ -47,7 +47,7 @@ namespace osu_progressCLI.Webserver.Server
                         client.OutputStream.Write(buffer, 0, buffer.Length);
                         client.OutputStream.Flush();
                     }
-                    catch (Exception e)  
+                    catch (Exception e)
                     {
                         Logger.Log(Logger.Severity.Warning, Logger.Framework.Server, e.Message);
                     }
@@ -57,14 +57,14 @@ namespace osu_progressCLI.Webserver.Server
 
         public static void SendScore(Score score)
         {
-
             var template = FluidRenderer.templates.Find(item => item.Key.Equals("score.liquid"));
 
             var context = new TemplateContext(score);
             context.SetValue("score", score);
 
-            string eventMessage = $"event: score\ndata: {template.Value.Render(context).Replace("\n","").Replace("\r","")}\n\n";
-            
+            string eventMessage =
+                $"event: score\ndata: {template.Value.Render(context).Replace("\n", "").Replace("\r", "")}\n\n";
+
             byte[] buffer = Encoding.UTF8.GetBytes(eventMessage);
 
             lock (lockObject)

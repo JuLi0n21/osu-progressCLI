@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 using osu1progressbar.Game.Database;
-using System.Diagnostics;
 
 namespace osu_progressCLI.server
 {
@@ -31,29 +31,40 @@ namespace osu_progressCLI.server
         {
             try
             {
-
                 var config = Credentials.Instance.GetConfig();
 
                 Random rdm = new Random();
 
                 string username = "Guest";
                 string avatar_url = "https://osu.ppy.sh/images/layout/avatar-guest.png";
-                string cover_url = "https://osu.ppy.sh/images/headers/profile-covers/c" + rdm.Next(1, 9).ToString() + ".jpg";
+                string cover_url =
+                    "https://osu.ppy.sh/images/headers/profile-covers/c"
+                    + rdm.Next(1, 9).ToString()
+                    + ".jpg";
                 string country = "Unknown";
                 string countrycode = "USA";
                 string rank = "-";
                 string countryrank = "-";
 
-                Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $@" Screen: {week.Status} Lastweek: {week.LastWeek} ThisWeek: {week.ThisWeek}");
+                Logger.Log(
+                    Logger.Severity.Debug,
+                    Logger.Framework.Server,
+                    $@" Screen: {week.Status} Lastweek: {week.LastWeek} ThisWeek: {week.ThisWeek}"
+                );
                 string BanchoStatus = week.Status;
-                string playtimethisweek = (week.ThisWeek / 3600).ToString().PadRight(5).Substring(0, 5);
-                string diffrencetolastweek = ((week.ThisWeek - week.LastWeek) / week.LastWeek * 100).ToString().PadRight(6).Substring(0, 6);
+                string playtimethisweek = (week.ThisWeek / 3600)
+                    .ToString()
+                    .PadRight(5)
+                    .Substring(0, 5);
+                string diffrencetolastweek = ((week.ThisWeek - week.LastWeek) / week.LastWeek * 100)
+                    .ToString()
+                    .PadRight(6)
+                    .Substring(0, 6);
                 if (config.Local == "False" || user == null)
                 {
                     try
                     {
                         user = ApiController.Instance.getuser(userid, mode).Result;
-
                     }
                     catch
                     {
@@ -96,7 +107,6 @@ namespace osu_progressCLI.server
                 }
                 else
                 {
-
                     if (!string.IsNullOrEmpty(config.username))
                     {
                         username = config.username;
@@ -123,10 +133,8 @@ namespace osu_progressCLI.server
                     }
                 }
 
-
-
-
-                string html = $@"
+                string html =
+                    $@"
 <!DOCTYPE html>
 <html lang=""en"">
 <head>

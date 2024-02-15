@@ -4,7 +4,7 @@ namespace osu_progressCLI.Datatypes
 {
     public class Score
     {
-        public int Id { get; set; }  
+        public int Id { get; set; }
         public DateTime Date { get; set; }
         public string Title { get; set; }
         public int BeatmapSetId { get; set; }
@@ -24,7 +24,7 @@ namespace osu_progressCLI.Datatypes
         public string Creator { get; set; }
         public string Username { get; set; }
         public double Acc { get; set; }
-        public int score { get; set; } 
+        public int score { get; set; }
         public int MaxCombo { get; set; }
         public int ScoreValue { get; set; }
         public int Combo { get; set; }
@@ -49,8 +49,7 @@ namespace osu_progressCLI.Datatypes
         public string Grade { get; set; }
         public double FCPP { get; set; }
 
-        public Score() {
-        }
+        public Score() { }
 
         public Score(SQLiteDataReader reader)
         {

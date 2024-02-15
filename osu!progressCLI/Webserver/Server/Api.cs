@@ -1,10 +1,10 @@
-﻿using Fluid;
-using Newtonsoft.Json;
-using osu_progressCLI.Datatypes;
-using osu1progressbar.Game.Database;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Net;
 using System.Web;
+using Fluid;
+using Newtonsoft.Json;
+using osu1progressbar.Game.Database;
+using osu_progressCLI.Datatypes;
 using WebSocketSharp;
 
 namespace osu_progressCLI.Webserver.Server
@@ -17,8 +17,12 @@ namespace osu_progressCLI.Webserver.Server
         {
             controller = new DatabaseController();
         }
-		
-        public async void Route(HttpListenerRequest request, HttpListenerResponse response, FluidParser parser)
+
+        public async void Route(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            FluidParser parser
+        )
         {
             try
             {
@@ -47,8 +51,11 @@ namespace osu_progressCLI.Webserver.Server
 
                 if (queryparams["from"] != null && queryparams["to"] != null)
                 {
-                    if (!DateTime.TryParse(queryparams["to"].ToString(), out to) || !DateTime.TryParse(queryparams["from"].ToString(), out from)) ;
-
+                    if (
+                        !DateTime.TryParse(queryparams["to"].ToString(), out to)
+                        || !DateTime.TryParse(queryparams["from"].ToString(), out from)
+                    )
+                        ;
                 }
 
                 if (!queryparams["Beatmapid"].IsNullOrEmpty())
@@ -65,20 +72,28 @@ namespace osu_progressCLI.Webserver.Server
                 //routing
                 if (path == "/api/beatmaps" && request.HttpMethod == "GET")
                 {
-
                     List<Score> scores = controller.GetScoresInTimeSpan(from, to);
-                    var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scores.liquid"));
+                    var template = FluidRenderer.templates.Find(item =>
+                        item.Key.Equals("Scores.liquid")
+                    );
 
                     var context = new TemplateContext(scores);
                     context.SetValue("List", scores);
                     try
                     {
-                        Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+                        Webserver
+                            .Instance()
+                            .WriteResponse(response, template.Value.Render(context), "text/html");
                     }
                     catch (Exception ex)
                     {
-
-                        Webserver.Instance().WriteResponse(response, "Something went wrong" + ex.Message, "text/html");
+                        Webserver
+                            .Instance()
+                            .WriteResponse(
+                                response,
+                                "Something went wrong" + ex.Message,
+                                "text/html"
+                            );
                     }
                     return;
                 }
@@ -90,57 +105,150 @@ namespace osu_progressCLI.Webserver.Server
 
                         if (!queryparams["Osufilename"].IsNullOrEmpty())
                         {
-                            scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString(), queryparams["Osufilename"].ToString())); ;
+                            scores = controller.GetScoreSearch(
+                                from,
+                                to,
+                                QueryParser.Filter(
+                                    queryparams["query"].ToString(),
+                                    queryparams["Osufilename"].ToString()
+                                )
+                            );
+                            ;
                         }
                         else
                         {
-                            scores = controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()));
+                            scores = controller.GetScoreSearch(
+                                from,
+                                to,
+                                QueryParser.Filter(queryparams["query"].ToString())
+                            );
                         }
 
                         Console.WriteLine(scores.Count);
-                        var template = FluidRenderer.templates.Find(item => item.Key.Equals("Scores.liquid"));
+                        var template = FluidRenderer.templates.Find(item =>
+                            item.Key.Equals("Scores.liquid")
+                        );
 
                         var context = new TemplateContext(scores);
                         context.SetValue("List", scores);
-                        Webserver.Instance().WriteResponse(response, template.Value.Render(context), "text/html");
+                        Webserver
+                            .Instance()
+                            .WriteResponse(response, template.Value.Render(context), "text/html");
                     }
                     else
                     {
                         if (!queryparams["Osufilename"].IsNullOrEmpty())
                         {
-                            Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString(), queryparams["Osufilename"].ToString()))), "application/json");
-
+                            Webserver
+                                .Instance()
+                                .WriteResponse(
+                                    response,
+                                    System.Text.Json.JsonSerializer.Serialize(
+                                        controller.GetScoreSearch(
+                                            from,
+                                            to,
+                                            QueryParser.Filter(
+                                                queryparams["query"].ToString(),
+                                                queryparams["Osufilename"].ToString()
+                                            )
+                                        )
+                                    ),
+                                    "application/json"
+                                );
                         }
                         else
                         {
-                            Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(queryparams["query"].ToString()))), "application/json");
+                            Webserver
+                                .Instance()
+                                .WriteResponse(
+                                    response,
+                                    System.Text.Json.JsonSerializer.Serialize(
+                                        controller.GetScoreSearch(
+                                            from,
+                                            to,
+                                            QueryParser.Filter(queryparams["query"].ToString())
+                                        )
+                                    ),
+                                    "application/json"
+                                );
                         }
                     }
                     return;
                 }
                 else if (path == "/api/beatmaps/averages" && request.HttpMethod == "GET")
                 {
-                    Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreAveragesbyDay(from, to)), "application/json");
+                    Webserver
+                        .Instance()
+                        .WriteResponse(
+                            response,
+                            System.Text.Json.JsonSerializer.Serialize(
+                                controller.GetScoreAveragesbyDay(from, to)
+                            ),
+                            "application/json"
+                        );
                 }
                 else if (path == "/api/banchotime" && request.HttpMethod == "GET")
                 {
-                    Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTime(from, to)), "application/json");
+                    Webserver
+                        .Instance()
+                        .WriteResponse(
+                            response,
+                            System.Text.Json.JsonSerializer.Serialize(
+                                controller.GetBanchoTime(from, to)
+                            ),
+                            "application/json"
+                        );
                 }
                 else if (path == "/api/banchotimebyday" && request.HttpMethod == "GET")
                 {
-                    Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTimebyDay(from, to)), "application/json");
+                    Webserver
+                        .Instance()
+                        .WriteResponse(
+                            response,
+                            System.Text.Json.JsonSerializer.Serialize(
+                                controller.GetBanchoTimebyDay(from, to)
+                            ),
+                            "application/json"
+                        );
                 }
                 else if (path == "/api/timewasted" && request.HttpMethod == "GET")
                 {
-                    Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWasted(from, to)), "application/json");
+                    Webserver
+                        .Instance()
+                        .WriteResponse(
+                            response,
+                            System.Text.Json.JsonSerializer.Serialize(
+                                controller.GetTimeWasted(from, to)
+                            ),
+                            "application/json"
+                        );
                 }
                 else if (path == "/api/timewastedbyday" && request.HttpMethod == "GET")
                 {
-                    Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWastedByDay(from, to)), "application/json");
+                    Webserver
+                        .Instance()
+                        .WriteResponse(
+                            response,
+                            System.Text.Json.JsonSerializer.Serialize(
+                                controller.GetTimeWastedByDay(from, to)
+                            ),
+                            "application/json"
+                        );
                 }
                 else if (path == "/api/user" && request.HttpMethod == "GET")
                 {
-                    Webserver.Instance().WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(await ApiController.Instance.getuser(queryparams["userid"], queryparams["mode"])), "application/json");
+                    Webserver
+                        .Instance()
+                        .WriteResponse(
+                            response,
+                            System.Text.Json.JsonSerializer.Serialize(
+                                await ApiController.Instance.getuser(
+                                    queryparams["userid"],
+                                    queryparams["mode"]
+                                )
+                            ),
+                            "application/json"
+                        );
                 }
                 else if (path == "/api/save" && request.HttpMethod == "POST")
                 {
@@ -164,57 +272,78 @@ namespace osu_progressCLI.Webserver.Server
                     }
                     catch
                     {
-                        Webserver.Instance().WriteResponse(response, "<span class=\"text-red-500 hide-me\">Something Went Wrong!</span>", "text/html");
+                        Webserver
+                            .Instance()
+                            .WriteResponse(
+                                response,
+                                "<span class=\"text-red-500 hide-me\">Something Went Wrong!</span>",
+                                "text/html"
+                            );
                         return;
                     }
 
-                    Webserver.Instance().WriteResponse(response, "<span class=\"text-green-600 hide-me\">Settings Updated!</span>", "text/html");
-
+                    Webserver
+                        .Instance()
+                        .WriteResponse(
+                            response,
+                            "<span class=\"text-green-600 hide-me\">Settings Updated!</span>",
+                            "text/html"
+                        );
                 }
-                else if (path == "/api/run" && request.HttpMethod == "POST")
-                {
-
-                }
+                else if (path == "/api/run" && request.HttpMethod == "POST") { }
                 else if (path == "/api/uploadstatus" && request.HttpMethod == "POST")
                 {
-                    bool allAreFalse = ScoreImporter.Instance.getScoreFileTracker().All(obj => obj.running == false);
+                    bool allAreFalse = ScoreImporter
+                        .Instance.getScoreFileTracker()
+                        .All(obj => obj.running == false);
 
                     if (allAreFalse)
                     {
-                        Webserver.Instance().WriteResponse(response, "<span> All Scores Imported </span>", "text/html");
+                        Webserver
+                            .Instance()
+                            .WriteResponse(
+                                response,
+                                "<span> All Scores Imported </span>",
+                                "text/html"
+                            );
                     }
                     else
                     {
-
                         string output = $"<div>";
 
                         if (ScoreImporter.Instance.getScoreFileTracker() != null)
                         {
-                            foreach (ScoreFileTracker list in ScoreImporter.Instance.getScoreFileTracker())
+                            foreach (
+                                ScoreFileTracker list in ScoreImporter.Instance.getScoreFileTracker()
+                            )
                             {
                                 int percentage = (list.index + 1) * 100 / list.amountoffscores;
-                                output += $"<div class=\" text--pink m-2 flex justify-between\">" +
-                                    $"<p>{Path.GetFileName(list.filename)}</p> <p>{list.index + 1}|{list.amountoffscores}</p></div>" +
-                                    $"<div class=\"bg-pink-900 border\" style=\"width:{percentage}%\">{percentage}%</div>" +
-                                    $"</div>";
+                                output +=
+                                    $"<div class=\" text--pink m-2 flex justify-between\">"
+                                    + $"<p>{Path.GetFileName(list.filename)}</p> <p>{list.index + 1}|{list.amountoffscores}</p></div>"
+                                    + $"<div class=\"bg-pink-900 border\" style=\"width:{percentage}%\">{percentage}%</div>"
+                                    + $"</div>";
                             }
                             output += "</div>";
 
                             Webserver.Instance().WriteResponse(response, output, "text/html");
                         }
                     }
-
                 }
                 else if (path == "/api/import" && request.HttpMethod == "POST")
                 {
-
-                    Webserver.Instance().WriteResponse(response, "<span  class=\" text--pink text-3xl \"> Folder to Put in the score.db or score.csv file should open!</span>", "text/html");
+                    Webserver
+                        .Instance()
+                        .WriteResponse(
+                            response,
+                            "<span  class=\" text--pink text-3xl \"> Folder to Put in the score.db or score.csv file should open!</span>",
+                            "text/html"
+                        );
                     DifficultyAttributes.Startshell(@"start explorer.exe Importer\imports");
                     return;
                 }
                 else if (path == "/api/importfiles" && request.HttpMethod == "POST")
                 {
-
                     try
                     {
                         string output = "<div class=\"flex flex-col\">";
@@ -230,7 +359,9 @@ namespace osu_progressCLI.Webserver.Server
                     }
                     catch (Exception e)
                     {
-                        Webserver.Instance().WriteResponse(response, $"<span> {e.Message} </span>", "text/html");
+                        Webserver
+                            .Instance()
+                            .WriteResponse(response, $"<span> {e.Message} </span>", "text/html");
                     }
                 }
                 else if (path == "/api/startimport" && request.HttpMethod == "POST")
@@ -249,48 +380,76 @@ namespace osu_progressCLI.Webserver.Server
                         }
                         else
                         {
-                            Webserver.Instance().WriteResponse(response, $"<span class=\" text-red-600 text-3xl hide-me\"> Add a Copy off your osu!.db into the Folder, scores will not be imported otherwise! </span>", "text/html");
+                            Webserver
+                                .Instance()
+                                .WriteResponse(
+                                    response,
+                                    $"<span class=\" text-red-600 text-3xl hide-me\"> Add a Copy off your osu!.db into the Folder, scores will not be imported otherwise! </span>",
+                                    "text/html"
+                                );
                             return;
                         }
                     }
 
                     if (files.Length > 0)
                     {
-                        Webserver.Instance().WriteResponse(response, $"<span class=\" text--pink text-3xl hide-me\"> Starting Scoreimporter it will Take a few Seconds to Update! </span>", "text/html");
+                        Webserver
+                            .Instance()
+                            .WriteResponse(
+                                response,
+                                $"<span class=\" text--pink text-3xl hide-me\"> Starting Scoreimporter it will Take a few Seconds to Update! </span>",
+                                "text/html"
+                            );
                         Task.Run(() => ScoreImporter.Instance.StartImporting());
                         return;
                     }
-                    Webserver.Instance().WriteResponse(response, $"<span class=\" text-red-600 text-3xl hide-me\"> Please Add Scores to Import </span>", "text/html");
+                    Webserver
+                        .Instance()
+                        .WriteResponse(
+                            response,
+                            $"<span class=\" text-red-600 text-3xl hide-me\"> Please Add Scores to Import </span>",
+                            "text/html"
+                        );
                     return;
                 }
                 else if (path == "/api/callback" && request.HttpMethod == "GET")
                 {
-                   
                     if (!queryparams["access_token"].IsNullOrEmpty())
                     {
                         Credentials.Instance.SetAccessToken(queryparams["access_token"]);
 
-                        Credentials.Instance.GetLoginHelper().access_token = queryparams["access_token"];
-                        Credentials.Instance.GetLoginHelper().expires_in = int.Parse(queryparams["expires_in"]);
-                        Credentials.Instance.GetLoginHelper().refresh_token = queryparams["refresh_token"];
+                        Credentials.Instance.GetLoginHelper().access_token = queryparams[
+                            "access_token"
+                        ];
+                        Credentials.Instance.GetLoginHelper().expires_in = int.Parse(
+                            queryparams["expires_in"]
+                        );
+                        Credentials.Instance.GetLoginHelper().refresh_token = queryparams[
+                            "refresh_token"
+                        ];
                         Credentials.Instance.GetLoginHelper().CreatedAt = DateTime.Now;
 
                         try
                         {
-                            await File.WriteAllTextAsync(Credentials.loginwithosuFilePath, JsonConvert.SerializeObject(Credentials.Instance.GetLoginHelper(), Formatting.Indented));
-                        } catch (Exception e) {
+                            await File.WriteAllTextAsync(
+                                Credentials.loginwithosuFilePath,
+                                JsonConvert.SerializeObject(
+                                    Credentials.Instance.GetLoginHelper(),
+                                    Formatting.Indented
+                                )
+                            );
+                        }
+                        catch (Exception e)
+                        {
                             Logger.Log(Logger.Severity.Error, Logger.Framework.Misc, e.Message);
                         }
                     }
-                       
+
                     Webserver.Instance().Redirect(response, $"/");
                     return;
                 }
-
             }
-            catch (Exception e) { 
-                
-            }
+            catch (Exception e) { }
             finally
             {
                 response.StatusCode = 404;

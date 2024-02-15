@@ -5,7 +5,6 @@
     /// </summary>
     public static class ModParser
     {
-
         public static string ParseEverything(int combinedFlags)
         {
             // Define a dictionary mapping mod names to their corresponding bit values
@@ -131,5 +130,4 @@
             return String.Empty;
         }
     }
-
 }

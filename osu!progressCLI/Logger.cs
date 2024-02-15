@@ -37,7 +37,8 @@
 
     public static async void Log(Severity severity, Framework framework, string message)
     {
-        string logEntry = $"{DateTime.Now} | {severity.ToString().PadRight(7)} | {framework.ToString().PadRight(8)} | {message}";
+        string logEntry =
+            $"{DateTime.Now} | {severity.ToString().PadRight(7)} | {framework.ToString().PadRight(8)} | {message}";
 
         string logFileName = $@"Logs\{framework}_Log.txt";
 
@@ -45,7 +46,14 @@
         {
             await Task.Run(() =>
             {
-                using (var fileStream = new FileStream(logFileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+                using (
+                    var fileStream = new FileStream(
+                        logFileName,
+                        FileMode.Append,
+                        FileAccess.Write,
+                        FileShare.ReadWrite
+                    )
+                )
                 using (var writer = new StreamWriter(fileStream))
                 {
                     writer.WriteLineAsync(logEntry);
@@ -63,7 +71,6 @@
         }
         catch (Exception e)
         {
-
             if (!Directory.Exists("Logs"))
             {
                 Directory.CreateDirectory("Logs");

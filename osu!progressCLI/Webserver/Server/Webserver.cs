@@ -1,7 +1,7 @@
-﻿using Fluid;
-using System.Net;
+﻿using System.Net;
 using System.Text;
 using System.Web;
+using Fluid;
 using WebSocketSharp;
 
 namespace osu_progressCLI.Webserver.Server
@@ -22,8 +22,6 @@ namespace osu_progressCLI.Webserver.Server
         private Api api;
         private RequestHandler helper;
         private SSEstream sse;
-     
-
 
         private Webserver()
         {
@@ -40,7 +38,6 @@ namespace osu_progressCLI.Webserver.Server
 
         public static Webserver Instance()
         {
-
             if (instance == null)
             {
                 instance = new Webserver();
@@ -65,14 +62,23 @@ namespace osu_progressCLI.Webserver.Server
 
         private async Task HandleRequest(HttpListenerContext context)
         {
-
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
 
             string path = request.Url.AbsolutePath;
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, path);
 
-            if (path.EndsWith(".jpg") || path.EndsWith(".jpeg") || path.EndsWith(".png") || path.EndsWith(".gif") || path.EndsWith(".bmp") || path.EndsWith(".tiff") || path.EndsWith(".ico") || path.EndsWith(".webp") || path.EndsWith(".svg"))
+            if (
+                path.EndsWith(".jpg")
+                || path.EndsWith(".jpeg")
+                || path.EndsWith(".png")
+                || path.EndsWith(".gif")
+                || path.EndsWith(".bmp")
+                || path.EndsWith(".tiff")
+                || path.EndsWith(".ico")
+                || path.EndsWith(".webp")
+                || path.EndsWith(".svg")
+            )
             {
                 serveimage(request, response, path);
             }
@@ -83,7 +89,12 @@ namespace osu_progressCLI.Webserver.Server
                 return;
             }
 
-            if (path.EndsWith(".css") || path.EndsWith(".html") || path.EndsWith(".js") || path.EndsWith(".osr"))
+            if (
+                path.EndsWith(".css")
+                || path.EndsWith(".html")
+                || path.EndsWith(".js")
+                || path.EndsWith(".osr")
+            )
             {
                 if (path.EndsWith(".css"))
                 {
@@ -105,7 +116,11 @@ namespace osu_progressCLI.Webserver.Server
 
                 if (path.EndsWith(".osr"))
                 {
-                    ServeStaticFile(response, $"{Credentials.Instance.GetConfig().osufolder}/Data/r/{path}", "application/osr");
+                    ServeStaticFile(
+                        response,
+                        $"{Credentials.Instance.GetConfig().osufolder}/Data/r/{path}",
+                        "application/osr"
+                    );
                     return;
                 }
             }
@@ -134,11 +149,19 @@ namespace osu_progressCLI.Webserver.Server
                 response.StatusCode = 404;
                 response.OutputStream.Close();
 
-                Logger.Log(Logger.Severity.Warning, Logger.Framework.Server, $"Not found: {path}. (Can be Ignored if everything works fine!)");
+                Logger.Log(
+                    Logger.Severity.Warning,
+                    Logger.Framework.Server,
+                    $"Not found: {path}. (Can be Ignored if everything works fine!)"
+                );
             }
         }
 
-        public void WriteResponse(HttpListenerResponse response, string responseString, string contentType)
+        public void WriteResponse(
+            HttpListenerResponse response,
+            string responseString,
+            string contentType
+        )
         {
             try
             {
@@ -157,7 +180,11 @@ namespace osu_progressCLI.Webserver.Server
             }
         }
 
-        public void Redirect(HttpListenerResponse response, string redirectLocation, bool permanent = false)
+        public void Redirect(
+            HttpListenerResponse response,
+            string redirectLocation,
+            bool permanent = false
+        )
         {
             try
             {
@@ -167,7 +194,8 @@ namespace osu_progressCLI.Webserver.Server
                 response.AddHeader("Location", redirectLocation);
                 response.ContentType = "text/html";
 
-                string html = $"<!DOCTYPE html><html><head><meta http-equiv='refresh' content='0;url={redirectLocation}'></head><body></body></html>";
+                string html =
+                    $"<!DOCTYPE html><html><head><meta http-equiv='refresh' content='0;url={redirectLocation}'></head><body></body></html>";
 
                 byte[] buffer = Encoding.UTF8.GetBytes(html);
                 response.ContentLength64 = buffer.Length;
@@ -182,8 +210,11 @@ namespace osu_progressCLI.Webserver.Server
             }
         }
 
-
-        public void ServeStaticFile(HttpListenerResponse response, string filePath, string contentType)
+        public void ServeStaticFile(
+            HttpListenerResponse response,
+            string filePath,
+            string contentType
+        )
         {
             if (File.Exists(filePath))
             {
@@ -198,7 +229,12 @@ namespace osu_progressCLI.Webserver.Server
             }
         }
 
-        public void Servevid(HttpListenerRequest request ,HttpListenerResponse response, string filePath, string contentType)
+        public void Servevid(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            string filePath,
+            string contentType
+        )
         {
             Task.Run(() =>
             {
@@ -224,13 +260,17 @@ namespace osu_progressCLI.Webserver.Server
                             }
                             else
                             {
-                                endRange = rangeValues.Length > 1 ? long.Parse(rangeValues[1]) : fs.Length - 1;
+                                endRange =
+                                    rangeValues.Length > 1
+                                        ? long.Parse(rangeValues[1])
+                                        : fs.Length - 1;
                             }
 
-
                             response.StatusCode = 206;
-                            response.Headers.Add("Content-Range", $"bytes {startRange}-{endRange}/{fs.Length}");
-
+                            response.Headers.Add(
+                                "Content-Range",
+                                $"bytes {startRange}-{endRange}/{fs.Length}"
+                            );
 
                             response.ContentLength64 = endRange - startRange + 1;
 
@@ -240,7 +280,6 @@ namespace osu_progressCLI.Webserver.Server
                         }
                         else
                         {
-
                             response.ContentLength64 = fs.Length;
 
                             videoBytes = new byte[fs.Length];
@@ -250,32 +289,46 @@ namespace osu_progressCLI.Webserver.Server
 
                     Stream output = response.OutputStream;
 
-
                     output.Write(videoBytes, 0, videoBytes.Length);
                     output.FlushAsync();
                     output.Close();
                 }
                 catch (Exception e) { }
-                
             });
         }
 
-        private void serveaudio(HttpListenerRequest request, HttpListenerResponse response, string path) {
-
-            if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}{HttpUtility.UrlDecode(path)}")) {
+        private void serveaudio(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            string path
+        )
+        {
+            if (
+                File.Exists(
+                    $"{Credentials.Instance.GetConfig().songfolder}{HttpUtility.UrlDecode(path)}"
+                )
+            )
+            {
                 response.ContentType = GetContentType(HttpUtility.UrlDecode(path));
 
-                using (FileStream fs = File.OpenRead($"{Credentials.Instance.GetConfig().songfolder}{HttpUtility.UrlDecode(path)}"))
+                using (
+                    FileStream fs = File.OpenRead(
+                        $"{Credentials.Instance.GetConfig().songfolder}{HttpUtility.UrlDecode(path)}"
+                    )
+                )
                 {
                     fs.CopyTo(response.OutputStream);
                 }
                 response.OutputStream.Close();
             }
             return;
-
         }
 
-        private void serveimage(HttpListenerRequest request, HttpListenerResponse response, string path)
+        private void serveimage(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            string path
+        )
         {
             string sanitizedname = Path.GetFileName(path);
             string decodedname = HttpUtility.UrlDecode(path);
@@ -283,20 +336,27 @@ namespace osu_progressCLI.Webserver.Server
             {
                 if (File.Exists(DEFAULT_IMAGES + sanitizedname))
                 {
-                    string contentType = GetContentType(Path.GetExtension(DEFAULT_IMAGES + sanitizedname));
+                    string contentType = GetContentType(
+                        Path.GetExtension(DEFAULT_IMAGES + sanitizedname)
+                    );
 
                     byte[] imageBytes = File.ReadAllBytes(DEFAULT_IMAGES + sanitizedname);
                     response.ContentType = contentType;
                     response.ContentLength64 = imageBytes.Length;
                     response.OutputStream.Write(imageBytes, 0, imageBytes.Length);
                     response.OutputStream.Close();
-
                 }
                 else if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}{decodedname}"))
                 {
-                    string contentType = GetContentType(Path.GetExtension($"{Credentials.Instance.GetConfig().songfolder}{decodedname}"));
+                    string contentType = GetContentType(
+                        Path.GetExtension(
+                            $"{Credentials.Instance.GetConfig().songfolder}{decodedname}"
+                        )
+                    );
 
-                    byte[] imageBytes = File.ReadAllBytes($"{Credentials.Instance.GetConfig().songfolder}{decodedname}");
+                    byte[] imageBytes = File.ReadAllBytes(
+                        $"{Credentials.Instance.GetConfig().songfolder}{decodedname}"
+                    );
                     response.ContentType = contentType;
                     response.ContentLength64 = imageBytes.Length;
                     response.OutputStream.Write(imageBytes, 0, imageBytes.Length);
@@ -308,7 +368,8 @@ namespace osu_progressCLI.Webserver.Server
                     string responseString = $"404 - Not Found: Image not found at {path}";
                     WriteResponse(response, responseString, "text/plain");
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Logger.Log(Logger.Severity.Error, Logger.Framework.Server, $"{ex.Message}");
             }

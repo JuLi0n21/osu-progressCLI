@@ -1,13 +1,13 @@
-﻿using MethodTimer;
-using Newtonsoft.Json.Linq;
-using osu_progressCLI;
-using osu_progressCLI.Datatypes;
-using osu_progressCLI.Webserver.Server;
-using OsuMemoryDataProvider.OsuMemoryModels;
-using System;
+﻿using System;
 using System.Data.SQLite;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using MethodTimer;
+using Newtonsoft.Json.Linq;
+using OsuMemoryDataProvider.OsuMemoryModels;
+using osu_progressCLI;
+using osu_progressCLI.Datatypes;
+using osu_progressCLI.Webserver.Server;
 
 namespace osu1progressbar.Game.Database
 {
@@ -18,6 +18,7 @@ namespace osu1progressbar.Game.Database
     {
         private readonly string dbname = null;
         private readonly string connectionString = "Data Source=osu!progress.db;Version=3;";
+
         //private readonly string connectionString = "Data Source=osu!TEST.db;Version=3;";
 
         public DatabaseController()
@@ -28,18 +29,15 @@ namespace osu1progressbar.Game.Database
 
         public bool Init()
         {
-
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
                     createTables(connection);
-
                 }
                 catch (Exception e)
                 {
-
                     Logger.Log(Logger.Severity.Error, Logger.Framework.Database, $"{e.Message}");
 
                     return false;
@@ -48,19 +46,15 @@ namespace osu1progressbar.Game.Database
                 {
                     connection.Close();
                 }
-
             }
-
-
 
             return true;
         }
 
-
         private void createTables(SQLiteConnection connection)
         {
-
-            string createScoreTableQuery = @"
+            string createScoreTableQuery =
+                @"
                 CREATE TABLE IF NOT EXISTS ScoreData (
                     Date TEXT,
                     Title TEXT,
@@ -107,14 +101,19 @@ namespace osu1progressbar.Game.Database
                 );
             ";
 
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Creating Database if it dont exists: {dbname}");
+            Logger.Log(
+                Logger.Severity.Debug,
+                Logger.Framework.Database,
+                $"Creating Database if it dont exists: {dbname}"
+            );
 
             using (var command = new SQLiteCommand(createScoreTableQuery, connection))
             {
                 command.ExecuteNonQuery();
             }
 
-            string timeSpendTableQuery = @"
+            string timeSpendTableQuery =
+                @"
                 CREATE TABLE IF NOT EXISTS TimeWasted (Date TEXT ,RawStatus INTEGER, Time REAL)";
 
             using (var command = new SQLiteCommand(timeSpendTableQuery, connection))
@@ -122,7 +121,8 @@ namespace osu1progressbar.Game.Database
                 command.ExecuteNonQuery();
             }
 
-            string BanchoTimesTableQuery = @"
+            string BanchoTimesTableQuery =
+                @"
                 CREATE TABLE IF NOT EXISTS BanchoTime (Date TEXT ,BanchoStatus TEXT, Time REAL)";
 
             using (var command = new SQLiteCommand(BanchoTimesTableQuery, connection))
@@ -130,19 +130,23 @@ namespace osu1progressbar.Game.Database
                 command.ExecuteNonQuery();
             }
 
-            string ScoreHelperTableQuery = @"
+            string ScoreHelperTableQuery =
+                @"
                 CREATE TABLE IF NOT EXISTS BeatmapHelper (id INTEGER, SR REAL, Artist TEXT, Creator TEXT, Bpm REAL, Version TEXT, Status TEXT, Tags TEXT, CoverList TEXT, Cover TEXT, Preview TEXT)";
 
             using (var command = new SQLiteCommand(ScoreHelperTableQuery, connection))
             {
                 command.ExecuteNonQuery();
             }
-
         }
 
         public void UpdateTimeWasted(int OldStatus, float timeElapsed)
         {
-            Logger.Log(Logger.Severity.Info, Logger.Framework.Database, $"Updating Timewasted: {OldStatus} : {timeElapsed}s");
+            Logger.Log(
+                Logger.Severity.Info,
+                Logger.Framework.Database,
+                $"Updating Timewasted: {OldStatus} : {timeElapsed}s"
+            );
 
             DateTime time = DateTime.UtcNow;
             string date = time.ToString("yyyy-MM-dd HH:00");
@@ -154,13 +158,12 @@ namespace osu1progressbar.Game.Database
 
             using (var connection = new SQLiteConnection(connectionString))
             {
-
                 connection.Open();
 
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
-
-                    command.CommandText = @"
+                    command.CommandText =
+                        @"
                         Update TimeWasted Set Time = Time + @timeElapsed WHERE Date = @Date AND RawStatus = @RawStatus";
                     command.Parameters.AddWithValue("@timeElapsed", timeElapsed);
                     command.Parameters.AddWithValue("@Date", date);
@@ -174,8 +177,8 @@ namespace osu1progressbar.Game.Database
                     {
                         using (SQLiteCommand insertCommand = new SQLiteCommand(connection))
                         {
-
-                            insertCommand.CommandText = @"
+                            insertCommand.CommandText =
+                                @"
                                 INSERT INTO TimeWasted (Date ,RawStatus, Time
                                     ) VALUES (
                                         @Date, @RawStatus, @Time
@@ -188,13 +191,20 @@ namespace osu1progressbar.Game.Database
 
                             insertCommand.ExecuteNonQuery();
 
-                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"New Timewasted for this Hour: {OldStatus} : {timeElapsed}s");
-
+                            Logger.Log(
+                                Logger.Severity.Debug,
+                                Logger.Framework.Database,
+                                $"New Timewasted for this Hour: {OldStatus} : {timeElapsed}s"
+                            );
                         }
                     }
                     else
                     {
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Updated TimeWasted in: {OldStatus} time: {timeElapsed}s");
+                        Logger.Log(
+                            Logger.Severity.Debug,
+                            Logger.Framework.Database,
+                            $"Updated TimeWasted in: {OldStatus} time: {timeElapsed}s"
+                        );
                     }
                 }
 
@@ -204,11 +214,14 @@ namespace osu1progressbar.Game.Database
 
         public void UpdateBanchoTime(string BanchoStatus, float timeElapsed)
         {
-            Logger.Log(Logger.Severity.Info, Logger.Framework.Database, $"Updating BanchoTime: {BanchoStatus} : {timeElapsed}s");
+            Logger.Log(
+                Logger.Severity.Info,
+                Logger.Framework.Database,
+                $"Updating BanchoTime: {BanchoStatus} : {timeElapsed}s"
+            );
 
             DateTime time = DateTime.UtcNow;
             string date = time.ToString("yyyy-MM-dd HH:00");
-
 
             if (BanchoStatus == null || timeElapsed == 0)
             {
@@ -217,13 +230,12 @@ namespace osu1progressbar.Game.Database
 
             using (var connection = new SQLiteConnection(connectionString))
             {
-
                 connection.Open();
 
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
-
-                    command.CommandText = @"
+                    command.CommandText =
+                        @"
                         Update BanchoTime Set Time = Time + @timeElapsed WHERE Date = @Date AND BanchoStatus = @BanchoStatus";
                     command.Parameters.AddWithValue("@timeElapsed", timeElapsed);
                     command.Parameters.AddWithValue("@Date", date);
@@ -237,8 +249,8 @@ namespace osu1progressbar.Game.Database
                     {
                         using (SQLiteCommand insertCommand = new SQLiteCommand(connection))
                         {
-
-                            insertCommand.CommandText = @"
+                            insertCommand.CommandText =
+                                @"
                                 INSERT INTO BanchoTime (Date ,BanchoStatus, Time
                                     ) VALUES (
                                         @Date, @BanchoStatus, @Time
@@ -250,13 +262,20 @@ namespace osu1progressbar.Game.Database
                             insertCommand.Parameters.AddWithValue("@Time", timeElapsed);
 
                             insertCommand.ExecuteNonQuery();
-                            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Updating BanchoStatus {BanchoStatus} : {timeElapsed}s");
-
+                            Logger.Log(
+                                Logger.Severity.Debug,
+                                Logger.Framework.Database,
+                                $"Updating BanchoStatus {BanchoStatus} : {timeElapsed}s"
+                            );
                         }
                     }
                     else
                     {
-                        Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Updating BanchoStatus: {BanchoStatus} : {timeElapsed}s");
+                        Logger.Log(
+                            Logger.Severity.Debug,
+                            Logger.Framework.Database,
+                            $"Updating BanchoStatus: {BanchoStatus} : {timeElapsed}s"
+                        );
                     }
                 }
 
@@ -265,17 +284,21 @@ namespace osu1progressbar.Game.Database
         }
 
         [Time]
-        public async static Task<bool> ImportScore(OsuParsers.Database.Objects.Score score)
+        public static async Task<bool> ImportScore(OsuParsers.Database.Objects.Score score)
         {
             if (score == null)
                 return false;
-                    
+
             var beatmap = OsuDbsExposer.GetBeatmapbyHash(score.BeatmapMD5Hash);
 
             if (beatmap == null)
                 return false;
 
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Insert Score {beatmap.MD5Hash} {score.ScoreId}");
+            Logger.Log(
+                Logger.Severity.Debug,
+                Logger.Framework.Database,
+                $"Trying to Insert Score {beatmap.MD5Hash} {score.ScoreId}"
+            );
 
             using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
             {
@@ -284,7 +307,8 @@ namespace osu1progressbar.Game.Database
                 double bpm = -1;
                 if (beatmap.TimingPoints.Count > 0)
                 {
-                    bpm = beatmap.TimingPoints.GroupBy(tp => tp.BPM)
+                    bpm = beatmap
+                        .TimingPoints.GroupBy(tp => tp.BPM)
                         .OrderByDescending(group => group.Count())
                         .Select(group => group.Key)
                         .First();
@@ -299,7 +323,8 @@ namespace osu1progressbar.Game.Database
 
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = @"
+                    command.CommandText =
+                        @"
                        INSERT OR IGNORE INTO ScoreData (
                                 Date,
                                 BeatmapSetid,
@@ -385,7 +410,10 @@ namespace osu1progressbar.Game.Database
                                             );
                     ";
 
-                    command.Parameters.AddWithValue("@Date", score.ScoreTimestamp.ToString("yyyy-MM-dd HH:mm"));
+                    command.Parameters.AddWithValue(
+                        "@Date",
+                        score.ScoreTimestamp.ToString("yyyy-MM-dd HH:mm")
+                    );
                     command.Parameters.AddWithValue("@BeatmapSetid", beatmap.BeatmapSetId);
                     command.Parameters.AddWithValue("@Beatmapid", beatmap.BeatmapId);
                     command.Parameters.AddWithValue("@Osufilename", beatmap.FileName);
@@ -398,10 +426,19 @@ namespace osu1progressbar.Game.Database
                     command.Parameters.AddWithValue("@Od", beatmap.OverallDifficulty); //needs mod recalculation
                     command.Parameters.AddWithValue("@Status", beatmap.RankedStatus.ToString());
 
-                    PerfomanceAttributes pp = DifficultyAttributes.CalculatePP(beatmap.FolderName, beatmap.FileName, score.ReplayScore,
-                      (int)score.Mods, score.CountMiss, score.Count50, score.Count100, score.Count300, 0, score.Combo, (int)score.Ruleset);
-
-
+                    PerfomanceAttributes pp = DifficultyAttributes.CalculatePP(
+                        beatmap.FolderName,
+                        beatmap.FileName,
+                        score.ReplayScore,
+                        (int)score.Mods,
+                        score.CountMiss,
+                        score.Count50,
+                        score.Count100,
+                        score.Count300,
+                        0,
+                        score.Combo,
+                        (int)score.Ruleset
+                    );
 
                     command.Parameters.AddWithValue("@SR", pp.starrating);
 
@@ -409,8 +446,18 @@ namespace osu1progressbar.Game.Database
                     command.Parameters.AddWithValue("@Creator", beatmap.Creator);
                     command.Parameters.AddWithValue("@Artist", beatmap.Artist);
                     command.Parameters.AddWithValue("@Username", score.PlayerName);
-                    double acc = (double)(score.Count300 * 300 + score.Count100 * 100 + score.Count50 * 50 + score.CountMiss * 0) /
-                        ((score.Count300 + score.Count100 + score.Count50 + score.CountMiss) * 300) * 100;
+                    double acc =
+                        (double)(
+                            score.Count300 * 300
+                            + score.Count100 * 100
+                            + score.Count50 * 50
+                            + score.CountMiss * 0
+                        )
+                        / (
+                            (score.Count300 + score.Count100 + score.Count50 + score.CountMiss)
+                            * 300
+                        )
+                        * 100;
 
                     command.Parameters.AddWithValue("@Acc", Math.Round(acc, 2));
 
@@ -431,34 +478,58 @@ namespace osu1progressbar.Game.Database
                     command.Parameters.AddWithValue("@Tags", beatmap.Tags);
                     command.Parameters.AddWithValue("@Time", beatmap.DrainTime);
 
-
                     command.Parameters.AddWithValue("@pp", pp.pp);
 
-                    PerfomanceAttributes fcpp = DifficultyAttributes.CalculatePP(beatmap.FolderName, beatmap.FileName, score.ReplayScore,
-                       (int)score.Mods, 0, score.Count50, score.Count100, score.Count300, 0, score.Combo, (int)score.Ruleset);
+                    PerfomanceAttributes fcpp = DifficultyAttributes.CalculatePP(
+                        beatmap.FolderName,
+                        beatmap.FileName,
+                        score.ReplayScore,
+                        (int)score.Mods,
+                        0,
+                        score.Count50,
+                        score.Count100,
+                        score.Count300,
+                        0,
+                        score.Combo,
+                        (int)score.Ruleset
+                    );
 
                     command.Parameters.AddWithValue("@fcpp", fcpp.pp);
 
                     command.Parameters.AddWithValue("@aim", pp.aim);
                     command.Parameters.AddWithValue("@speed", pp.speed);
                     command.Parameters.AddWithValue("@accuracyatt", pp.accuracy);
-                    command.Parameters.AddWithValue("@grade", DifficultyAttributes.CalculateGrade(score.Count300, score.Count100, score.Count50, score.CountMiss));
+                    command.Parameters.AddWithValue(
+                        "@grade",
+                        DifficultyAttributes.CalculateGrade(
+                            score.Count300,
+                            score.Count100,
+                            score.Count50,
+                            score.CountMiss
+                        )
+                    );
 
                     int rows = command.ExecuteNonQuery();
                     Console.WriteLine("rows inserted: " + rows);
                     connection.Close();
-                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Saved Score: {beatmap.Title}");
+                    Logger.Log(
+                        Logger.Severity.Debug,
+                        Logger.Framework.Database,
+                        $"Saved Score: {beatmap.Title}"
+                    );
                     return true;
-
                 }
             }
         }
 
-        [Time]
-        public async static Task<bool> ImportScore(object importscore)
+        public static async Task<bool> ImportScore(object importscore)
         {
             ImportScore score = (ImportScore)importscore;
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Insert Score {score.file_md5} {score.pp}");
+            Logger.Log(
+                Logger.Severity.Debug,
+                Logger.Framework.Database,
+                $"Trying to Insert Score {score.file_md5} {score.pp}"
+            );
             using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
             {
                 try
@@ -473,18 +544,30 @@ namespace osu1progressbar.Game.Database
                     //GET FOLDER AND FILENAME
                     HttpClient client = new HttpClient();
 
-                    foldername = await ApiController.Instance.DownloadBeatmapset(client, score.set_id, true);
+                    foldername = await ApiController.Instance.DownloadBeatmapset(
+                        client,
+                        score.set_id,
+                        true
+                    );
 
                     client.Dispose();
 
-                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Get Filename {score.beatmap_id}");
+                    Logger.Log(
+                        Logger.Severity.Debug,
+                        Logger.Framework.Database,
+                        $"Trying to Get Filename {score.beatmap_id}"
+                    );
                     osufilename = Util.osufile(foldername, score.diffname, "TESTFOLDERDELETEAFTER");
 
-                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Trying to Find Background for {score.beatmap_id}");
+                    Logger.Log(
+                        Logger.Severity.Debug,
+                        Logger.Framework.Database,
+                        $"Trying to Find Background for {score.beatmap_id}"
+                    );
                     background = Util.getBackground(foldername, osufilename);
 
-
-                    string insertQuery = @"
+                    string insertQuery =
+                        @"
                         INSERT OR IGNORE INTO ScoreData (
                                 Date,
                                 Title,
@@ -572,15 +655,26 @@ namespace osu1progressbar.Game.Database
                                             );
                     ";
 
+                    PerfomanceAttributes fcpp = DifficultyAttributes.CalculatePP(
+                        foldername,
+                        osufilename,
+                        score.score,
+                        score.enabled_mods,
+                        0,
+                        score.count50,
+                        score.count100,
+                        score.count300,
+                        0,
+                        score.combo
+                    );
 
-                    PerfomanceAttributes fcpp = DifficultyAttributes.CalculatePP(foldername, osufilename, score.score,
-                  score.enabled_mods, 0, score.count50, score.count100, score.count300, 0, score.combo);
-
-
-                    //YYYY-MM-DD HH:MM THIS FORMAT IS SUPPOSED TO BE USED 
+                    //YYYY-MM-DD HH:MM THIS FORMAT IS SUPPOSED TO BE USED
                     using (var command = new SQLiteCommand(insertQuery, connection))
                     {
-                        command.Parameters.AddWithValue("@Date", score.date_played.ToString("yyyy-MM-dd HH:mm"));
+                        command.Parameters.AddWithValue(
+                            "@Date",
+                            score.date_played.ToString("yyyy-MM-dd HH:mm")
+                        );
                         command.Parameters.AddWithValue("@Title", score.title);
                         command.Parameters.AddWithValue("@BeatmapSetid", score.set_id);
                         command.Parameters.AddWithValue("@Beatmapid", score.beatmap_id);
@@ -597,7 +691,10 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Bpm", score.bpm);
                         command.Parameters.AddWithValue("@Creator", score.creator);
                         command.Parameters.AddWithValue("@Artist", score.artist);
-                        command.Parameters.AddWithValue("@Username", Credentials.Instance.GetConfig().username);
+                        command.Parameters.AddWithValue(
+                            "@Username",
+                            Credentials.Instance.GetConfig().username
+                        );
                         command.Parameters.AddWithValue("@Acc", score.accuracy);
                         command.Parameters.AddWithValue("@MaxCombo", score.maxcombo);
                         command.Parameters.AddWithValue("@Score", score.score);
@@ -626,16 +723,22 @@ namespace osu1progressbar.Game.Database
                         command.ExecuteNonQuery();
                     }
 
-                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Saved Score: {score.title}");
+                    Logger.Log(
+                        Logger.Severity.Debug,
+                        Logger.Framework.Database,
+                        $"Saved Score: {score.title}"
+                    );
                     return true;
-
                 }
                 catch (Exception e)
                 {
-                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Failed to Import Score({score.file_md5}):{e.Message}");
+                    Logger.Log(
+                        Logger.Severity.Debug,
+                        Logger.Framework.Database,
+                        $"Failed to Import Score({score.file_md5}):{e.Message}"
+                    );
                     return false;
                     Console.WriteLine(e.ToString());
-
                 }
                 finally
                 {
@@ -644,17 +747,24 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-
-        public List<Score> GetPotentcialtopplays(string from, string to, int combopercent, int misscount, bool pass) {
+        public List<Score> GetPotentcialtopplays(
+            string from,
+            string to,
+            int combopercent,
+            int misscount,
+            bool pass
+        )
+        {
             List<Score> scores = new List<Score>();
 
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
 
-                using (var command = connection.CreateCommand()) {
-
-                    string insertquery = @" SELECT *, rowid AS id 
+                using (var command = connection.CreateCommand())
+                {
+                    string insertquery =
+                        @" SELECT *, rowid AS id 
                                             FROM ScoreData
                                             WHERE Date BETWEEN @from AND @to
                                             AND 
@@ -662,11 +772,15 @@ namespace osu1progressbar.Game.Database
                 }
             }
 
-
             return scores;
         }
 
-        public async void InsertScore(OsuBaseAddresses baseAddresses, float timeElapsed, string playtype, string replay = null)
+        public async void InsertScore(
+            OsuBaseAddresses baseAddresses,
+            float timeElapsed,
+            string playtype,
+            string replay = null
+        )
         {
             var localbeatmap = OsuDbsExposer.GetBeatmapbyHash(baseAddresses.Beatmap.Md5);
 
@@ -678,8 +792,9 @@ namespace osu1progressbar.Game.Database
             {
                 score.Title = localbeatmap.Title;
                 score.Bpm = 0;
-                
-                double oldbpm = 1 / localbeatmap.TimingPoints[0].BPM * 1000 * 60; ;
+
+                double oldbpm = 1 / localbeatmap.TimingPoints[0].BPM * 1000 * 60;
+                ;
 
                 int oldoffset = 0;
                 List<KeyValuePair<double, int>> bpmpairs = new List<KeyValuePair<double, int>>
@@ -688,23 +803,23 @@ namespace osu1progressbar.Game.Database
                 };
                 for (int i = 1; i < localbeatmap.TimingPoints.Count - 1; i++)
                 {
-
                     if (localbeatmap.TimingPoints[i].Inherited == false)
                     {
-
-                    double newbpm = 1 / localbeatmap.TimingPoints[i].BPM * 1000 * 60;
+                        double newbpm = 1 / localbeatmap.TimingPoints[i].BPM * 1000 * 60;
 
                         if (newbpm != oldbpm)
                         {
-                            KeyValuePair<double, int> existingPair = bpmpairs.FirstOrDefault(t => t.Key == oldbpm);
-
+                            KeyValuePair<double, int> existingPair = bpmpairs.FirstOrDefault(t =>
+                                t.Key == oldbpm
+                            );
 
                             int newoffset = (int)localbeatmap.TimingPoints[i].Offset;
 
                             if (existingPair.Equals(default(KeyValuePair<double, int>)))
                             {
-                                bpmpairs.Add(new KeyValuePair<double, int>(oldbpm, (newoffset - oldoffset)));
-
+                                bpmpairs.Add(
+                                    new KeyValuePair<double, int>(oldbpm, (newoffset - oldoffset))
+                                );
                             }
                             else
                             {
@@ -719,8 +834,9 @@ namespace osu1progressbar.Game.Database
                     }
                 }
 
-
-               score.Bpm = Math.Round(bpmpairs.OrderByDescending(kv => kv.Value).FirstOrDefault().Key);
+                score.Bpm = Math.Round(
+                    bpmpairs.OrderByDescending(kv => kv.Value).FirstOrDefault().Key
+                );
 
                 score.BeatmapSetId = localbeatmap.BeatmapSetId;
                 score.BeatmapId = localbeatmap.BeatmapId;
@@ -742,11 +858,11 @@ namespace osu1progressbar.Game.Database
                 //score.PlayType = playtype;
                 //score.SR = localbeatmap.StandardStarRating.ToString();
                 //score.Bpm = localbeatmap.timing...
-                //score.Username = 
+                //score.Username =
                 //score.Acc =
                 //score.MaxCombo =
                 //score.score
-                //score.combo 
+                //score.combo
                 //score.hit50
                 //score.hit100
                 //score.hit300
@@ -763,7 +879,9 @@ namespace osu1progressbar.Game.Database
                 //score.grade
             }
 
-            JObject apibeatmap = await ApiController.Instance.getExpandedBeatmapinfo(baseAddresses.Beatmap.Id.ToString());
+            JObject apibeatmap = await ApiController.Instance.getExpandedBeatmapinfo(
+                baseAddresses.Beatmap.Id.ToString()
+            );
 
             if (apibeatmap != null)
             {
@@ -779,17 +897,18 @@ namespace osu1progressbar.Game.Database
             }
 
             var perfAtt = DifficultyAttributes.CalculatePP(
-                   baseAddresses.Beatmap.FolderName,
-                   baseAddresses.Beatmap.OsuFileName,
-                   baseAddresses.Player.Score,
-                   baseAddresses.Player.Mods.Value,
-                   baseAddresses.Player.HitMiss,
-                   baseAddresses.Player.Hit50,
-                   baseAddresses.Player.Hit100,
-                   baseAddresses.Player.Hit300,
-                   0, //allow acc calc
-                   baseAddresses.Player.MaxCombo,
-                   baseAddresses.Player.Mode);
+                baseAddresses.Beatmap.FolderName,
+                baseAddresses.Beatmap.OsuFileName,
+                baseAddresses.Player.Score,
+                baseAddresses.Player.Mods.Value,
+                baseAddresses.Player.HitMiss,
+                baseAddresses.Player.Hit50,
+                baseAddresses.Player.Hit100,
+                baseAddresses.Player.Hit300,
+                0, //allow acc calc
+                baseAddresses.Player.MaxCombo,
+                baseAddresses.Player.Mode
+            );
 
             if (playtype == "Cancel" || playtype == "Fail" || playtype == "Retry")
             {
@@ -797,17 +916,18 @@ namespace osu1progressbar.Game.Database
             }
 
             var fcPerfAtt = DifficultyAttributes.CalculatePP(
-                    baseAddresses.Beatmap.FolderName,
-                    baseAddresses.Beatmap.OsuFileName,
-                    baseAddresses.Player.Score,
-                    baseAddresses.Player.Mods.Value,
-                    0,  //force no Misses
-                    baseAddresses.Player.Hit50,
-                    baseAddresses.Player.Hit100,
-                    baseAddresses.Player.Hit300,
-                    0, //allow acc calc
-                    0, //force fc
-                    baseAddresses.Player.Mode);
+                baseAddresses.Beatmap.FolderName,
+                baseAddresses.Beatmap.OsuFileName,
+                baseAddresses.Player.Score,
+                baseAddresses.Player.Mods.Value,
+                0, //force no Misses
+                baseAddresses.Player.Hit50,
+                baseAddresses.Player.Hit100,
+                baseAddresses.Player.Hit300,
+                0, //allow acc calc
+                0, //force fc
+                baseAddresses.Player.Mode
+            );
 
             score.Date = DateTime.Now;
             score.Replay = replay;
@@ -834,21 +954,23 @@ namespace osu1progressbar.Game.Database
             score.ACCURACYATT = perfAtt.accuracy;
             score.Grade = perfAtt.grade;
 
-            string insertQuery = 
-                "INSERT OR IGNORE INTO ScoreData (Date,Title,BeatmapSetid,Beatmapid,Osufilename,Foldername,Replay,Playtype,Ar,Cs,Hp,Od,Status,SR,Bpm,Creator,Artist,Username,Acc,MaxCombo,Score,Combo,Hit50,Hit100,Hit300,Ur,HitMiss,Mode,Mods,Version,Tags,Cover,Coverlist,Preview,Time,pp,fcpp,aim,speed,accuracyatt,grade" +
-                    ") VALUES (" +
-                "@Date,@Title,@BeatmapSetid,@Beatmapid,@Osufilename,@Foldername,@Replay,@Playtype,@Ar,@Cs,@Hp,@Od,@Status,@SR,@Bpm,@Creator,@Artist,@Username,@Acc,@MaxCombo,@Score,@Combo,@Hit50,@Hit100,@Hit300,@Ur,@HitMiss,@Mode,@Mods,@Version,@Tags,@Cover,@Coverlist,@Preview,@Time,@pp,@fcpp,@aim,@speed,@accuracyatt,@grade" +
-                    ");";
+            string insertQuery =
+                "INSERT OR IGNORE INTO ScoreData (Date,Title,BeatmapSetid,Beatmapid,Osufilename,Foldername,Replay,Playtype,Ar,Cs,Hp,Od,Status,SR,Bpm,Creator,Artist,Username,Acc,MaxCombo,Score,Combo,Hit50,Hit100,Hit300,Ur,HitMiss,Mode,Mods,Version,Tags,Cover,Coverlist,Preview,Time,pp,fcpp,aim,speed,accuracyatt,grade"
+                + ") VALUES ("
+                + "@Date,@Title,@BeatmapSetid,@Beatmapid,@Osufilename,@Foldername,@Replay,@Playtype,@Ar,@Cs,@Hp,@Od,@Status,@SR,@Bpm,@Creator,@Artist,@Username,@Acc,@MaxCombo,@Score,@Combo,@Hit50,@Hit100,@Hit300,@Ur,@HitMiss,@Mode,@Mods,@Version,@Tags,@Cover,@Coverlist,@Preview,@Time,@pp,@fcpp,@aim,@speed,@accuracyatt,@grade"
+                + ");";
 
             using (var connection = new SQLiteConnection(connectionString))
             {
-                
                 try
                 {
                     connection.Open();
                     using (var command = new SQLiteCommand(insertQuery, connection))
                     {
-                        command.Parameters.AddWithValue("@Date", score.Date.ToString("yyyy-MM-dd HH:mm:ss"));
+                        command.Parameters.AddWithValue(
+                            "@Date",
+                            score.Date.ToString("yyyy-MM-dd HH:mm:ss")
+                        );
                         command.Parameters.AddWithValue("@Title", score.Title);
                         command.Parameters.AddWithValue("@BeatmapSetid", score.BeatmapSetId);
                         command.Parameters.AddWithValue("@Beatmapid", score.BeatmapId);
@@ -903,22 +1025,23 @@ namespace osu1progressbar.Game.Database
                         }
                     }
 
-                    Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"Saved Score: {baseAddresses.Beatmap.OsuFileName}");
-
-
+                    Logger.Log(
+                        Logger.Severity.Debug,
+                        Logger.Framework.Database,
+                        $"Saved Score: {baseAddresses.Beatmap.OsuFileName}"
+                    );
                 }
                 catch (Exception e)
                 {
                     Logger.Log(Logger.Severity.Debug, Logger.Framework.Database, $"{e.Message}");
 
                     Console.WriteLine(e.ToString());
-
                 }
                 finally
                 {
                     connection.Close();
                 }
-            }   
+            }
         }
 
         [Time]
@@ -931,17 +1054,16 @@ namespace osu1progressbar.Game.Database
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
-
                 using (var command = new SQLiteCommand(connection))
                 {
-
                     connection.Open();
 
-                    command.CommandText = "SELECT rowid as id, * " +
-                        "FROM ScoreData " +
-                        "WHERE datetime(Date) BETWEEN @from AND @to " +
-                        "ORDER BY Date DESC " +
-                        "LIMIT 100;";
+                    command.CommandText =
+                        "SELECT rowid as id, * "
+                        + "FROM ScoreData "
+                        + "WHERE datetime(Date) BETWEEN @from AND @to "
+                        + "ORDER BY Date DESC "
+                        + "LIMIT 100;";
                     //";";
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
@@ -963,11 +1085,12 @@ namespace osu1progressbar.Game.Database
         }
 
         [Time]
-        public List<Score> GetScoreSearch(DateTime from = new DateTime(),
+        public List<Score> GetScoreSearch(
+            DateTime from = new DateTime(),
             DateTime to = new DateTime(),
-            string search = "")
+            string search = ""
+        )
         {
-
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
             string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -975,14 +1098,13 @@ namespace osu1progressbar.Game.Database
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
-
                 using (var command = new SQLiteCommand(connection))
                 {
-
                     connection.Open();
 
-                    StringBuilder queryBuilder = new StringBuilder("SELECT rowid as id, * FROM ScoreData WHERE 1=1 ");
-
+                    StringBuilder queryBuilder = new StringBuilder(
+                        "SELECT rowid as id, * FROM ScoreData WHERE 1=1 "
+                    );
 
                     if (from != null || to != null)
                     {
@@ -992,7 +1114,6 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@from", fromFormatted);
                         command.Parameters.AddWithValue("@to", toFormatted);
                     }
-
 
                     command.CommandText = queryBuilder.ToString();
                     DateTime dateString = DateTime.Now;
@@ -1007,7 +1128,6 @@ namespace osu1progressbar.Game.Database
                                 scores.Add(score);
                             }
                         }
-
                     }
                     catch
                     {
@@ -1017,7 +1137,6 @@ namespace osu1progressbar.Game.Database
                     {
                         connection.Close();
                     }
-
                 }
                 return scores;
             }
@@ -1025,7 +1144,6 @@ namespace osu1progressbar.Game.Database
 
         public List<Dictionary<string, object>> GetScoreAveragesbyDay(DateTime from, DateTime to)
         {
-
             List<Dictionary<string, object>> scoreAverages = new List<Dictionary<string, object>>();
 
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
@@ -1035,7 +1153,8 @@ namespace osu1progressbar.Game.Database
             {
                 connection.Open();
 
-                string commandstring = @"
+                string commandstring =
+                    @"
             SELECT 
                 strftime('%Y-%m-%d', Date) AS FDate,
                 AVG(Bpm) AS AverageBpm,
@@ -1081,14 +1200,14 @@ namespace osu1progressbar.Game.Database
 
         public WeekCompare GetWeekCompare()
         {
-
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 WeekCompare week = new WeekCompare();
 
                 connection.Open();
 
-                string sqlQuery = @"
+                string sqlQuery =
+                    @"
                          WITH StatusTime AS (
                             SELECT
                                 BanchoStatus AS Status,
@@ -1125,12 +1244,12 @@ namespace osu1progressbar.Game.Database
                             week.Status = reader["Status"].ToString();
                             week.LastWeek = Convert.ToDouble(reader["TotalEightTo15DaysTime"]);
                             week.ThisWeek = Convert.ToDouble(reader["TotalLast7DaysTime"]);
-
                         }
                     }
                 }
 
-                sqlQuery = @"SELECT SUM(Time) AS TotalTimeWasted, RawStatus
+                sqlQuery =
+                    @"SELECT SUM(Time) AS TotalTimeWasted, RawStatus
                             FROM TimeWasted
                             WHERE Date >= date('now', '-7 days')
                             GROUP BY RawStatus
@@ -1143,7 +1262,9 @@ namespace osu1progressbar.Game.Database
                     {
                         if (reader.Read())
                         {
-                            week.Screen = DifficultyAttributes.ScreenConverter(int.Parse(reader["RawStatus"].ToString()));
+                            week.Screen = DifficultyAttributes.ScreenConverter(
+                                int.Parse(reader["RawStatus"].ToString())
+                            );
                         }
                     }
                 }
@@ -1160,12 +1281,12 @@ namespace osu1progressbar.Game.Database
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
-
                 connection.Open();
 
                 using (var command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = "SELECT * FROM ScoreData WHERE datetime(Date) BETWEEN @from AND @to ;";
+                    command.CommandText =
+                        "SELECT * FROM ScoreData WHERE datetime(Date) BETWEEN @from AND @to ;";
 
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
@@ -1174,20 +1295,20 @@ namespace osu1progressbar.Game.Database
 
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
-
                         while (reader.Read())
                         {
                             rows++;
                         }
-
                     }
                 }
             }
             return rows;
         }
+
         public List<KeyValuePair<string, double>> GetBanchoTime(DateTime from, DateTime to)
         {
-            List<KeyValuePair<string, double>> BanchoTime = new List<KeyValuePair<string, double>>();
+            List<KeyValuePair<string, double>> BanchoTime =
+                new List<KeyValuePair<string, double>>();
             int rows = 0;
 
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
@@ -1195,12 +1316,12 @@ namespace osu1progressbar.Game.Database
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
-
                 connection.Open();
 
                 using (var command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = "SELECT BanchoStatus, SUM(Time) as Time FROM BanchoTime WHERE datetime(Date) BETWEEN @from AND @to Group by BanchoStatus;";
+                    command.CommandText =
+                        "SELECT BanchoStatus, SUM(Time) as Time FROM BanchoTime WHERE datetime(Date) BETWEEN @from AND @to Group by BanchoStatus;";
 
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
@@ -1209,18 +1330,20 @@ namespace osu1progressbar.Game.Database
 
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
-
                         while (reader.Read())
                         {
-                            BanchoTime.Add(new KeyValuePair<string, double>(reader["BanchoStatus"].ToString(), Convert.ToDouble(reader["Time"])));
+                            BanchoTime.Add(
+                                new KeyValuePair<string, double>(
+                                    reader["BanchoStatus"].ToString(),
+                                    Convert.ToDouble(reader["Time"])
+                                )
+                            );
                         }
                     }
                 }
             }
             return BanchoTime;
         }
-
-
 
         public List<Dictionary<string, object>> GetBanchoTimebyDay(DateTime from, DateTime to)
         {
@@ -1232,7 +1355,8 @@ namespace osu1progressbar.Game.Database
 
                 using (var command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = @"
+                    command.CommandText =
+                        @"
                     SELECT strftime('%Y-%m-%d', Date) AS FormattedDate, BanchoStatus, SUM(Time) AS TotalTime
                     FROM BanchoTime
                     GROUP BY FormattedDate, BanchoStatus;";
@@ -1246,16 +1370,19 @@ namespace osu1progressbar.Game.Database
                             var totalTime = Convert.ToDouble(reader["TotalTime"]);
 
                             // Check if there is an entry for the current date in the result list.
-                            var entry = result.FirstOrDefault(dict => dict.ContainsKey("Date") && ((DateTime)dict["Date"]).Date == date.Date);
+                            var entry = result.FirstOrDefault(dict =>
+                                dict.ContainsKey("Date")
+                                && ((DateTime)dict["Date"]).Date == date.Date
+                            );
 
                             if (entry == null)
                             {
                                 // If the entry doesn't exist, create a new dictionary for the date.
                                 entry = new Dictionary<string, object>
-                        {
-                            { "Date", date.Date },
-                            { banchoStatus, totalTime }
-                        };
+                                {
+                                    { "Date", date.Date },
+                                    { banchoStatus, totalTime }
+                                };
                                 result.Add(entry);
                             }
                             else
@@ -1263,7 +1390,8 @@ namespace osu1progressbar.Game.Database
                                 // If the entry exists, update the existing dictionary.
                                 if (entry.ContainsKey(banchoStatus))
                                 {
-                                    entry[banchoStatus] = Convert.ToDouble(entry[banchoStatus]) + totalTime;
+                                    entry[banchoStatus] =
+                                        Convert.ToDouble(entry[banchoStatus]) + totalTime;
                                 }
                                 else
                                 {
@@ -1278,14 +1406,12 @@ namespace osu1progressbar.Game.Database
             return result;
         }
 
-
         public Score GetScore(int id)
         {
             Score score;
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
-
                 connection.Open();
 
                 using (var command = new SQLiteCommand(connection))
@@ -1310,7 +1436,8 @@ namespace osu1progressbar.Game.Database
 
         public List<KeyValuePair<string, double>> GetTimeWasted(DateTime from, DateTime to)
         {
-            List<KeyValuePair<string, double>> BanchoTime = new List<KeyValuePair<string, double>>();
+            List<KeyValuePair<string, double>> BanchoTime =
+                new List<KeyValuePair<string, double>>();
             int rows = 0;
 
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
@@ -1318,12 +1445,12 @@ namespace osu1progressbar.Game.Database
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
-
                 connection.Open();
 
                 using (var command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = "SELECT strftime('%Y-%m-%d', Date) as Day, RawStatus, SUM(Time) as Time FROM TimeWasted Group by RawStatus";
+                    command.CommandText =
+                        "SELECT strftime('%Y-%m-%d', Date) as Day, RawStatus, SUM(Time) as Time FROM TimeWasted Group by RawStatus";
 
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
@@ -1334,7 +1461,12 @@ namespace osu1progressbar.Game.Database
                     {
                         while (reader.Read())
                         {
-                            BanchoTime.Add(new KeyValuePair<string, double>(reader["RawStatus"].ToString(), Convert.ToDouble(reader["Time"])));
+                            BanchoTime.Add(
+                                new KeyValuePair<string, double>(
+                                    reader["RawStatus"].ToString(),
+                                    Convert.ToDouble(reader["Time"])
+                                )
+                            );
                         }
                     }
                 }
@@ -1352,7 +1484,8 @@ namespace osu1progressbar.Game.Database
 
                 using (var command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = @"
+                    command.CommandText =
+                        @"
                     SELECT strftime('%Y-%m-%d', Date) AS FormattedDate, RawStatus, SUM(Time) AS TotalTime
                     FROM TimeWasted
                     GROUP BY FormattedDate, RawStatus;
@@ -1367,16 +1500,19 @@ namespace osu1progressbar.Game.Database
                             var totalTime = Convert.ToDouble(reader["TotalTime"]);
 
                             // Check if there is an entry for the current date in the result list.
-                            var entry = result.FirstOrDefault(dict => dict.ContainsKey("Date") && ((DateTime)dict["Date"]).Date == date.Date);
+                            var entry = result.FirstOrDefault(dict =>
+                                dict.ContainsKey("Date")
+                                && ((DateTime)dict["Date"]).Date == date.Date
+                            );
 
                             if (entry == null)
                             {
                                 // If the entry doesn't exist, create a new dictionary for the date.
                                 entry = new Dictionary<string, object>
-                        {
-                            { "Date", date.Date },
-                            { banchoStatus, totalTime }
-                        };
+                                {
+                                    { "Date", date.Date },
+                                    { banchoStatus, totalTime }
+                                };
                                 result.Add(entry);
                             }
                             else
@@ -1384,7 +1520,8 @@ namespace osu1progressbar.Game.Database
                                 // If the entry exists, update the existing dictionary.
                                 if (entry.ContainsKey(banchoStatus))
                                 {
-                                    entry[banchoStatus] = Convert.ToDouble(entry[banchoStatus]) + totalTime;
+                                    entry[banchoStatus] =
+                                        Convert.ToDouble(entry[banchoStatus]) + totalTime;
                                 }
                                 else
                                 {
@@ -1399,8 +1536,8 @@ namespace osu1progressbar.Game.Database
             return result;
         }
 
-        public int scorecount(){
-
+        public int scorecount()
+        {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
@@ -1408,12 +1545,12 @@ namespace osu1progressbar.Game.Database
                 using (var command = new SQLiteCommand(connection))
                 {
                     command.CommandText = $"SELECT COUNT(*) FROM ScoreData";
-                
+
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                           return int.Parse(reader.GetValue(0).ToString());
+                            return int.Parse(reader.GetValue(0).ToString());
                         }
                     }
                 }
@@ -1430,5 +1567,3 @@ namespace osu1progressbar.Game.Database
         public double ThisWeek { get; set; }
     }
 }
-
-

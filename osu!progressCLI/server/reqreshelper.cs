@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using osu1progressbar.Game.Database;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Net;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using osu1progressbar.Game.Database;
 
 namespace osu_progressCLI.server
 {
@@ -21,13 +21,19 @@ namespace osu_progressCLI.server
 
         public void defaultpage(HttpListenerRequest request, HttpListenerResponse response)
         {
-            WriteResponse(response, PageGenerator.Instance.generatepage(Credentials.Instance.GetConfig().userid, "osu", controller.GetWeekCompare()), "text/html");
-
+            WriteResponse(
+                response,
+                PageGenerator.Instance.generatepage(
+                    Credentials.Instance.GetConfig().userid,
+                    "osu",
+                    controller.GetWeekCompare()
+                ),
+                "text/html"
+            );
         }
 
         public void getAllBeatmapScroes(HttpListenerRequest request, HttpListenerResponse response)
         {
-
             DateTime to = DateTime.Now;
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
@@ -36,7 +42,12 @@ namespace osu_progressCLI.server
             WriteResponse(response, beatmapstring, "application/json");
         }
 
-        public void getBeatmapsinTimeSpan(HttpListenerRequest request, HttpListenerResponse response, DateTime from, DateTime to)
+        public void getBeatmapsinTimeSpan(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            DateTime from,
+            DateTime to
+        )
         {
             string beatmapstring = GetBeatmapData(from, to);
 
@@ -53,7 +64,12 @@ namespace osu_progressCLI.server
             WriteResponse(response, beatmapstring, "application/json");
         }
 
-        public void getTimeWastedinTimeSpan(HttpListenerRequest request, HttpListenerResponse response, DateTime from, DateTime to)
+        public void getTimeWastedinTimeSpan(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            DateTime from,
+            DateTime to
+        )
         {
             //create db query firts
         }
@@ -73,7 +89,11 @@ namespace osu_progressCLI.server
             DateTime to = DateTime.Now;
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
-            WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTimebyDay(from, to)), "application/json");
+            WriteResponse(
+                response,
+                System.Text.Json.JsonSerializer.Serialize(controller.GetBanchoTimebyDay(from, to)),
+                "application/json"
+            );
         }
 
         public void getTimeWastedbyday(HttpListenerRequest request, HttpListenerResponse response)
@@ -81,35 +101,83 @@ namespace osu_progressCLI.server
             DateTime to = DateTime.Now;
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
-            WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWastedByDay(from, to)), "application/json");
+            WriteResponse(
+                response,
+                System.Text.Json.JsonSerializer.Serialize(controller.GetTimeWastedByDay(from, to)),
+                "application/json"
+            );
         }
 
-        public void getBanchoTimeinTineSpan(HttpListenerRequest request, HttpListenerResponse response, DateTime from, DateTime to)
+        public void getBanchoTimeinTineSpan(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            DateTime from,
+            DateTime to
+        )
         {
             //create db query firts
         }
 
-        public void search(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters)
+        public void search(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            NameValueCollection parameters
+        )
         {
             DateTime to = DateTime.Now;
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
-            WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScoreSearch(from, to, QueryParser.Filter(parameters[0].ToString()))), "application/json");
+            WriteResponse(
+                response,
+                System.Text.Json.JsonSerializer.Serialize(
+                    controller.GetScoreSearch(
+                        from,
+                        to,
+                        QueryParser.Filter(parameters[0].ToString())
+                    )
+                ),
+                "application/json"
+            );
         }
 
-        public void Simulateplay(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters)
+        public void Simulateplay(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            NameValueCollection parameters
+        )
         {
-            Logger.Log(Logger.Severity.Info, Logger.Framework.Server, @$"Request PP calc for {parameters.Count}");
+            Logger.Log(
+                Logger.Severity.Info,
+                Logger.Framework.Server,
+                @$"Request PP calc for {parameters.Count}"
+            );
             if (parameters["Beatmapid"] != null)
             {
                 //implement
             }
         }
 
-        public async void user(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters)
+        public async void user(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            NameValueCollection parameters
+        )
         {
-            Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, $@"{parameters["userid"]} - {DifficultyAttributes.ModeConverter(int.Parse(parameters["mode"]))}");
-            WriteResponse(response, JsonConvert.SerializeObject(await ApiController.Instance.getuser(parameters["userid"], DifficultyAttributes.ModeConverter(int.Parse(parameters["mode"])))), "application/json");
+            Logger.Log(
+                Logger.Severity.Debug,
+                Logger.Framework.Server,
+                $@"{parameters["userid"]} - {DifficultyAttributes.ModeConverter(int.Parse(parameters["mode"]))}"
+            );
+            WriteResponse(
+                response,
+                JsonConvert.SerializeObject(
+                    await ApiController.Instance.getuser(
+                        parameters["userid"],
+                        DifficultyAttributes.ModeConverter(int.Parse(parameters["mode"]))
+                    )
+                ),
+                "application/json"
+            );
         }
 
         public void run(HttpListenerRequest request, HttpListenerResponse response)
@@ -133,12 +201,19 @@ namespace osu_progressCLI.server
 
                 if (parameters == null)
                 {
-                    Logger.Log(Logger.Severity.Warning, Logger.Framework.Server, $"No Parameters for Programm Request");
+                    Logger.Log(
+                        Logger.Severity.Warning,
+                        Logger.Framework.Server,
+                        $"No Parameters for Programm Request"
+                    );
 
                     return;
                 }
 
-                if (parameters["programm"].ToString() == "OsuMissAnalyzer" && parameters["id"] != null)
+                if (
+                    parameters["programm"].ToString() == "OsuMissAnalyzer"
+                    && parameters["id"] != null
+                )
                 {
                     DifficultyAttributes.StartMissAnalyzer(int.Parse(parameters["id"].ToString()));
                 }
@@ -149,12 +224,26 @@ namespace osu_progressCLI.server
             }
         }
 
-        public void getScore(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters)
+        public void getScore(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            NameValueCollection parameters
+        )
         {
-            WriteResponse(response, System.Text.Json.JsonSerializer.Serialize(controller.GetScore(int.Parse(parameters[0]))), "application/json");
+            WriteResponse(
+                response,
+                System.Text.Json.JsonSerializer.Serialize(
+                    controller.GetScore(int.Parse(parameters[0]))
+                ),
+                "application/json"
+            );
         }
 
-        public void getScoreAverages(HttpListenerRequest request, HttpListenerResponse response, NameValueCollection parameters)
+        public void getScoreAverages(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            NameValueCollection parameters
+        )
         {
             DateTime to = DateTime.Now;
             DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
@@ -239,7 +328,12 @@ namespace osu_progressCLI.server
             }
         }
 
-        private void WriteResponse(HttpListenerResponse response, string message, string contentType, int statusCode = 200)
+        private void WriteResponse(
+            HttpListenerResponse response,
+            string message,
+            string contentType,
+            int statusCode = 200
+        )
         {
             response.StatusCode = statusCode;
             response.ContentType = contentType;
@@ -250,10 +344,11 @@ namespace osu_progressCLI.server
             }
         }
 
-
         private string GetBeatmapData(DateTime from, DateTime to)
         {
-            return System.Text.Json.JsonSerializer.Serialize(controller.GetScoresInTimeSpan(from, to));
+            return System.Text.Json.JsonSerializer.Serialize(
+                controller.GetScoresInTimeSpan(from, to)
+            );
         }
 
         private string GetBanchoTime(DateTime from, DateTime to)
@@ -268,7 +363,9 @@ namespace osu_progressCLI.server
 
         private string GetScoreAverages(DateTime from, DateTime to)
         {
-            return System.Text.Json.JsonSerializer.Serialize(controller.GetScoreAveragesbyDay(from, to));
+            return System.Text.Json.JsonSerializer.Serialize(
+                controller.GetScoreAveragesbyDay(from, to)
+            );
         }
 
         private string GetScore(int id)
@@ -276,42 +373,65 @@ namespace osu_progressCLI.server
             return System.Text.Json.JsonSerializer.Serialize(controller.GetScore(id));
         }
 
-        public void serveimage(HttpListenerRequest request, HttpListenerResponse response, string filepath)
+        public void serveimage(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            string filepath
+        )
         {
-
             if (File.Exists("public/img" + filepath))
             {
                 ServeStaticImage(response, "public/img" + filepath);
             }
             else if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}{filepath}"))
             {
-                ServeStaticImage(response, WebUtility.UrlDecode($@"{Credentials.Instance.GetConfig().songfolder}{filepath}"));
+                ServeStaticImage(
+                    response,
+                    WebUtility.UrlDecode(
+                        $@"{Credentials.Instance.GetConfig().songfolder}{filepath}"
+                    )
+                );
             }
         }
 
-        public void servehtml(HttpListenerRequest request, HttpListenerResponse response, string filepath)
+        public void servehtml(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            string filepath
+        )
         {
             string htmlFilePath = "public/html" + filepath;
 
             ServeStaticFile(response, htmlFilePath, "text/html");
         }
 
-        public void servejs(HttpListenerRequest request, HttpListenerResponse response, string filepath)
+        public void servejs(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            string filepath
+        )
         {
-
             string jsFilePath = "public/js" + filepath;
 
             ServeStaticFile(response, jsFilePath, "text/javascript");
         }
 
-        public void serveosr(HttpListenerRequest request, HttpListenerResponse response, string filepath)
+        public void serveosr(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            string filepath
+        )
         {
             string jsFilePath = $"{Credentials.Instance.GetConfig().osufolder}/Data/r/{filepath}";
 
             ServeStaticFile(response, jsFilePath, "application/osr");
         }
 
-        public void servecss(HttpListenerRequest request, HttpListenerResponse response, string filepath)
+        public void servecss(
+            HttpListenerRequest request,
+            HttpListenerResponse response,
+            string filepath
+        )
         {
             string jsFilePath = "public/css" + filepath;
 
@@ -320,7 +440,6 @@ namespace osu_progressCLI.server
 
         public async Task<bool> upload(HttpListenerRequest request, HttpListenerResponse response)
         {
-
             try
             {
                 string uploadDir = "imports";
@@ -344,11 +463,14 @@ namespace osu_progressCLI.server
 
                 if (fileName.EndsWith(".csv"))
                     //    Task.Run(() => ScoreImporter.ImportScores(fileName));
-                    Logger.Log(Logger.Severity.Info, Logger.Framework.Server, $"Received and saved: {fileName}");
+                    Logger.Log(
+                        Logger.Severity.Info,
+                        Logger.Framework.Server,
+                        $"Received and saved: {fileName}"
+                    );
 
                 WriteResponse(response, "{\"message\":\"Upload Successful!\"}", "application/json");
                 return true;
-
             }
             catch (Exception ex)
             {
@@ -357,7 +479,11 @@ namespace osu_progressCLI.server
             }
         }
 
-        static void ServeStaticFile(HttpListenerResponse response, string filePath, string contentType)
+        static void ServeStaticFile(
+            HttpListenerResponse response,
+            string filePath,
+            string contentType
+        )
         {
             if (File.Exists(filePath))
             {
@@ -419,7 +545,11 @@ namespace osu_progressCLI.server
             }
         }
 
-        static void WriteResponse(HttpListenerResponse response, string responseString, string contentType)
+        static void WriteResponse(
+            HttpListenerResponse response,
+            string responseString,
+            string contentType
+        )
         {
             try
             {
@@ -437,6 +567,5 @@ namespace osu_progressCLI.server
                 Logger.Log(Logger.Severity.Error, Logger.Framework.Server, e.Message);
             }
         }
-
     }
 }

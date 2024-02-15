@@ -1,8 +1,8 @@
-﻿using Fleck;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Security.Policy;
+using Fleck;
+using Newtonsoft.Json.Linq;
 
 class WebSocket
 {
@@ -14,23 +14,22 @@ class WebSocket
 
     static WebSocketServer server;
 
-    private WebSocket() {
+    private WebSocket()
+    {
         server = new Fleck.WebSocketServer("ws://0.0.0.0:9001");
     }
 
     public static WebSocket Instance()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = new WebSocket();
-        } 
+        }
         return instance;
     }
 
     public static void start()
     {
-      
-
         server.Start(socket =>
         {
             socket.OnOpen = () =>
@@ -47,13 +46,12 @@ class WebSocket
             socket.OnMessage = message =>
             {
                 Console.WriteLine($"Received message: {message}");
-
-               
             };
         });
 
         Console.WriteLine("WebSocket server listening on ws://0.0.0.0:9001");
     }
+
     public static void BroadcastMessage(string message, IWebSocketConnection socket)
     {
         try
@@ -63,12 +61,8 @@ class WebSocket
             {
                 s.Send($"{sender}: {message}");
             }
-
         }
-        catch (Exception e)
-        {
-
-        }
+        catch (Exception e) { }
     }
 
     public static void BroadcastMessage(string message)
@@ -79,7 +73,6 @@ class WebSocket
             {
                 s.Send(message);
             }
-
         }
         catch (Exception e)
         {

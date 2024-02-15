@@ -3,14 +3,11 @@
     public class Socketserver
     {
         private static Socketserver instance;
-        private Socketserver()
-        {
 
-        }
+        private Socketserver() { }
 
         public Socketserver Instance()
         {
-
             if (instance == null)
             {
                 instance = new Socketserver();

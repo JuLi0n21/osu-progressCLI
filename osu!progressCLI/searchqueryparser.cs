@@ -4,7 +4,8 @@ using System.Text.RegularExpressions;
 public class QueryParser
 {
     public List<string> SearchTerms { get; } = new List<string>();
-    public Dictionary<string, List<string>> QueryParams { get; } = new Dictionary<string, List<string>>();
+    public Dictionary<string, List<string>> QueryParams { get; } =
+        new Dictionary<string, List<string>>();
     public List<string> ParametersWithoutOperators { get; } = new List<string>();
 
     /// <summary>
@@ -19,7 +20,11 @@ public class QueryParser
 
         foreach (string part in parts)
         {
-            Match match = Regex.Match(part, @"^(?<name>[a-zA-Z]+)(?<operator>[<=>]=?)(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
+            Match match = Regex.Match(
+                part,
+                @"^(?<name>[a-zA-Z]+)(?<operator>[<=>]=?)(?<value>[0-9.]+)$",
+                RegexOptions.IgnoreCase
+            );
 
             if (match.Success)
             {
@@ -33,7 +38,11 @@ public class QueryParser
 
         foreach (string param in parameters)
         {
-            Match match = Regex.Match(param, @"^(?<name>[a-zA-Z]+)(?<operator>[<=>]=?)(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
+            Match match = Regex.Match(
+                param,
+                @"^(?<name>[a-zA-Z]+)(?<operator>[<=>]=?)(?<value>[0-9.]+)$",
+                RegexOptions.IgnoreCase
+            );
 
             if (match.Success)
             {
@@ -59,6 +68,7 @@ public class QueryParser
             }
         }
     }
+
     public static string Filter(string queryString)
     {
         QueryParser parser = new QueryParser();
@@ -99,7 +109,7 @@ public class QueryParser
 
         StringBuilder commandBuilder = new StringBuilder();
 
-        if(filename is not null)
+        if (filename is not null)
         {
             commandBuilder.Append($"AND Osufilename == \"{filename}\" ");
         }
