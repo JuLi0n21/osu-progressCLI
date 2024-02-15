@@ -283,8 +283,7 @@ namespace osu_progressCLI.Webserver.Server
                         }
                     }
                        
-
-                    Webserver.Instance().Redirect(response, "/");
+                    Webserver.Instance().Redirect(response, $"/");
                     return;
                 }
 

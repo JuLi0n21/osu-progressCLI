@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text;
 using System.Web;
+using WebSocketSharp;
 
 namespace osu_progressCLI.Webserver.Server
 {
@@ -13,6 +14,7 @@ namespace osu_progressCLI.Webserver.Server
         public static readonly string DEFAULT_IMAGES = "public/img/";
         public static readonly string DEFAULT_JS = "public/js/";
         public static readonly string DEFAULT_FLUID = "Webserver/Fluid/";
+        public static readonly string DEFAULT_VIDEO = "public/video/";
         private static readonly FluidParser parser = new FluidParser();
 
         private static Webserver instance;
@@ -68,10 +70,17 @@ namespace osu_progressCLI.Webserver.Server
             HttpListenerResponse response = context.Response;
 
             string path = request.Url.AbsolutePath;
+            Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, path);
 
             if (path.EndsWith(".jpg") || path.EndsWith(".jpeg") || path.EndsWith(".png") || path.EndsWith(".gif") || path.EndsWith(".bmp") || path.EndsWith(".tiff") || path.EndsWith(".ico") || path.EndsWith(".webp") || path.EndsWith(".svg"))
             {
                 serveimage(request, response, path);
+            }
+
+            if (path.EndsWith(".mp4"))
+            {
+                Servevid(request, response, Webserver.DEFAULT_VIDEO + path, "video/mp4");
+                return;
             }
 
             if (path.EndsWith(".css") || path.EndsWith(".html") || path.EndsWith(".js") || path.EndsWith(".osr"))
@@ -187,6 +196,68 @@ namespace osu_progressCLI.Webserver.Server
                 string responseString = $"404 - Not Found: File not found at {filePath}";
                 WriteResponse(response, responseString, "text/plain");
             }
+        }
+
+        public void Servevid(HttpListenerRequest request ,HttpListenerResponse response, string filePath, string contentType)
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    byte[] videoBytes;
+
+                    using (FileStream fs = File.OpenRead(filePath))
+                    {
+                        // Check for a range header in the request
+
+                        if (request.Headers["Range"] is not null)
+                        {
+                            string rangeHeader = request.Headers["Range"];
+
+                            // Parse the range header
+                            string[] rangeValues = rangeHeader.Split('=')[1].Split('-');
+                            long startRange = long.Parse(rangeValues[0]);
+                            long endRange = 0;
+                            if (rangeValues[1].IsNullOrEmpty())
+                            {
+                                endRange = fs.Length - 1;
+                            }
+                            else
+                            {
+                                endRange = rangeValues.Length > 1 ? long.Parse(rangeValues[1]) : fs.Length - 1;
+                            }
+
+
+                            response.StatusCode = 206;
+                            response.Headers.Add("Content-Range", $"bytes {startRange}-{endRange}/{fs.Length}");
+
+
+                            response.ContentLength64 = endRange - startRange + 1;
+
+                            videoBytes = new byte[endRange - startRange + 1];
+                            fs.Seek(startRange, SeekOrigin.Begin);
+                            fs.Read(videoBytes, 0, videoBytes.Length);
+                        }
+                        else
+                        {
+
+                            response.ContentLength64 = fs.Length;
+
+                            videoBytes = new byte[fs.Length];
+                            fs.Read(videoBytes, 0, videoBytes.Length);
+                        }
+                    }
+
+                    Stream output = response.OutputStream;
+
+
+                    output.Write(videoBytes, 0, videoBytes.Length);
+                    output.FlushAsync();
+                    output.Close();
+                }
+                catch (Exception e) { }
+                
+            });
         }
 
         private void serveaudio(HttpListenerRequest request, HttpListenerResponse response, string path) {
