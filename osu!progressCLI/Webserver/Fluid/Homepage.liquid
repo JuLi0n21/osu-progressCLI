@@ -74,15 +74,20 @@
                 <div style="background-size: cover; background-position: center center;background-image: url(&quot; {{ config.cover_url }} &quot;); height: 250px">
 
                 </div>
+                
+                     <a href="https://osu.ppy.sh/users/{{ config.userid }}" class="left-12 inline-block rounded -top-12 relative max-h-0 h-0  hover:border-yellow-500  hover:border" target="_blank" rel="noopener noreferrer">
+                         <img src="{{ config.avatar_url }}" style="width:100px;" class="" />
+                     </a>
 
-                <div class="flex">
-                    <div class="ml-60 text-left pt-6 pb-6">
+                <div class="flex justify-around">
+
+                    <div class="text-left pt-3 pb-3">
                         <p class="usernameplaceholder">{{ config.username }} </p>
                         <p class="rankplaceholder">#{{ config.rank }} (# {{ config.country_rank }})</p>
                         <p class="countryplaceholder">  <span class="fi fi-{{ config.country_code }}"></span>{{ config.country }}</p>
                     </div>
 
-                    <div class="ml-60 text-left pt-6 pb-6">
+                    <div class="text-left pt-3 pb-3">
                         <p class="WastedTime">
                             ⏰ {{ thisweek }}H
                             {% if thisweek < 2400 %}
@@ -94,13 +99,11 @@
                         <p class="mostplayedscreen">💻 {{ week.Screen }}</p>
                         <p class="count">📂 {{ count }}</p>
                         </div>
-                </div>
-
-                <div style="position: relative;" class="mb-7"
-                    <a href="https://osu.ppy.sh/users/{{ config.userid }}" class=" hover:border-yellow-500  hover:border" target="_blank" rel="noopener noreferrer">
-                        <img src="{{ config.avatar_url }}" style="position: absolute; top: -150px; left: 60px; right: 0; height:120px; width:120px" class="rounded-lg" />
-                    </a>
-                </div>
+             
+                    </div>
+            </div>
+            <!-- Decorative Spacer -->
+            <div class="backdrop--medium--light h-8">
 
             </div>
 
@@ -177,8 +180,6 @@
               <canvas id="pieTimeWastedChart" height="250" width="450"></canvas>
           </div>
       </div>
-
-        </div>
 
     </div>
 
