@@ -451,7 +451,7 @@ namespace osu_progressCLI.Webserver.Server
                 {
                     List<Score> scores = null;
 
-                    scores = controller.GetPotentcialtopplays();
+                    scores = controller.GetPotentcialtopplays(250);
                     
                     var template = FluidRenderer.templates.Find(item =>
                         item.Key.Equals("Scores.liquid")

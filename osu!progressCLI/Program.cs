@@ -2,6 +2,8 @@
 using osu1progressbar.Game.MemoryProvider;
 using osu_progressCLI;
 using osu_progressCLI.Webserver.Server;
+using osu1progressbar.Game.Database;
+using osu_progressCLI.Datatypes;
 
 class Program
 {
@@ -19,7 +21,7 @@ class Program
             }
         }
 
-        //Task.Run(() =>  ScoreImporter.Instance.StartImporting());
+        Task.Run(() =>  ScoreImporter.Instance.StartImporting());
 
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
@@ -32,6 +34,9 @@ class Program
 
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
+
+        DatabaseController databaseController = new DatabaseController();
+        List<Score> scores = databaseController.GetPotentcialtopplays(250);
 
         //Console.WriteLine($"{job.ToString()}");
         await Webserver.Instance().start();

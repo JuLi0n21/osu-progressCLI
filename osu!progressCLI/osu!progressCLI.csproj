@@ -96,4 +96,9 @@
     <PackageReference Include="SocketIOSharp" Version="2.0.3" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
   </ItemGroup>
+	
+	
+	<ItemGroup>
+	  <Folder Include="public\video\" />
+	</ItemGroup>
 </Project>

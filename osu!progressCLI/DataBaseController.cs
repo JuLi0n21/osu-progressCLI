@@ -746,26 +746,27 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        public List<Score> GetPotentcialtopplays()
+        public List<Score> GetPotentcialtopplays(int ppcutoffpoint)
         {
             List<Score> scores = new List<Score>();
 
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                //play number 20 has 30% impact on topscore 
                 using (var command = connection.CreateCommand())
                 {
                     string insertquery =
                         @"SELECT *, rowid AS id 
                             FROM ScoreData
-                            WHERE COMBO >= MAXCOMBO * 0.5
-                            AND COMBO <= MAXCOMBO * 0.9
+                            WHERE COMBO >= MAXCOMBO * 0.45
+                            AND COMBO <= MAXCOMBO * 0.95
                             AND HITMISS <= 5
-                            AND FCPP > 255;
+                            AND FCPP > @pp; 
                                             ";
 
                     command.CommandText = insertquery;
+
+                    command.Parameters.AddWithValue("@pp", ppcutoffpoint);
 
                     command.ExecuteNonQuery( );
 
