@@ -38,8 +38,6 @@
    {% endif %}
 
 
-
-
     <!-- Reload button -->
     <div class="fixed top-0 right-20 z-40">
         <button id="loadDataButton" class="text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 backdrop--light">
@@ -111,18 +109,37 @@
             <div class="rounded-t-lg justify-center backdrop--medium pb-4">
 
                <div class="flex justify-center">
-                <h1 class="m-4">Recent Scores</h1>
+                <h1 class="m-4">Scores</h1>
                </div>
+                
+                <div class="flex justify-around">
+                
+                 <!-- Loading Potential topscores  ADD PAGEING WITH INDEXES (giveuser limit control)?-->
+                <div class="flex cursor-pointer">
+                    <div hx-get="/api/potentialfcs"
+                        hx-trigger="click"
+                        hx-target="#scorecontainer"
+                        class="flex text-center rounded-lg p-2 mb-4 mr-2 border self-center text--dark--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500">
+                        Fcable
+                    </div>
+              
+                        <div hx-get="/api/beatmaps"
+                            hx-trigger="click, load"
+                            hx-target="#scorecontainer"
+                            class="flex cursor-pointer text-center rounded-lg p-2  mb-4 border  self-center text--dark--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500">
+                            Recent Plays
+                        </div>
+                 </div>
 
                 <form hx-get="/api/beatmaps/search"
                       hx-trigger="input delay:500ms" 
                       hx-target="#scorecontainer" 
                       hx-swap="innerHTML transition:true" 
                       hx-indicator="#loading"
-                      class="mb-4 flex justify-center">
-                
+                      class="mb-4 flex justify-center self-center align-center">
+
                     <div class="flex justify-center rounded-lg">
-                        <input type="text" id="searchInput" name="query" placeholder="Search for stuff" title="Suported terms pp, sr, ar, hp, od, pp, fcpp ... and conditions -> fcpp > 300" 
+                        <input type="text" id="searchInput" name="query" placeholder="Type to Search..." title="Suported terms pp, sr, ar, hp, od, pp, fcpp ... and conditions -> fcpp > 300" 
                             class="text--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500 w-1/2 rounded-lg mx-auto border block" 
                             onkeydown="if (event.key === 'Enter') event.preventDefault();">
 
@@ -133,27 +150,16 @@
                     </div>
 
                 </form>
-
             </div>
-
+            </div>
+            
+            <!-- Stream connection To load in scroes after being set -->
                <div hx-ext="sse" sse-connect="/stream">
                    <div sse-swap="score" hx-target="#scorecontainer" hx-swap="afterbegin">
                    </div>
                </div>
-            
-            <div hx-get="/api/potentialfcs" 
-                 hx-trigger="load"
-                class="page-width flex-col overflow-y-scroll backdrop--dark">
-                <button>
-                    Load potential Plays 
-                </button>
-            </div>
 
-            <div id="scorecontainer" class="flex-col overflow-y-scroll backdrop--medium page-width h-96 max-h-96  min-h-96 transition"
-                 hx-get="/api/beatmaps"
-                 hx-trigger="load"
-                 hx-swap="innerHTML">
-                Loading scores...
+            <div id="scorecontainer" class="flex-col backdrop--medium page-width transition">
             </div>
 
 
@@ -201,15 +207,14 @@
         });
         document.getElementById('toDate').valueAsDate = new Date();
     </script>
-    <script src="recentscores.js"></script>
+
     <script src="configmenu.js"></script>
+
     <script src="difficulities.js"></script>
-    <script src="savebutton.js"></script>
-    <script src="scoreexample.js"></script>
-    <script src="searchbar.js"></script>
+
     <script src="timespend.js"></script>
     <script src="timespendtotal.js"></script>
-    <script src="websocket.js"></script>
+
     <script src="onload.js"></script>
 </body>
 </html>

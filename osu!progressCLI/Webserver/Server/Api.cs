@@ -66,7 +66,6 @@ namespace osu_progressCLI.Webserver.Server
                 if (!queryparams["Osufilename"].IsNullOrEmpty())
                 {
                     queryparams["query"] += $" {queryparams["Osufilename"]}";
-                    Console.WriteLine(queryparams["query"]);
                 }
 
                 //routing
@@ -451,7 +450,7 @@ namespace osu_progressCLI.Webserver.Server
                 {
                     List<Score> scores = null;
 
-                    scores = controller.GetPotentcialtopplays(250);
+                    scores = controller.GetPotentcialtopplays(await ApiController.Instance.getppcutoffpoint());
                     
                     var template = FluidRenderer.templates.Find(item =>
                         item.Key.Equals("Scores.liquid")

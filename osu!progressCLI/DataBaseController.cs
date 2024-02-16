@@ -746,7 +746,7 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        public List<Score> GetPotentcialtopplays(int ppcutoffpoint)
+        public List<Score> GetPotentcialtopplays(double ppcutoffpoint)
         {
             List<Score> scores = new List<Score>();
 
@@ -755,13 +755,21 @@ namespace osu1progressbar.Game.Database
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    string insertquery =
+                     string insertquery = //make sure to not show in case an fc already exists
                         @"SELECT *, rowid AS id 
                             FROM ScoreData
                             WHERE COMBO >= MAXCOMBO * 0.45
                             AND COMBO <= MAXCOMBO * 0.95
                             AND HITMISS <= 5
-                            AND FCPP > @pp; 
+                            AND FCPP > @pp
+                              AND NOT EXISTS (
+                                      SELECT 1 
+                                      FROM ScoreData AS s2
+                                      WHERE s2.beatmapid = ScoreData.beatmapid
+                                        AND s2.HITMISS = 0
+                                        AND s2.COMBO >=  s2.MAXCOMBO * 0.95
+                                    )
+                            GROUP BY Beatmapid;
                                             ";
 
                     command.CommandText = insertquery;
@@ -1054,7 +1062,7 @@ namespace osu1progressbar.Game.Database
         }
 
         [Time]
-        public List<Score> GetScoresInTimeSpan(DateTime from, DateTime to)
+        public List<Score> GetScoresInTimeSpan(DateTime from, DateTime to, int limit = 100, int offset = 0)
         {
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
             string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
@@ -1072,10 +1080,14 @@ namespace osu1progressbar.Game.Database
                         + "FROM ScoreData "
                         + "WHERE datetime(Date) BETWEEN @from AND @to "
                         + "ORDER BY Date DESC "
-                        + "LIMIT 1000;";
+                        + "LIMIT @limit " 
+                        + "OFFSET @offset;";
                     //";";
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
+                    command.Parameters.AddWithValue ("@limit", limit);
+                    command.Parameters.AddWithValue("@offset", offset);
+
 
                     DateTime dateString = DateTime.Now;
 
@@ -1097,7 +1109,9 @@ namespace osu1progressbar.Game.Database
         public List<Score> GetScoreSearch(
             DateTime from = new DateTime(),
             DateTime to = new DateTime(),
-            string search = ""
+            string search = "",
+            int limit = 100,
+            int offset = 0
         )
         {
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
@@ -1119,12 +1133,27 @@ namespace osu1progressbar.Game.Database
                     {
                         queryBuilder.Append("AND datetime(Date) BETWEEN @from AND @to ");
                         queryBuilder.Append(search);
-                        queryBuilder.Append("ORDER BY Date DESC LIMIT 1000;");
                         command.Parameters.AddWithValue("@from", fromFormatted);
                         command.Parameters.AddWithValue("@to", toFormatted);
                     }
 
+                    queryBuilder.Append("ORDER BY Date DESC ");
+
+                    if (limit != 0)
+                    {
+                        queryBuilder.Append("LIMIT @limit ");
+                        command.Parameters.AddWithValue("@limit", limit);
+                    }
+
+                    if (offset != 0)
+                    {
+                         queryBuilder.Append("OFFSET @offset ");
+                        command.Parameters.AddWithValue("@offset", offset);
+                    }
+
+                    queryBuilder.Append(";");
                     command.CommandText = queryBuilder.ToString();
+                    String text = queryBuilder.ToString();
                     DateTime dateString = DateTime.Now;
 
                     try

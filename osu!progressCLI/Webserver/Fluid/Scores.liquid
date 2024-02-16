@@ -1,6 +1,15 @@
-﻿<div id="scorecontainer">
+﻿<div>
 	{% if List.size == 0 %}
-	<p>No Score Found!</p>
+
+ <div class="flex justify-center mb-0">
+	<div class="flex backdrop--light h-16 rounded justify-start m-4 w-5/6 mb-1 mt-1">
+		<div class="flex flex-col grade-rank-container rounded justify-evenly w-1/6"></div>
+		<div class="flex justify-center">
+				<img src="not-found.gif" class="w-16 h-16" alt="?">
+				<p class="text-white">No Score found.</p>
+			</div>
+		</div>
+	</div>
 	{% else %}
 	{% for score in List %}
 	{% include 'score.liquid' %}

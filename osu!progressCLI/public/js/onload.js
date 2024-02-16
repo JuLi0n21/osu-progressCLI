@@ -1,28 +1,5 @@
-﻿document.getElementById('loadDataButton').addEventListener('click', function () {
+﻿function loaddata() {
     {
-        {
-            {
-                loaddata();
-            }
-        }
-    }
-});
-
-//get data from internal api
-function loaddata() {
-    {
-        fetch('/api/beatmaps')
-            .then(response => response.json())
-            .then(data => {
-                {
-                     console.log(data);
-                }
-            })
-            .catch(error => {
-                {
-                    console.error('Error loading data:', error);
-                }
-            });
 
         fetch('/api/banchotime')
             .then(response => response.json())
@@ -100,9 +77,7 @@ function loaddata() {
 // Trigger the initial data load when the page loads (optional)
 window.addEventListener('DOMContentLoaded', function () {
     {
-        // You can choose to load data immediately or wait for the button click
-        // For example, you can uncomment the line below to load data on page load:
-        // document.getElementById('loadDataButton').click();
+
         loaddata();
     }
 });
