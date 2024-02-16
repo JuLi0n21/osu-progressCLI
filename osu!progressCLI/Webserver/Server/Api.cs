@@ -446,12 +446,15 @@ namespace osu_progressCLI.Webserver.Server
 
                     Webserver.Instance().Redirect(response, $"/");
                     return;
-                } else if(path == "/api/potentialfcs")
+                }
+                else if (path == "/api/potentialfcs")
                 {
                     List<Score> scores = null;
 
-                    scores = controller.GetPotentcialtopplays(await ApiController.Instance.getppcutoffpoint());
-                    
+                    scores = controller.GetPotentcialtopplays(
+                        await ApiController.Instance.getppcutoffpoint()
+                    );
+
                     var template = FluidRenderer.templates.Find(item =>
                         item.Key.Equals("Scores.liquid")
                     );

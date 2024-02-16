@@ -83,7 +83,6 @@ namespace osu_progressCLI
             {
                 if (files[0].EndsWith(".csv"))
                 {
-
                     List<ImportScore> scores = new();
                     List<ImportScore> filterd = new();
                     using (var reader = new StreamReader(files[0]))
@@ -112,10 +111,6 @@ namespace osu_progressCLI
                 }
             }
         }
-          
-        
-                
-            
 
         public List<ScoreFileTracker> getScoreFileTracker()
         {

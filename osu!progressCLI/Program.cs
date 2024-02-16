@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
+using osu1progressbar.Game.Database;
 using osu1progressbar.Game.MemoryProvider;
 using osu_progressCLI;
-using osu_progressCLI.Webserver.Server;
-using osu1progressbar.Game.Database;
 using osu_progressCLI.Datatypes;
+using osu_progressCLI.Webserver.Server;
 
 class Program
 {
@@ -21,7 +21,7 @@ class Program
             }
         }
 
-        Task.Run(() =>  ScoreImporter.Instance.StartImporting());
+        Task.Run(() => ScoreImporter.Instance.StartImporting());
 
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
@@ -34,6 +34,8 @@ class Program
 
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
+
+        JArray array = await ApiController.Instance.getTopScores();
 
         DatabaseController databaseController = new DatabaseController();
         List<Score> scores = databaseController.GetPotentcialtopplays(250);

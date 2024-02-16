@@ -18,9 +18,10 @@ namespace osu_progressCLI
 
         private JObject usercache = null;
         private DateTime userTimestamp;
-    
+
         private double ppcutoffcache;
         private DateTime ppcutoffTimestamp;
+
         private ApiController() { }
 
         private async Task<JObject> MakeRequest(string Query)
@@ -610,10 +611,9 @@ namespace osu_progressCLI
             if (ppcutoffcache == null || ppcutoffTimestamp <= DateTime.Now.AddMinutes(-5))
             {
                 ppcutoffTimestamp = DateTime.Now;
-              JArray toplays = await getTopScores();  
-               ppcutoffcache = Convert.ToDouble(toplays.ElementAt(10)["pp"]);
+                JArray toplays = await getTopScores();
+                ppcutoffcache = Convert.ToDouble(toplays.ElementAt(10)["pp"]);
             }
-                  
 
             return ppcutoffcache;
         }

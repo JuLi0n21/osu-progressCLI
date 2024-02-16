@@ -57,7 +57,6 @@ namespace osu1progressbar.Game.Database
                 @"
                 CREATE TABLE IF NOT EXISTS ScoreData (
                     Date TEXT,
-                    Title TEXT,
                     BeatmapSetid INTEGER,
                     Beatmapid INTEGER,
                     Osufilename TEXT,
@@ -97,6 +96,7 @@ namespace osu1progressbar.Game.Database
                     ACCURACYATT REAL,
                     Grade TEXT,
                     FCPP REAL,
+                    Title TEXT,
                     CONSTRAINT duplicate_score UNIQUE (Beatmapid, Date, Score)
                 );
             ";
@@ -107,9 +107,88 @@ namespace osu1progressbar.Game.Database
                 $"Creating Database if it dont exists: {dbname}"
             );
 
+            string loadexistingrows = "PRAGMA table_info(ScoreData)";
+
+            List<string> Rows = new();
+
+            using (var command = new SQLiteCommand(loadexistingrows, connection))
+            {
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string columnName = reader["name"].ToString();
+                        Rows.Add(columnName);
+                    }
+                }
+            }
+
             using (var command = new SQLiteCommand(createScoreTableQuery, connection))
             {
                 command.ExecuteNonQuery();
+            }
+
+            if (!Rows.Contains("Title"))
+            {
+                Logger.Log(
+                    Logger.Severity.Warning,
+                    Logger.Framework.Database,
+                    "Old Database Version Detected Updating."
+                );
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    string addcolum = "ALTER TABLE ScoreData ADD Title TEXT;";
+                    command.CommandText = addcolum;
+                    command.ExecuteNonQuery();
+                }
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    string addcolum = "CREATE TABLE ScoreData_temp AS SELECT * FROM ScoreData;";
+                    command.CommandText = addcolum;
+                    command.ExecuteNonQuery();
+                }
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    string addcolum =
+                        "DELETE FROM ScoreData_temp WHERE rowid NOT IN (SELECT MIN(rowid) FROM ScoreData_temp GROUP BY Beatmapid, Date, Score);";
+                    command.CommandText = addcolum;
+                    command.ExecuteNonQuery();
+                }
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    string addcolum = "DROP TABLE ScoreData";
+                    command.CommandText = addcolum;
+                    command.ExecuteNonQuery();
+                }
+
+                using (var command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = createScoreTableQuery;
+                    command.ExecuteNonQuery();
+                }
+                using (var command = new SQLiteCommand(connection))
+                {
+                    string addcolum =
+                        "INSERT OR REPLACE INTO ScoreData SELECT * FROM ScoreData_temp";
+                    command.CommandText = addcolum;
+                    command.ExecuteNonQuery();
+                }
+                using (var command = new SQLiteCommand(connection))
+                {
+                    string addcolum = "DROP TABLE ScoreData_temp";
+                    command.CommandText = addcolum;
+                    command.ExecuteNonQuery();
+                }
+
+                Logger.Log(
+                    Logger.Severity.Warning,
+                    Logger.Framework.Database,
+                    "Updated to New Table Layout"
+                );
             }
 
             string timeSpendTableQuery =
@@ -755,7 +834,7 @@ namespace osu1progressbar.Game.Database
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                     string insertquery = //make sure to not show in case an fc already exists
+                    string insertquery = //make sure to not show in case an fc already exists
                         @"SELECT *, rowid AS id 
                             FROM ScoreData
                             WHERE COMBO >= MAXCOMBO * 0.45
@@ -776,7 +855,7 @@ namespace osu1progressbar.Game.Database
 
                     command.Parameters.AddWithValue("@pp", ppcutoffpoint);
 
-                    command.ExecuteNonQuery( );
+                    command.ExecuteNonQuery();
 
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
@@ -1062,7 +1141,12 @@ namespace osu1progressbar.Game.Database
         }
 
         [Time]
-        public List<Score> GetScoresInTimeSpan(DateTime from, DateTime to, int limit = 100, int offset = 0)
+        public List<Score> GetScoresInTimeSpan(
+            DateTime from,
+            DateTime to,
+            int limit = 100,
+            int offset = 0
+        )
         {
             string fromFormatted = from.ToString("yyyy-MM-dd HH:mm:ss");
             string toFormatted = to.ToString("yyyy-MM-dd HH:mm:ss");
@@ -1080,14 +1164,13 @@ namespace osu1progressbar.Game.Database
                         + "FROM ScoreData "
                         + "WHERE datetime(Date) BETWEEN @from AND @to "
                         + "ORDER BY Date DESC "
-                        + "LIMIT @limit " 
+                        + "LIMIT @limit "
                         + "OFFSET @offset;";
                     //";";
                     command.Parameters.AddWithValue("@from", fromFormatted);
                     command.Parameters.AddWithValue("@to", toFormatted);
-                    command.Parameters.AddWithValue ("@limit", limit);
+                    command.Parameters.AddWithValue("@limit", limit);
                     command.Parameters.AddWithValue("@offset", offset);
-
 
                     DateTime dateString = DateTime.Now;
 
@@ -1147,7 +1230,7 @@ namespace osu1progressbar.Game.Database
 
                     if (offset != 0)
                     {
-                         queryBuilder.Append("OFFSET @offset ");
+                        queryBuilder.Append("OFFSET @offset ");
                         command.Parameters.AddWithValue("@offset", offset);
                     }
 
