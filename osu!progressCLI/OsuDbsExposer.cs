@@ -128,6 +128,10 @@ namespace osu_progressCLI
 
         public static OsuParsers.Database.Objects.DbBeatmap GetBeatmapbyHash(string Hash)
         {
+            if(Hash == null || Osudb == null)
+            {
+                return null;
+            }
             return Osudb.Beatmaps.FirstOrDefault(beatmap => beatmap.MD5Hash == Hash);
         }
     }
