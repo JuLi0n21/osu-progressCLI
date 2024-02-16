@@ -16,8 +16,15 @@
 			<div>
 				<p class="text-white whitespace-nowrap overflow-hidden">{{ score.Title }} by {{ score.Artist }}</p>
 			</div>
-			<div>
-				<p class="text-white whitespace-nowrap overflow-hidden">{{ score.ScoreValue }} / {{ score.Combo }} ({{ score.MaxCombo }}) {{ score.ModsString }}</p>
+			<div class="flex justify-between">
+				<p class="text-white whitespace-nowrap overflow-hidden">{{ score.ScoreValue }} / {{ score.Combo }} ({{ score.MaxCombo }}) </p>   
+					{% assign Mods = score.ModsString | split: ", " %}
+						<div class="flex">
+						  {% for mod in Mods %}
+							   <img class="align-end" src="{{ mod }}.png" style="height: 25px" />
+						  {% endfor %}
+						</div>
+					 
 			</div>
 			<div class="flex">
 				<p class="text--dark--yellow whitespace-nowrap overflow-hidden">{{ score.Version }}</p>

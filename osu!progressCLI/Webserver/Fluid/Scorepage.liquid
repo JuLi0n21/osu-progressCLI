@@ -36,7 +36,7 @@
                 <!-- Beatmap data will be displayed here -->
 
                 <p class="relative top-6 left-4">{{ score.Status }}</p>
-                <div class="flex justify-center ml-4 mb-4 mr-4 text-xl">
+                <div class="flex justify-center m-4 text-xl">
 
                     <h2>{{ score.Title }}</h2>
                 </div>
@@ -82,11 +82,17 @@
 
                         <div class="relative">
                             <div class="abs-div" id="absDiv"></div>
-
-
+                            
                         </div>
 
-                        <div>
+                        <div>    
+                            <div class="absolute right-0 flex">
+                                {% assign Mods = score.ModsString | split: ", " %}
+                               {% for mod in Mods %}
+                                    <img src="{{ mod }}.png" style="height: 50px" />
+                                {% endfor %}
+                            </div>
+
                             <a href="https://osu.ppy.sh/beatmapsets/{{ score.BeatmapSetId }}#{{ score.Mode }}/{{ score.BeatmapId }}"
                                 target="_blank">
                                 <img src="{{ score.CoverList }}"
