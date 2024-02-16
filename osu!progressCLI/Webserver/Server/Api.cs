@@ -5,7 +5,6 @@ using Fluid;
 using Newtonsoft.Json;
 using osu1progressbar.Game.Database;
 using osu_progressCLI.Datatypes;
-using WebSocketSharp;
 
 namespace osu_progressCLI.Webserver.Server
 {
@@ -58,12 +57,12 @@ namespace osu_progressCLI.Webserver.Server
                         ;
                 }
 
-                if (!queryparams["Beatmapid"].IsNullOrEmpty())
+                if (!String.IsNullOrEmpty(queryparams["Beatmapid"]))
                 {
                     queryparams["query"] += $" BeatmapId=={queryparams["Beatmapid"]}";
                 }
 
-                if (!queryparams["Osufilename"].IsNullOrEmpty())
+                if (!String.IsNullOrEmpty(queryparams["Osufilename"]))
                 {
                     queryparams["query"] += $" {queryparams["Osufilename"]}";
                 }
@@ -102,7 +101,7 @@ namespace osu_progressCLI.Webserver.Server
                     {
                         List<Score> scores = null;
 
-                        if (!queryparams["Osufilename"].IsNullOrEmpty())
+                        if (!String.IsNullOrEmpty(queryparams["Osufilename"]))
                         {
                             scores = controller.GetScoreSearch(
                                 from,
@@ -136,7 +135,7 @@ namespace osu_progressCLI.Webserver.Server
                     }
                     else
                     {
-                        if (!queryparams["Osufilename"].IsNullOrEmpty())
+                        if (!String.IsNullOrEmpty(queryparams["Osufilename"]))
                         {
                             Webserver
                                 .Instance()
@@ -413,7 +412,7 @@ namespace osu_progressCLI.Webserver.Server
                 }
                 else if (path == "/api/callback" && request.HttpMethod == "GET")
                 {
-                    if (!queryparams["access_token"].IsNullOrEmpty())
+                    if (!String.IsNullOrEmpty(queryparams["access_token"]))
                     {
                         Credentials.Instance.SetAccessToken(queryparams["access_token"]);
 

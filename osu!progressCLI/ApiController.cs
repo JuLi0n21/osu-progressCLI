@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using WebSocketSharp;
 
 namespace osu_progressCLI
 {
@@ -100,7 +99,7 @@ namespace osu_progressCLI
         {
             Logger.Log(Logger.Severity.Debug, Logger.Framework.Network, $"Getting AccessToken");
 
-            if (!Credentials.Instance.GetAccessToken().IsNullOrEmpty())
+            if (!String.IsNullOrEmpty(Credentials.Instance.GetAccessToken()))
                 return;
 
             string oauthTokenEndpoint = "https://osu.ppy.sh/oauth/token";
@@ -304,7 +303,7 @@ namespace osu_progressCLI
                 $"Requesting User info for: {userid}, {mode}"
             );
 
-            if (userid.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(userid))
             {
                 return null;
             }

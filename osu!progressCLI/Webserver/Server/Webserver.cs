@@ -2,7 +2,6 @@
 using System.Text;
 using System.Web;
 using Fluid;
-using WebSocketSharp;
 
 namespace osu_progressCLI.Webserver.Server
 {
@@ -254,7 +253,7 @@ namespace osu_progressCLI.Webserver.Server
                             string[] rangeValues = rangeHeader.Split('=')[1].Split('-');
                             long startRange = long.Parse(rangeValues[0]);
                             long endRange = 0;
-                            if (rangeValues[1].IsNullOrEmpty())
+                            if (String.IsNullOrEmpty(rangeValues[1]))
                             {
                                 endRange = fs.Length - 1;
                             }

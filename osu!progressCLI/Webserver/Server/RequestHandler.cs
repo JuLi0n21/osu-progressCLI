@@ -3,7 +3,6 @@ using System.Web;
 using Fluid;
 using osu1progressbar.Game.Database;
 using osu_progressCLI.Datatypes;
-using WebSocketSharp;
 
 namespace osu_progressCLI.Webserver.Server
 {
@@ -47,7 +46,7 @@ namespace osu_progressCLI.Webserver.Server
 
                 var context = new TemplateContext(week);
 
-                context.SetValue("isAuth", !Credentials.Instance.GetAccessToken().IsNullOrEmpty());
+                context.SetValue("isAuth", !String.IsNullOrEmpty(Credentials.Instance.GetAccessToken()));
                 context.SetValue("count", controller.scorecount());
                 context.SetValue("thisweek", playtimethisweek);
                 context.SetValue("lastweek", diffrencetolastweek);

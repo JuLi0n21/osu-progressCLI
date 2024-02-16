@@ -2,7 +2,6 @@
 using System.Data.SQLite;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using MethodTimer;
 using Newtonsoft.Json.Linq;
 using OsuMemoryDataProvider.OsuMemoryModels;
 using osu_progressCLI;
@@ -1140,7 +1139,7 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        [Time]
+
         public List<Score> GetScoresInTimeSpan(
             DateTime from,
             DateTime to,
@@ -1188,7 +1187,7 @@ namespace osu1progressbar.Game.Database
             return scores;
         }
 
-        [Time]
+
         public List<Score> GetScoreSearch(
             DateTime from = new DateTime(),
             DateTime to = new DateTime(),
