@@ -106,6 +106,11 @@ namespace osu1progressbar.Game.Database
                 $"Creating Database if it dont exists: {dbname}"
             );
 
+            using (var command = new SQLiteCommand(createScoreTableQuery, connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
             string loadexistingrows = "PRAGMA table_info(ScoreData)";
 
             List<string> Rows = new();
@@ -120,11 +125,6 @@ namespace osu1progressbar.Game.Database
                         Rows.Add(columnName);
                     }
                 }
-            }
-
-            using (var command = new SQLiteCommand(createScoreTableQuery, connection))
-            {
-                command.ExecuteNonQuery();
             }
 
             if (!Rows.Contains("Title"))
