@@ -23,6 +23,7 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 - Tracks Time spend on Any specific Screen
 - Tracks BanchoTime (Idle, playing, afk...)
 - More or less supports All Modes and Mods
+- Shows Potential Fcable Maps
 - Progression over time.
 - Missanalzer for Passed Scores
 
@@ -32,11 +33,12 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 
 1. Download the zip
 2. Extract it
-3. Add ur [Osu!Api](https://osu.ppy.sh/home/account/edit#oauth) credentails in the credentials.json
-4. Run the Programm and open the [Webpage](localhost:4200)
-5. Add ur Username under the Pen icon hit save and refresh
-6. If ur profile stats are displayed ur done!
+3. Run the Programm and open the [Webpage](localhost:4200)
+4. Add ur Username, Osu folder and song folder under the Pen icon hit save and refresh
+5. If ur profile stats are displayed ur done!
 
+6. If u wish to keep scores from older version, move the osu!progress.db to the new folder
+7. If u want to Import Scores from ur current game or from osu!alternative visit  [importer](localhost:4200/importer)
 
 ## Requirments
 - Only Windows supported currently (depends on OsuMemoryProvider, Missanalzer, etc...)
