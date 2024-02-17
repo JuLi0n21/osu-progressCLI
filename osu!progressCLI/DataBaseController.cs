@@ -361,7 +361,10 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        public static async Task<bool> ImportScore(OsuParsers.Database.Objects.Score score, SQLiteConnection connection)
+        public static async Task<bool> ImportScore(
+            OsuParsers.Database.Objects.Score score,
+            SQLiteConnection connection
+        )
         {
             if (score == null)
                 return false;
@@ -377,28 +380,26 @@ namespace osu1progressbar.Game.Database
                 $"Trying to Insert Score {beatmap.MD5Hash} {score.ScoreId}"
             );
 
-   
+            double bpm = -1;
+            if (beatmap.TimingPoints.Count > 0)
+            {
+                bpm = beatmap
+                    .TimingPoints.GroupBy(tp => tp.BPM)
+                    .OrderByDescending(group => group.Count())
+                    .Select(group => group.Key)
+                    .First();
+            }
 
-                double bpm = -1;
-                if (beatmap.TimingPoints.Count > 0)
-                {
-                    bpm = beatmap
-                        .TimingPoints.GroupBy(tp => tp.BPM)
-                        .OrderByDescending(group => group.Count())
-                        .Select(group => group.Key)
-                        .First();
-                }
+            if (bpm < 0)
+                bpm *= -1;
 
-                if (bpm < 0)
-                    bpm *= -1;
+            bpm = Math.Round(bpm, 2);
+            string background = Util.getBackground(beatmap.FolderName, beatmap.FileName);
 
-                bpm = Math.Round(bpm, 2);
-                string background = Util.getBackground(beatmap.FolderName, beatmap.FileName);
-
-                using (SQLiteCommand command = new SQLiteCommand(connection))
-                {
-                    command.CommandText =
-                        @"
+            using (SQLiteCommand command = new SQLiteCommand(connection))
+            {
+                command.CommandText =
+                    @"
                        INSERT OR IGNORE INTO ScoreData (
                                 Date,
                                 BeatmapSetid,
@@ -486,116 +487,113 @@ namespace osu1progressbar.Game.Database
                                             );
                     ";
 
-                    command.Parameters.AddWithValue(
-                        "@Date",
-                        score.ScoreTimestamp.ToString("yyyy-MM-dd HH:mm")
-                    );
-                    command.Parameters.AddWithValue("@BeatmapSetid", beatmap.BeatmapSetId);
-                    command.Parameters.AddWithValue("@Beatmapid", beatmap.BeatmapId);
-                    command.Parameters.AddWithValue("@Osufilename", beatmap.FileName);
-                    command.Parameters.AddWithValue("@Foldername", beatmap.FolderName);
-                    command.Parameters.AddWithValue("@Replay", null);
-                    command.Parameters.AddWithValue("@Playtype", "Pass");
-                    command.Parameters.AddWithValue("@Ar", beatmap.ApproachRate); //needs mod recalculation
-                    command.Parameters.AddWithValue("@Cs", beatmap.CircleSize); //needs mod recalculation
-                    command.Parameters.AddWithValue("@Hp", beatmap.HPDrain); //needs mod recalculation
-                    command.Parameters.AddWithValue("@Od", beatmap.OverallDifficulty); //needs mod recalculation
-                    command.Parameters.AddWithValue("@Status", beatmap.RankedStatus.ToString());
+                command.Parameters.AddWithValue(
+                    "@Date",
+                    score.ScoreTimestamp.ToString("yyyy-MM-dd HH:mm")
+                );
+                command.Parameters.AddWithValue("@BeatmapSetid", beatmap.BeatmapSetId);
+                command.Parameters.AddWithValue("@Beatmapid", beatmap.BeatmapId);
+                command.Parameters.AddWithValue("@Osufilename", beatmap.FileName);
+                command.Parameters.AddWithValue("@Foldername", beatmap.FolderName);
+                command.Parameters.AddWithValue("@Replay", null);
+                command.Parameters.AddWithValue("@Playtype", "Pass");
+                command.Parameters.AddWithValue("@Ar", beatmap.ApproachRate); //needs mod recalculation
+                command.Parameters.AddWithValue("@Cs", beatmap.CircleSize); //needs mod recalculation
+                command.Parameters.AddWithValue("@Hp", beatmap.HPDrain); //needs mod recalculation
+                command.Parameters.AddWithValue("@Od", beatmap.OverallDifficulty); //needs mod recalculation
+                command.Parameters.AddWithValue("@Status", beatmap.RankedStatus.ToString());
 
-                    PerfomanceAttributes pp = DifficultyAttributes.CalculatePP(
-                        beatmap.FolderName,
-                        beatmap.FileName,
-                        score.ReplayScore,
-                        (int)score.Mods,
-                        score.CountMiss,
-                        score.Count50,
-                        score.Count100,
+                PerfomanceAttributes pp = DifficultyAttributes.CalculatePP(
+                    beatmap.FolderName,
+                    beatmap.FileName,
+                    score.ReplayScore,
+                    (int)score.Mods,
+                    score.CountMiss,
+                    score.Count50,
+                    score.Count100,
+                    score.Count300,
+                    0,
+                    score.Combo,
+                    (int)score.Ruleset
+                );
+
+                command.Parameters.AddWithValue("@SR", pp.starrating);
+
+                command.Parameters.AddWithValue("@Bpm", bpm);
+                command.Parameters.AddWithValue("@Creator", beatmap.Creator);
+                command.Parameters.AddWithValue("@Artist", beatmap.Artist);
+                command.Parameters.AddWithValue("@Username", score.PlayerName);
+                double acc =
+                    (double)(
+                        score.Count300 * 300
+                        + score.Count100 * 100
+                        + score.Count50 * 50
+                        + score.CountMiss * 0
+                    )
+                    / ((score.Count300 + score.Count100 + score.Count50 + score.CountMiss) * 300)
+                    * 100;
+
+                command.Parameters.AddWithValue("@Acc", Math.Round(acc, 2));
+
+                command.Parameters.AddWithValue("@MaxCombo", pp.Maxcombo);
+                command.Parameters.AddWithValue("@Score", score.ReplayScore);
+                command.Parameters.AddWithValue("@Combo", score.Combo);
+                command.Parameters.AddWithValue("@Hit50", score.Count50);
+                command.Parameters.AddWithValue("@Hit100", score.Count100);
+                command.Parameters.AddWithValue("@Hit300", score.Count300);
+                command.Parameters.AddWithValue("@Ur", 0);
+                command.Parameters.AddWithValue("@HitMiss", score.CountMiss);
+                command.Parameters.AddWithValue("@Mode", score.Ruleset);
+                command.Parameters.AddWithValue("@Mods", score.Mods);
+                command.Parameters.AddWithValue("@Version", beatmap.Difficulty);
+                command.Parameters.AddWithValue("@Cover", background);
+                command.Parameters.AddWithValue("@Coverlist", background);
+                command.Parameters.AddWithValue("@Preview", beatmap.AudioFileName);
+                command.Parameters.AddWithValue("@Tags", beatmap.Tags);
+                command.Parameters.AddWithValue("@Time", beatmap.DrainTime);
+
+                command.Parameters.AddWithValue("@pp", pp.pp);
+
+                PerfomanceAttributes fcpp = DifficultyAttributes.CalculatePP(
+                    beatmap.FolderName,
+                    beatmap.FileName,
+                    score.ReplayScore,
+                    (int)score.Mods,
+                    0,
+                    score.Count50,
+                    score.Count100,
+                    score.Count300,
+                    0,
+                    0,
+                    (int)score.Ruleset
+                );
+
+                command.Parameters.AddWithValue("@fcpp", fcpp.pp);
+
+                command.Parameters.AddWithValue("@aim", pp.aim);
+                command.Parameters.AddWithValue("@speed", pp.speed);
+                command.Parameters.AddWithValue("@accuracyatt", pp.accuracy);
+                command.Parameters.AddWithValue(
+                    "@grade",
+                    DifficultyAttributes.CalculateGrade(
                         score.Count300,
-                        0,
-                        score.Combo,
-                        (int)score.Ruleset
-                    );
-
-                    command.Parameters.AddWithValue("@SR", pp.starrating);
-
-                    command.Parameters.AddWithValue("@Bpm", bpm);
-                    command.Parameters.AddWithValue("@Creator", beatmap.Creator);
-                    command.Parameters.AddWithValue("@Artist", beatmap.Artist);
-                    command.Parameters.AddWithValue("@Username", score.PlayerName);
-                    double acc =
-                        (double)(
-                            score.Count300 * 300
-                            + score.Count100 * 100
-                            + score.Count50 * 50
-                            + score.CountMiss * 0
-                        )
-                        / (
-                            (score.Count300 + score.Count100 + score.Count50 + score.CountMiss)
-                            * 300
-                        )
-                        * 100;
-
-                    command.Parameters.AddWithValue("@Acc", Math.Round(acc, 2));
-
-                    command.Parameters.AddWithValue("@MaxCombo", pp.Maxcombo);
-                    command.Parameters.AddWithValue("@Score", score.ReplayScore);
-                    command.Parameters.AddWithValue("@Combo", score.Combo);
-                    command.Parameters.AddWithValue("@Hit50", score.Count50);
-                    command.Parameters.AddWithValue("@Hit100", score.Count100);
-                    command.Parameters.AddWithValue("@Hit300", score.Count300);
-                    command.Parameters.AddWithValue("@Ur", 0);
-                    command.Parameters.AddWithValue("@HitMiss", score.CountMiss);
-                    command.Parameters.AddWithValue("@Mode", score.Ruleset);
-                    command.Parameters.AddWithValue("@Mods", score.Mods);
-                    command.Parameters.AddWithValue("@Version", beatmap.Difficulty);
-                    command.Parameters.AddWithValue("@Cover", background);
-                    command.Parameters.AddWithValue("@Coverlist", background);
-                    command.Parameters.AddWithValue("@Preview", beatmap.AudioFileName);
-                    command.Parameters.AddWithValue("@Tags", beatmap.Tags);
-                    command.Parameters.AddWithValue("@Time", beatmap.DrainTime);
-
-                    command.Parameters.AddWithValue("@pp", pp.pp);
-
-                    PerfomanceAttributes fcpp = DifficultyAttributes.CalculatePP(
-                        beatmap.FolderName,
-                        beatmap.FileName,
-                        score.ReplayScore,
-                        (int)score.Mods,
-                        0,
-                        score.Count50,
                         score.Count100,
-                        score.Count300,
-                        0,
-                        0,
-                        (int)score.Ruleset
-                    );
+                        score.Count50,
+                        score.CountMiss
+                    )
+                );
 
-                    command.Parameters.AddWithValue("@fcpp", fcpp.pp);
+                command.Parameters.AddWithValue("@Title", beatmap.Title);
 
-                    command.Parameters.AddWithValue("@aim", pp.aim);
-                    command.Parameters.AddWithValue("@speed", pp.speed);
-                    command.Parameters.AddWithValue("@accuracyatt", pp.accuracy);
-                    command.Parameters.AddWithValue(
-                        "@grade",
-                        DifficultyAttributes.CalculateGrade(
-                            score.Count300,
-                            score.Count100,
-                            score.Count50,
-                            score.CountMiss
-                        )
-                    );
+                int rows = command.ExecuteNonQuery();
 
-                    command.Parameters.AddWithValue("@Title", beatmap.Title);
-
-                    int rows = command.ExecuteNonQuery();
-                    
-                    Logger.Log(
-                        Logger.Severity.Debug,
-                        Logger.Framework.Database,
-                        $"Saved Score: {beatmap.Title}"
-                    );
-                    return true;
-                }
+                Logger.Log(
+                    Logger.Severity.Debug,
+                    Logger.Framework.Database,
+                    $"Saved Score: {beatmap.Title}"
+                );
+                return true;
+            }
         }
 
         public static async Task<bool> ImportScore(object importscore, SQLiteConnection connection)
@@ -606,41 +604,40 @@ namespace osu1progressbar.Game.Database
                 Logger.Framework.Database,
                 $"Trying to Insert Score {score.file_md5} {score.pp}"
             );
-                try
-                {
+            try
+            {
+                string foldername = "";
 
-                    string foldername = "";
+                string osufilename = "";
 
-                    string osufilename = "";
+                string background = "";
+                //GET FOLDER AND FILENAME
+                HttpClient client = new HttpClient();
 
-                    string background = "";
-                    //GET FOLDER AND FILENAME
-                    HttpClient client = new HttpClient();
+                foldername = await ApiController.Instance.DownloadBeatmapset(
+                    client,
+                    score.set_id,
+                    true
+                );
 
-                    foldername = await ApiController.Instance.DownloadBeatmapset(
-                        client,
-                        score.set_id,
-                        true
-                    );
+                client.Dispose();
 
-                    client.Dispose();
+                Logger.Log(
+                    Logger.Severity.Debug,
+                    Logger.Framework.Database,
+                    $"Trying to Get Filename {score.beatmap_id}"
+                );
+                osufilename = Util.osufile(foldername, score.diffname);
 
-                    Logger.Log(
-                        Logger.Severity.Debug,
-                        Logger.Framework.Database,
-                        $"Trying to Get Filename {score.beatmap_id}"
-                    );
-                    osufilename = Util.osufile(foldername, score.diffname);
+                Logger.Log(
+                    Logger.Severity.Debug,
+                    Logger.Framework.Database,
+                    $"Trying to Find Background for {score.beatmap_id}"
+                );
+                background = Util.getBackground(foldername, osufilename);
 
-                    Logger.Log(
-                        Logger.Severity.Debug,
-                        Logger.Framework.Database,
-                        $"Trying to Find Background for {score.beatmap_id}"
-                    );
-                    background = Util.getBackground(foldername, osufilename);
-
-                    string insertQuery =
-                        @"
+                string insertQuery =
+                    @"
                         INSERT OR IGNORE INTO ScoreData (
                                 Date,
                                 Title,
@@ -728,93 +725,93 @@ namespace osu1progressbar.Game.Database
                                             );
                     ";
 
-                    PerfomanceAttributes fcpp = DifficultyAttributes.CalculatePP(
-                        foldername,
-                        osufilename,
-                        score.score,
-                        score.enabled_mods,
-                        0,
-                        score.count50,
-                        score.count100,
-                        score.count300,
-                        0,
-                        0
-                    );
+                PerfomanceAttributes fcpp = DifficultyAttributes.CalculatePP(
+                    foldername,
+                    osufilename,
+                    score.score,
+                    score.enabled_mods,
+                    0,
+                    score.count50,
+                    score.count100,
+                    score.count300,
+                    0,
+                    0
+                );
 
-                    //YYYY-MM-DD HH:MM THIS FORMAT IS SUPPOSED TO BE USED
-                    using (var command = new SQLiteCommand(insertQuery, connection))
-                    {
-                        command.Parameters.AddWithValue(
-                            "@Date",
-                            score.date_played.ToString("yyyy-MM-dd HH:mm")
-                        );
-                        command.Parameters.AddWithValue("@Title", score.title);
-                        command.Parameters.AddWithValue("@BeatmapSetid", score.set_id);
-                        command.Parameters.AddWithValue("@Beatmapid", score.beatmap_id);
-                        command.Parameters.AddWithValue("@Osufilename", osufilename);
-                        command.Parameters.AddWithValue("@Foldername", foldername);
-                        command.Parameters.AddWithValue("@Replay", null);
-                        command.Parameters.AddWithValue("@Playtype", "Pass");
-                        command.Parameters.AddWithValue("@Ar", score.ar);
-                        command.Parameters.AddWithValue("@Cs", score.cs); //needs mod recalculation
-                        command.Parameters.AddWithValue("@Hp", score.hp); //needs mod recalculation
-                        command.Parameters.AddWithValue("@Od", score.od);
-                        command.Parameters.AddWithValue("@Status", "Ranked");
-                        command.Parameters.AddWithValue("@SR", Math.Round(score.stars,2));
-                        command.Parameters.AddWithValue("@Bpm", score.bpm);
-                        command.Parameters.AddWithValue("@Creator", score.creator);
-                        command.Parameters.AddWithValue("@Artist", score.artist);
-                        command.Parameters.AddWithValue(
-                            "@Username",
-                            Credentials.Instance.GetConfig().username
-                        );
-                        command.Parameters.AddWithValue("@Acc", score.accuracy);
-                        command.Parameters.AddWithValue("@MaxCombo", score.maxcombo);
-                        command.Parameters.AddWithValue("@Score", score.score);
-                        command.Parameters.AddWithValue("@Combo", score.combo);
-                        command.Parameters.AddWithValue("@Hit50", score.count50);
-                        command.Parameters.AddWithValue("@Hit100", score.count100);
-                        command.Parameters.AddWithValue("@Hit300", score.count300);
-                        command.Parameters.AddWithValue("@Ur", 0);
-                        command.Parameters.AddWithValue("@HitMiss", score.countmiss);
-                        command.Parameters.AddWithValue("@Mode", score.mode);
-                        command.Parameters.AddWithValue("@Mods", score.enabled_mods);
-                        command.Parameters.AddWithValue("@Version", score.diffname);
-                        command.Parameters.AddWithValue("@Cover", background);
-                        command.Parameters.AddWithValue("@Coverlist", background);
-
-                        var beatmap = OsuDbsExposer.GetBeatmapbyHash(score.file_md5);
-
-                        command.Parameters.AddWithValue("@Preview", beatmap?.AudioFileName ?? null);
-                        command.Parameters.AddWithValue("@Tags", score.tags);
-                        command.Parameters.AddWithValue("@Time", score.drain);
-                        command.Parameters.AddWithValue("@pp", Math.Round(score.pp, 2));
-
-                        command.Parameters.AddWithValue("@fcpp", Math.Round(fcpp.pp, 2));
-                        command.Parameters.AddWithValue("@aim", 0);
-                        command.Parameters.AddWithValue("@speed", 0);
-                        command.Parameters.AddWithValue("@accuracyatt", 0);
-                        command.Parameters.AddWithValue("@grade", score.rank);
-
-                        command.ExecuteNonQuery();
-                    }
-
-                    Logger.Log(
-                        Logger.Severity.Debug,
-                        Logger.Framework.Database,
-                        $"Saved Score: {score.title}"
-                    );
-                    return true;
-                }
-                catch (Exception e)
+                //YYYY-MM-DD HH:MM THIS FORMAT IS SUPPOSED TO BE USED
+                using (var command = new SQLiteCommand(insertQuery, connection))
                 {
-                    Logger.Log(
-                        Logger.Severity.Debug,
-                        Logger.Framework.Database,
-                        $"Failed to Import Score({score.file_md5}):{e.Message}"
+                    command.Parameters.AddWithValue(
+                        "@Date",
+                        score.date_played.ToString("yyyy-MM-dd HH:mm")
                     );
-                    return false;
+                    command.Parameters.AddWithValue("@Title", score.title);
+                    command.Parameters.AddWithValue("@BeatmapSetid", score.set_id);
+                    command.Parameters.AddWithValue("@Beatmapid", score.beatmap_id);
+                    command.Parameters.AddWithValue("@Osufilename", osufilename);
+                    command.Parameters.AddWithValue("@Foldername", foldername);
+                    command.Parameters.AddWithValue("@Replay", null);
+                    command.Parameters.AddWithValue("@Playtype", "Pass");
+                    command.Parameters.AddWithValue("@Ar", score.ar);
+                    command.Parameters.AddWithValue("@Cs", score.cs); //needs mod recalculation
+                    command.Parameters.AddWithValue("@Hp", score.hp); //needs mod recalculation
+                    command.Parameters.AddWithValue("@Od", score.od);
+                    command.Parameters.AddWithValue("@Status", "Ranked");
+                    command.Parameters.AddWithValue("@SR", Math.Round(score.stars, 2));
+                    command.Parameters.AddWithValue("@Bpm", score.bpm);
+                    command.Parameters.AddWithValue("@Creator", score.creator);
+                    command.Parameters.AddWithValue("@Artist", score.artist);
+                    command.Parameters.AddWithValue(
+                        "@Username",
+                        Credentials.Instance.GetConfig().username
+                    );
+                    command.Parameters.AddWithValue("@Acc", score.accuracy);
+                    command.Parameters.AddWithValue("@MaxCombo", score.maxcombo);
+                    command.Parameters.AddWithValue("@Score", score.score);
+                    command.Parameters.AddWithValue("@Combo", score.combo);
+                    command.Parameters.AddWithValue("@Hit50", score.count50);
+                    command.Parameters.AddWithValue("@Hit100", score.count100);
+                    command.Parameters.AddWithValue("@Hit300", score.count300);
+                    command.Parameters.AddWithValue("@Ur", 0);
+                    command.Parameters.AddWithValue("@HitMiss", score.countmiss);
+                    command.Parameters.AddWithValue("@Mode", score.mode);
+                    command.Parameters.AddWithValue("@Mods", score.enabled_mods);
+                    command.Parameters.AddWithValue("@Version", score.diffname);
+                    command.Parameters.AddWithValue("@Cover", background);
+                    command.Parameters.AddWithValue("@Coverlist", background);
+
+                    var beatmap = OsuDbsExposer.GetBeatmapbyHash(score.file_md5);
+
+                    command.Parameters.AddWithValue("@Preview", beatmap?.AudioFileName ?? null);
+                    command.Parameters.AddWithValue("@Tags", score.tags);
+                    command.Parameters.AddWithValue("@Time", score.drain);
+                    command.Parameters.AddWithValue("@pp", Math.Round(score.pp, 2));
+
+                    command.Parameters.AddWithValue("@fcpp", Math.Round(fcpp.pp, 2));
+                    command.Parameters.AddWithValue("@aim", 0);
+                    command.Parameters.AddWithValue("@speed", 0);
+                    command.Parameters.AddWithValue("@accuracyatt", 0);
+                    command.Parameters.AddWithValue("@grade", score.rank);
+
+                    command.ExecuteNonQuery();
                 }
+
+                Logger.Log(
+                    Logger.Severity.Debug,
+                    Logger.Framework.Database,
+                    $"Saved Score: {score.title}"
+                );
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(
+                    Logger.Severity.Debug,
+                    Logger.Framework.Database,
+                    $"Failed to Import Score({score.file_md5}):{e.Message}"
+                );
+                return false;
+            }
         }
 
         public List<Score> GetPotentcialtopplays(double ppcutoffpoint)

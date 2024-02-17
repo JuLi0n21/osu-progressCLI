@@ -82,32 +82,38 @@ namespace osu_progressCLI
 
             if (files.Length > 0)
             {
-                Parallel.ForEach(files, file =>
-                {   
+                Parallel.ForEach(
+                    files,
+                    file =>
+                    {
                         {
-                        try
-                        {
-
-                            if (file.EndsWith(".csv"))
+                            try
                             {
-                                Importcsv(file);
-                            } 
-                            else if (file.Contains(".db"))
+                                if (file.EndsWith(".csv"))
+                                {
+                                    Importcsv(file);
+                                }
+                                else if (file.Contains(".db"))
+                                {
+                                    ImportScoreDb(file);
+                                }
+                            }
+                            catch (Exception e)
                             {
-                                ImportScoreDb(file);
+                                Logger.Log(
+                                    Logger.Severity.Error,
+                                    Logger.Framework.Scoreimporter,
+                                    e.Message
+                                );
                             }
                         }
-                        catch (Exception e)
-                        {
-                            Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, e.Message);
-                        }
                     }
-                });
+                );
             }
         }
 
-        public async void Importcsv(string Filename) {
-
+        public async void Importcsv(string Filename)
+        {
             ScoreFileTracker tracker = await loadprogress(Filename);
 
             List<ImportScore> scores;
@@ -154,20 +160,23 @@ namespace osu_progressCLI
                 {
                     Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, e.Message);
                 }
-                finally { connection.Close(); }
+                finally
+                {
+                    connection.Close();
+                }
             }
 
             await save(tracker);
             cleanup(tracker);
         }
 
-    
-        
         public async void ImportScoreDb(string Filename)
         {
             ScoreFileTracker tracker = await loadprogress(Filename);
 
-            ScoresDatabase Scoredb = OsuParsers.Decoders.DatabaseDecoder.DecodeScores($"{tracker.filename}");
+            ScoresDatabase Scoredb = OsuParsers.Decoders.DatabaseDecoder.DecodeScores(
+                $"{tracker.filename}"
+            );
             tracker.amountoffscores = Scoredb.Scores.Count;
 
             using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
@@ -182,7 +191,10 @@ namespace osu_progressCLI
                             return;
 
                         tracker.index = i;
-                        await DatabaseController.ImportScore(Scoredb.Scores.ElementAt(i).Item2.FirstOrDefault(), connection);
+                        await DatabaseController.ImportScore(
+                            Scoredb.Scores.ElementAt(i).Item2.FirstOrDefault(),
+                            connection
+                        );
 
                         if (i % 10 == 0)
                             await save(tracker);
@@ -192,22 +204,30 @@ namespace osu_progressCLI
                 {
                     Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, e.Message);
                 }
-                finally { connection.Close(); }
+                finally
+                {
+                    connection.Close();
+                }
             }
 
             await save(tracker);
             cleanup(tracker);
         }
 
-        private async Task<ScoreFileTracker> loadprogress(string Filename) {
-
+        private async Task<ScoreFileTracker> loadprogress(string Filename)
+        {
             ScoreFileTracker tracker = null;
-            string trackerfilepath = Path.Combine(CACHE_LOCATION, $"{Path.GetFileName(Filename)}.progress.json");
+            string trackerfilepath = Path.Combine(
+                CACHE_LOCATION,
+                $"{Path.GetFileName(Filename)}.progress.json"
+            );
 
             if (File.Exists(trackerfilepath) && File.ReadAllText(trackerfilepath).Length > 0)
-                tracker = JsonSerializer.Deserialize<ScoreFileTracker>(await File.ReadAllTextAsync(trackerfilepath));
+                tracker = JsonSerializer.Deserialize<ScoreFileTracker>(
+                    await File.ReadAllTextAsync(trackerfilepath)
+                );
 
-            if(tracker == null)
+            if (tracker == null)
             {
                 tracker = new ScoreFileTracker();
                 tracker.filename = Filename;
@@ -220,8 +240,13 @@ namespace osu_progressCLI
 
         private void cleanup(ScoreFileTracker tracker)
         {
-            File.Move(tracker.filename, Path.Combine(FINISHED_LOCATION, Path.GetFileName(tracker.filename)));
-            File.Delete(Path.Combine(CACHE_LOCATION, $"{Path.GetFileName(tracker.filename)}.progress.json"));
+            File.Move(
+                tracker.filename,
+                Path.Combine(FINISHED_LOCATION, Path.GetFileName(tracker.filename))
+            );
+            File.Delete(
+                Path.Combine(CACHE_LOCATION, $"{Path.GetFileName(tracker.filename)}.progress.json")
+            );
         }
 
         public List<ScoreFileTracker> getScoreFileTracker()
@@ -241,7 +266,10 @@ namespace osu_progressCLI
                 );
 
                 await File.WriteAllTextAsync(
-                    Path.Combine(CACHE_LOCATION, $"{Path.GetFileName(tracker.filename)}.progress.json"),
+                    Path.Combine(
+                        CACHE_LOCATION,
+                        $"{Path.GetFileName(tracker.filename)}.progress.json"
+                    ),
                     jsonText,
                     Encoding.UTF8
                 );
@@ -251,7 +279,6 @@ namespace osu_progressCLI
                 semaphore.Release();
             }
         }
-
     }
 
     public class ScoreFileTracker
