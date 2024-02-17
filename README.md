@@ -31,12 +31,12 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 
 1. Download the [Latest Release](https://github.com/juli0n21/osu-progresscli/releases/)
 2. Extract it
-3. Run the Programm and open the [Webpage](localhost:4200)
+3. Run the Programm and open the [Webpage](http://localhost:4200)
 4. Add ur Username, Osu folder and song folder under the Pen icon hit save and refresh
 5. If ur profile stats are displayed ur done!
 
 6. If u wish to keep scores from older version, move the osu!progress.db to the new folder
-7. If u want to Import Scores from ur current game or from osu!alternative visit  [importer](localhost:4200/importer)
+7. If u want to Import Scores from ur current game or from osu!alternative visit  [importer](http://localhost:4200/importer)
 
 ## Requirments
 - Only Windows supported currently (depends on OsuMemoryProvider, Missanalzer, etc...)
