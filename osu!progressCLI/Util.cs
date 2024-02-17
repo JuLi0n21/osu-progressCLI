@@ -90,7 +90,6 @@ public class Util
             string[] bgFiles = Directory.GetFiles(bgDirectory);
             string[] btFiles = Directory.GetFiles(btDirectory);
 
-            Console.WriteLine(btDirectory);
             if (bgFiles.Length > 0)
             {
                 Random random = new Random();
