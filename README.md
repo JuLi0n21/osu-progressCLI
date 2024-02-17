@@ -6,14 +6,21 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 <details>
   <summary>Homepage</summary>
 
-![Imgur](https://imgur.com/cvL9b6i.png)
+![Imgur](https://i.imgur.com/TOq4cZL.png)
 
 </details>
 
 <details>
   <summary>Scorepage</summary>
 
-![Imgur](https://imgur.com/t58MCPB.png)
+![Imgur](https://i.imgur.com/e8jnW7b.png)
+
+</details>
+
+<details>
+  <summary>Importer</summary>
+
+![Imgur](https://i.imgur.com/ETXmREw.png)
 
 </details>
 
@@ -32,7 +39,7 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 1. Download the [Latest Release](https://github.com/juli0n21/osu-progresscli/releases/)
 2. Extract it
 3. Run the Programm and open the [Webpage](http://localhost:4200)
-4. Add ur Username, Osu folder and song folder under the Pen icon hit save and refresh
+4. Add youre Userid, Osu folder and song folder under the Pen icon hit save and refresh
 5. If ur profile stats are displayed ur done!
 
 6. If u wish to keep scores from older version, move the osu!progress.db to the new folder
