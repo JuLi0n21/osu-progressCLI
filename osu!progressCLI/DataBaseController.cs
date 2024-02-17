@@ -151,6 +151,13 @@ namespace osu1progressbar.Game.Database
 
                 using (var command = new SQLiteCommand(connection))
                 {
+                    string copyDataQuery = "UPDATE ScoreData_temp SET Title = Osufilename;";
+                    command.CommandText = copyDataQuery;
+                    command.ExecuteNonQuery();
+                }
+
+                using (var command = new SQLiteCommand(connection))
+                {
                     string addcolum =
                         "DELETE FROM ScoreData_temp WHERE rowid NOT IN (SELECT MIN(rowid) FROM ScoreData_temp GROUP BY Beatmapid, Date, Score);";
                     command.CommandText = addcolum;
