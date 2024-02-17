@@ -824,7 +824,7 @@ namespace osu1progressbar.Game.Database
                 using (var command = connection.CreateCommand())
                 {
                     string insertquery = //make sure to not show in case an fc already exists
-                        @"SELECT *, rowid AS id 
+                        @"SELECT *, rowid AS id, datetime(date)
                             FROM ScoreData
                             WHERE COMBO >= MAXCOMBO * 0.45
                             AND COMBO <= MAXCOMBO * 0.95
@@ -837,7 +837,8 @@ namespace osu1progressbar.Game.Database
                                         AND s2.HITMISS = 0
                                         AND s2.COMBO >=  s2.MAXCOMBO * 0.95
                                     )
-                            GROUP BY Beatmapid;
+                            GROUP BY Beatmapid
+                            ORDER BY datetime(Date) DESC;
                                             ";
 
                     command.CommandText = insertquery;
@@ -1151,7 +1152,7 @@ namespace osu1progressbar.Game.Database
                         "SELECT rowid as id, * "
                         + "FROM ScoreData "
                         + "WHERE datetime(Date) BETWEEN @from AND @to "
-                        + "ORDER BY Date DESC "
+                        + "ORDER BY datetime(Date) DESC "
                         + "LIMIT @limit "
                         + "OFFSET @offset;";
                     //";";
@@ -1207,7 +1208,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@to", toFormatted);
                     }
 
-                    queryBuilder.Append("ORDER BY Date DESC ");
+                    queryBuilder.Append("ORDER BY datetime(Date) DESC ");
 
                     if (limit != 0)
                     {
