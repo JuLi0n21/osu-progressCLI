@@ -587,7 +587,6 @@ namespace osu1progressbar.Game.Database
                     );
 
                     int rows = command.ExecuteNonQuery();
-                    Console.WriteLine("rows inserted: " + rows);
                     connection.Close();
                     Logger.Log(
                         Logger.Severity.Debug,
@@ -815,7 +814,6 @@ namespace osu1progressbar.Game.Database
                         $"Failed to Import Score({score.file_md5}):{e.Message}"
                     );
                     return false;
-                    Console.WriteLine(e.ToString());
                 }
                 finally
                 {

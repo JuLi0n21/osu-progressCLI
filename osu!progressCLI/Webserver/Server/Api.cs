@@ -354,7 +354,7 @@ namespace osu_progressCLI.Webserver.Server
                 {
                     bool allAreFalse = ScoreImporter
                         .Instance.getScoreFileTracker()
-                        .All(obj => obj.running == false);
+                        .All(obj => obj.index >= obj.amountoffscores);
 
                     if (allAreFalse)
                     {
@@ -379,7 +379,7 @@ namespace osu_progressCLI.Webserver.Server
                                 int percentage = (list.index + 1) * 100 / list.amountoffscores;
                                 output +=
                                     $"<div class=\" text--pink m-2 flex justify-between\">"
-                                    + $"<p>{Path.GetFileName(list.filename)}</p> <p>{list.index + 1}|{list.amountoffscores}</p></div>"
+                                    + $"<p>{Path.GetFileName(list.filename)}</p> <p>{list.index}|{list.amountoffscores}</p></div>"
                                     + $"<div class=\"bg-pink-900 border\" style=\"width:{percentage}%\">{percentage}%</div>"
                                     + $"</div>";
                             }
@@ -425,30 +425,7 @@ namespace osu_progressCLI.Webserver.Server
                 }
                 else if (path == "/api/startimport" && request.HttpMethod == "POST")
                 {
-                    string[] files = Directory.GetFiles("imports");
-
-                    for (int i = 0; i < files.Length; i++)
-                    {
-                        if (File.Exists("Importer/imports/osu!.db"))
-                        {
-                            File.Move("Importer/imports/osu!.db", "Importer/cache/osu!.db");
-                        }
-                        else if (File.Exists("Importer/cache/osu!.db"))
-                        {
-                            //osudb exists dont do anything
-                        }
-                        else
-                        {
-                            Webserver
-                                .Instance()
-                                .WriteResponse(
-                                    response,
-                                    $"<span class=\" text-red-600 text-3xl hide-me\"> Add a Copy off your osu!.db into the Folder, scores will not be imported otherwise! </span>",
-                                    "text/html"
-                                );
-                            return;
-                        }
-                    }
+                    string[] files = Directory.GetFiles(ScoreImporter.IMPORT_LOCATION);
 
                     if (files.Length > 0)
                     {
