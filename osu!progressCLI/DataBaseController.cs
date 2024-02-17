@@ -495,7 +495,7 @@ namespace osu1progressbar.Game.Database
                 command.Parameters.AddWithValue("@Beatmapid", beatmap.BeatmapId);
                 command.Parameters.AddWithValue("@Osufilename", beatmap.FileName);
                 command.Parameters.AddWithValue("@Foldername", beatmap.FolderName);
-                command.Parameters.AddWithValue("@Replay", null);
+                command.Parameters.AddWithValue("@Replay", score.ReplayMD5Hash);
                 command.Parameters.AddWithValue("@Playtype", "Pass");
                 command.Parameters.AddWithValue("@Ar", beatmap.ApproachRate); //needs mod recalculation
                 command.Parameters.AddWithValue("@Cs", beatmap.CircleSize); //needs mod recalculation

@@ -347,7 +347,7 @@
                                 <div class="flex justify-evenly rounded-full score-backdrop--dark text-white">
                                     MISS
                                 </div>
-                               {% if score.Replay != null and score.Replay != "" %}
+                               {% if score.Replay != null and score.Replay != "" and score.Replay contains ".osr" and true %}
                                     <div class="flex justify-evenly">
                                  <button 
                                      hx-post="api/run?id={{ scoreid }}" id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600 hover:text-white">{{ score.HitMiss }}↩</pre> </button>
