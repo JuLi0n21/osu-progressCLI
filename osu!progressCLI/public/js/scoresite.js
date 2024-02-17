@@ -1,4 +1,12 @@
-﻿let beatmapid ,rowid, myChart;
+﻿let beatmapid, rowid, myChart;
+const audioPlayer = document.getElementById("audioPlayer");
+
+function updateVolume() {
+    var volumeSlider = document.getElementById('volumeSlider');
+
+    audioPlayer.volume = volumeSlider.value;
+}
+
 function fetchOsuBeatmap() {
     const urlParams = new URLSearchParams(window.location.search);
     const rowid = urlParams.get("id");
@@ -6,8 +14,7 @@ function fetchOsuBeatmap() {
     beatmapid = document.getElementById("beatmapid").value;
     osufilename = document.getElementById("Osufilename").value;
     const playButton = document.getElementById("playButton");
-    const audioPlayer = document.getElementById("audioPlayer");
-    audioPlayer.volume = 0.5;
+    audioPlayer.volume = 0.2;
     playButton.addEventListener("click", function () {
         event.preventDefault();
         if (audioPlayer.paused) {
