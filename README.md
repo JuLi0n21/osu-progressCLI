@@ -29,7 +29,7 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 
 ## How to run
 
-1. Download the zip
+1. Download the [Latest Release](https://github.com/juli0n21/osu-progresscli/releases/)
 2. Extract it
 3. Run the Programm and open the [Webpage](localhost:4200)
 4. Add ur Username, Osu folder and song folder under the Pen icon hit save and refresh
