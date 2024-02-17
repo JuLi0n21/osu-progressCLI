@@ -6,14 +6,21 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 <details>
   <summary>Homepage</summary>
 
-![Imgur](https://imgur.com/cvL9b6i.png)
+![Imgur](https://imgur.com/TOq4cZL)
 
 </details>
 
 <details>
   <summary>Scorepage</summary>
 
-![Imgur](https://imgur.com/t58MCPB.png)
+![Imgur](https://i.imgur.com/e8jnW7b.png)
+
+</details>
+
+<details>
+  <summary>Importer</summary>
+
+![Imgur](https://i.imgur.com/ETXmREw.png)
 
 </details>
 
