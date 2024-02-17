@@ -1139,7 +1139,6 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-
         public List<Score> GetScoresInTimeSpan(
             DateTime from,
             DateTime to,
@@ -1186,7 +1185,6 @@ namespace osu1progressbar.Game.Database
             }
             return scores;
         }
-
 
         public List<Score> GetScoreSearch(
             DateTime from = new DateTime(),

@@ -46,7 +46,10 @@ namespace osu_progressCLI.Webserver.Server
 
                 var context = new TemplateContext(week);
 
-                context.SetValue("isAuth", !String.IsNullOrEmpty(Credentials.Instance.GetAccessToken()));
+                context.SetValue(
+                    "isAuth",
+                    !String.IsNullOrEmpty(Credentials.Instance.GetAccessToken())
+                );
                 context.SetValue("count", controller.scorecount());
                 context.SetValue("thisweek", playtimethisweek);
                 context.SetValue("lastweek", diffrencetolastweek);
@@ -72,6 +75,7 @@ namespace osu_progressCLI.Webserver.Server
                 if (score != null)
                 {
                     var context = new TemplateContext(score);
+                    context.SetValue("scoreid", queryparams["id"]);
                     context.SetValue("score", score);
                     context.SetValue(
                         "player",

@@ -2,9 +2,11 @@
 using System.Net;
 using System.Web;
 using Fluid;
+using Fluid.Ast;
 using Newtonsoft.Json;
 using osu1progressbar.Game.Database;
 using osu_progressCLI.Datatypes;
+using Parlot.Fluent;
 
 namespace osu_progressCLI.Webserver.Server
 {
@@ -30,7 +32,7 @@ namespace osu_progressCLI.Webserver.Server
                 Logger.Log(Logger.Severity.Info, Logger.Framework.Server, path);
 
                 var queryparams = HttpUtility.ParseQueryString(request.Url.Query);
-
+                Console.WriteLine(queryparams.ToString());
                 string requestData;
                 using (Stream bodystream = request.InputStream)
                 using (StreamReader reader = new StreamReader(bodystream))
@@ -70,12 +72,40 @@ namespace osu_progressCLI.Webserver.Server
                 //routing
                 if (path == "/api/beatmaps" && request.HttpMethod == "GET")
                 {
-                    List<Score> scores = controller.GetScoresInTimeSpan(from, to);
                     var template = FluidRenderer.templates.Find(item =>
                         item.Key.Equals("Scores.liquid")
                     );
 
+                    List<Score> scores = new();
                     var context = new TemplateContext(scores);
+
+                    if (
+                        !String.IsNullOrEmpty(queryparams["offset"])
+                        && !String.IsNullOrEmpty(queryparams["limit"])
+                    )
+                    {
+                        scores = controller.GetScoresInTimeSpan(
+                            from,
+                            to,
+                            int.Parse(queryparams["limit"]),
+                            int.Parse(queryparams["offset"])
+                        );
+                        context.SetValue("limit", int.Parse(queryparams["limit"]));
+
+                        if (scores.Count == int.Parse(queryparams["limit"]))
+                        {
+                            context.SetValue("limit", int.Parse(queryparams["limit"]));
+                            context.SetValue(
+                                "offset",
+                                int.Parse(queryparams["offset"]) + int.Parse(queryparams["limit"])
+                            );
+                        }
+                    }
+                    else
+                    {
+                        scores = controller.GetScoresInTimeSpan(from, to);
+                    }
+
                     context.SetValue("List", scores);
                     try
                     {
@@ -99,7 +129,13 @@ namespace osu_progressCLI.Webserver.Server
                 {
                     if (request.Headers["HX-Request"] != null)
                     {
-                        List<Score> scores = null;
+                        List<Score> scores = new();
+
+                        var template = FluidRenderer.templates.Find(item =>
+                            item.Key.Equals("Scores.liquid")
+                        );
+
+                        var context = new TemplateContext(scores);
 
                         if (!String.IsNullOrEmpty(queryparams["Osufilename"]))
                         {
@@ -111,23 +147,45 @@ namespace osu_progressCLI.Webserver.Server
                                     queryparams["Osufilename"].ToString()
                                 )
                             );
-                            ;
                         }
                         else
                         {
-                            scores = controller.GetScoreSearch(
-                                from,
-                                to,
-                                QueryParser.Filter(queryparams["query"].ToString())
-                            );
+                            if (
+                                !String.IsNullOrEmpty(queryparams["offset"])
+                                && !String.IsNullOrEmpty(queryparams["limit"])
+                            )
+                            {
+                                scores = controller.GetScoreSearch(
+                                    from,
+                                    to,
+                                    QueryParser.Filter(queryparams["query"].ToString()),
+                                    int.Parse(queryparams["limit"]),
+                                    int.Parse(queryparams["offset"])
+                                );
+
+                                if (scores.Count == int.Parse(queryparams["limit"]))
+                                {
+                                    context.SetValue("limit", int.Parse(queryparams["limit"]));
+                                    context.SetValue(
+                                        "offset",
+                                        int.Parse(queryparams["offset"])
+                                            + int.Parse(queryparams["limit"])
+                                    );
+                                    context.SetValue("query", queryparams["query"].ToString());
+                                    context.SetValue("form", queryparams["from"]?.ToString());
+                                    context.SetValue("to", queryparams["to"].ToString());
+                                }
+                            }
+                            else
+                            {
+                                scores = controller.GetScoreSearch(
+                                    from,
+                                    to,
+                                    QueryParser.Filter(queryparams["query"].ToString())
+                                );
+                            }
                         }
 
-                        Console.WriteLine(scores.Count);
-                        var template = FluidRenderer.templates.Find(item =>
-                            item.Key.Equals("Scores.liquid")
-                        );
-
-                        var context = new TemplateContext(scores);
                         context.SetValue("List", scores);
                         Webserver
                             .Instance()
@@ -288,7 +346,10 @@ namespace osu_progressCLI.Webserver.Server
                             "text/html"
                         );
                 }
-                else if (path == "/api/run" && request.HttpMethod == "POST") { }
+                else if (path == "/api/run" && request.HttpMethod == "POST")
+                {
+                    DifficultyAttributes.StartMissAnalyzer(int.Parse(queryparams["id"].ToString()));
+                }
                 else if (path == "/api/uploadstatus" && request.HttpMethod == "POST")
                 {
                     bool allAreFalse = ScoreImporter

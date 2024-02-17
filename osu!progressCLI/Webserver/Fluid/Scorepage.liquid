@@ -349,7 +349,8 @@
                                 </div>
                                {% if score.Replay != null and score.Replay != "" %}
                                     <div class="flex justify-evenly">
-                                 <button id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600 hover:text-white">{{ score.HitMiss }}↩</pre> </button>
+                                 <button 
+                                     hx-post="api/run?id={{ scoreid }}" id="MissAnalyzer">  <pre title="Open OsuMissAnalyzer!" class="text-red-600 hover:text-white">{{ score.HitMiss }}↩</pre> </button>
                                  <a href="{{ score.Replay }}" target="_blank" title="Download Replay"><span class="fa fa-fw"><span class="fas fa-download"></span></span></a>
                                  </div>
                                 {% else %}

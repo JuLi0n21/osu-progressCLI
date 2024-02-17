@@ -124,10 +124,14 @@
                     </div>
               
                         <div hx-get="/api/beatmaps"
+                            hx-include="this"
                             hx-trigger="click, load"
                             hx-target="#scorecontainer"
                             class="flex cursor-pointer text-center rounded-lg p-2  mb-4 border  self-center text--dark--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500">
                             Recent Plays
+                            
+                            <input name="limit" value="20" class="hidden"/>
+                            <input name="offset" value="0" class="hidden"/>
                         </div>
                  </div>
 
@@ -142,7 +146,8 @@
                         <input type="text" id="searchInput" name="query" placeholder="Type to Search..." title="Suported terms pp, sr, ar, hp, od, pp, fcpp ... and conditions -> fcpp > 300" 
                             class="text--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500 w-1/2 rounded-lg mx-auto border block" 
                             onkeydown="if (event.key === 'Enter') event.preventDefault();">
-
+                        <input name="limit" value="20" class="hidden"/>
+                        <input name="offset" value="0" class="hidden"/>
                         <input type="date" id="fromDate" name="from" class="text--yellow w-1/6 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
 
                         <label for="toDate">-</label>
