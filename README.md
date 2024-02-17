@@ -45,6 +45,11 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 6. If u wish to keep scores from older version, move the osu!progress.db to the new folder
 7. If u want to Import Scores from ur current game or from osu!alternative visit  [importer](http://localhost:4200/importer)
 
+## Run on Startup 
+1. Create a shortcut to the **Start.vsb**
+2. Copy the Shortcut to the Startup Folder. Done!
+- Quickacces: win + r ```shell:startup```
+
 ## Requirments
 - Only Windows supported currently (depends on OsuMemoryProvider, Missanalzer, etc...)
 - [NET 6.0.x Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is required to run this programm
