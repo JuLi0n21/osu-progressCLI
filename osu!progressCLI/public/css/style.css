@@ -1,8 +1,8 @@
-﻿/* Reset some default styles */
-* {
+﻿* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    min-width: 0;
 }
 
 body {
@@ -42,25 +42,25 @@ header {
 }
 
 #scorebody {
-    background-color: rgba(23,26,28,255);
+    background-color: rgba(23,26,28,1);
 }
 
 .score-backdrop--dark {
-    background-color: rgba(23,26,28,255);
+    background-color: rgba(23,26,28,1);
 }
 
 .score-backdrop--medium--light {
-    background-color: rgba(34,40,42,255)
+    background-color: rgba(34,40,42,1)
 }
 
 
 .score-backdrop--medium--dark {
-    background-color: rgba(46,53,56,255)
+    background-color: rgba(46,53,56,1)
 }
 
 
 .score-backdrop--light {
-    background-color: rgba(57,66,70,255)
+    background-color: rgba(57,66,70,1)
 }
 
 
@@ -72,8 +72,15 @@ header {
     background-color: rgba(56, 46, 50, 1);
 }
 
-.backdrop--dark {
+.backdrop--medium--light {
     background-color: rgba(42, 34, 38, 1);
+}
+
+.backdrop--medium--dark {
+    background-color: rgba(56, 46, 50, 1)
+}
+.backdrop--dark {
+    background-color: rgba(28, 23, 25, 1) 
 }
 
 .text--dark--yellow {
@@ -191,4 +198,19 @@ header {
     position: absolute;
     top: 10px;
    
+}
+
+@keyframes hideAnimation {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+.hide-me {
+    animation: hideAnimation 2s forwards;
 }

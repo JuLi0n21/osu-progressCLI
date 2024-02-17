@@ -3,7 +3,12 @@ name: Dev Branch
 on:
   push:
     branches:
-      - dev  # Workflow triggers on pushes to the main branch
+      - dev
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
 
 jobs:
   build:

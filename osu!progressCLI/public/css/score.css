@@ -1,0 +1,26 @@
+﻿
+#scorecontainer {
+    background-color: rgba(23,26,28,255);
+}
+
+.backdrop--dark {
+    background-color: rgba(23,26,28,255);
+}
+
+.backdrop--medium--light {
+    background-color: rgba(34,40,42,255)
+}
+
+
+.backdrop--medium--dark {
+    background-color: rgba(46,53,56,255)
+}
+
+.backdrop--medium {
+    background-color: rgba(23,26,28,255);
+}
+
+
+.backdrop--light {
+    background-color: rgba(57,66,70,255)
+}

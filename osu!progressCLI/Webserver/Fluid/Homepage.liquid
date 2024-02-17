@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>osu!progress</title>
+    <title>osu!progress</title>
+     <script src="https://cdn.tailwindcss.com/"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.11.0/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+    </style>
+</head>
+<body hx-boost="false">
+
+   {% if isAuth %}
+    <Button class="fixed left-2 top-0 flex flex-grow items-center backdrop--light text-white rounded-full h-14 mt-4 mb-4 mr-3 p-3">
+        <img src="{{ config.avatar_url }}" class="h-12 ml-1 w-auto rounded-full" alt="{{ config.username }}"/>
+         <span class="" style="color: rgba(70, 57, 63, 1);">{{ config.username }}</span>
+        <span class="absolute z-10 left-1/2 transform -translate-x-1/2 text-xl p-2"  style="mix-blend-mode: difference;">{{ config.username }}</span>
+    </Button>
+   {% else %}
+     <a href="https://osu-progress-oauth-helper.vercel.app/authorize?port={{ config.port }}">
+     <Button class="fixed left-2 top-0 flex flex-grow items-center backdrop--light text-white rounded-full h-14 mr-3 mt-4 mb-4 p-3">
+         <img src="https://osu.ppy.sh/images/layout/avatar-guest.png" class="h-12 ml-1 w-auto rounded-full" alt="Guest"/>
+          <span class="text-nowrap" style="color: rgba(70, 57, 63, 1);">LOGIN WITH OSU!</span>
+         <span class="absolute z-10 left-1/2 transform -translate-x-1/2 text-xl p-2 text-nowrap"  style="mix-blend-mode: difference;">LOGIN WITH OSU!</span>
+     </Button>
+     </a>
+   {% endif %}
+
+
+    <!-- Reload button -->
+    <div class="fixed top-0 right-20 z-40">
+        <button id="loadDataButton" class="text-white rounded-full p-3 shadow-lg ml-4 mt-4 mb-4 backdrop--light">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Refresh_font_awesome.svg" alt="Refresh" style="width: 24px; height: 24px; filter: invert(100%);" />
+        </button>
+    </div>
+
+   {% include 'Settings.liquid' %}
+
+    <!-- Recap -->
+    <!-- Live Status-->
+    <div id="status-bar" class="z-10 sticky top-0 w-full h-20 backdrop--medium text-white text-center p-2 hidden">
+        <span id="status-text"></span>
+        <div id="audio-bar">
+            <div id="audio-time"></div>
+            <div id="audio-text"></div>
+
+        </div>
+
+    </div>
+    <!-- Main page-->
+    <div class="flex justify-center items-center">
+        
+        <div class="content w-1/2 rounded-lg backdrop--medium--dark text-white">
+
+            <!-- header -->
+            <div id="header" class="backdrop--medium justify-center items-center flex p-4 m-2">
+                <h1>Play History</h1>
+            </div>
+
+            <div class="backdrop--light">
+                <div style="background-size: cover; background-position: center center;background-image: url(&quot; {{ config.cover_url }} &quot;); height: 250px">
+
+                </div>
+                
+                     <a href="https://osu.ppy.sh/users/{{ config.userid }}" class="left-12 inline-block rounded -top-12 relative max-h-0 h-0  hover:border-yellow-500  hover:border" target="_blank" rel="noopener noreferrer">
+                         <img src="{{ config.avatar_url }}" style="width:100px;" class="" />
+                     </a>
+
+                <div class="flex justify-around">
+
+                    <div class="text-left pt-3 pb-3">
+                        <p class="usernameplaceholder">{{ config.username }} </p>
+                        <p class="rankplaceholder">#{{ config.rank }} (# {{ config.country_rank }})</p>
+                        <p class="countryplaceholder">  <span class="fi fi-{{ config.country_code }}"></span>{{ config.country }}</p>
+                    </div>
+
+                    <div class="text-left pt-3 pb-3">
+                        <p class="WastedTime">
+                            ⏰ {{ thisweek }}H
+                            {% if thisweek < 2400 %}
+                            ({{ lastweek }}%)
+                            {% endif %}
+                            [{{ week.Status }}]
+                        </p>
+
+                        <p class="mostplayedscreen">💻 {{ week.Screen }}</p>
+
+                        {% if count < 100 %}
+                        <p class="count">📂 {{ count }}</p><a href="/importer" class="text--pink hover:text-pink-700">Import Scores!</a>
+                        {% else %}
+                        <p class="count">📂 {{ count }}</p>
+                        {% endif %}
+                        </div>
+             
+                    </div>
+            </div>
+            <!-- Decorative Spacer -->
+            <div class="backdrop--medium--light h-8">
+
+            </div>
+
+            <!-- Recent Scores -->
+            <div class="rounded-t-lg justify-center backdrop--medium pb-4">
+
+               <div class="flex justify-center">
+                <h1 class="m-4">Scores</h1>
+               </div>
+                
+                <div class="flex justify-around">
+                
+                 <!-- Loading Potential topscores  ADD PAGEING WITH INDEXES (giveuser limit control)?-->
+                <div class="flex cursor-pointer">
+                    <div hx-get="/api/potentialfcs"
+                        hx-trigger="click"
+                        hx-target="#scorecontainer"
+                        hx-indicator="#loading"
+                        class="flex text-center rounded-lg p-2 mb-4 mr-2 border self-center text--dark--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500">
+                        Fcable
+                    </div>
+              
+                        <div hx-get="/api/beatmaps"
+                            hx-include="this"
+                            hx-trigger="click, load"
+                            hx-target="#scorecontainer"
+                            hx-indicator="#loading"
+                            class="flex cursor-pointer text-center rounded-lg p-2  mb-4 border  self-center text--dark--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500">
+                            Recent Plays
+                            
+                            <input name="limit" value="20" class="hidden"/>
+                            <input name="offset" value="0" class="hidden"/>
+                        </div>
+                 </div>
+
+                     <div class="flex justify-center">
+                         <img id="loading" src="loading.gif" class="htmx-indicator" style="height:40px"/>
+                     </div>
+
+                <form hx-get="/api/beatmaps/search"
+                      hx-trigger="input delay:500ms" 
+                      hx-target="#scorecontainer" 
+                      hx-indicator="#loading"
+                      hx-swap="innerHTML transition:true"
+                      class="mb-4 flex justify-center self-center align-center">
+
+                    <div class="flex justify-center rounded-lg">
+                        <input type="text" id="searchInput" name="query" placeholder="Type to Search..." title="Suported terms pp, sr, ar, hp, od, pp, fcpp ... and conditions -> fcpp > 300" 
+                            class="text--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500 w-1/2 rounded-lg mx-auto border block" 
+                            onkeydown="if (event.key === 'Enter') event.preventDefault();">
+                        <input name="limit" value="20" class="hidden"/>
+                        <input name="offset" value="0" class="hidden"/>
+                        <input type="date" id="fromDate" name="from" class="text--yellow w-1/6 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
+
+                        <label for="toDate">-</label>
+                        <input type="date" id="toDate" name="to" class="text--yellow w-1/6 backdrop--dark rounded-lg border block focus:border-pink-500 hover:border-pink-500">
+                    </div>
+
+                </form>
+            </div>
+            </div>
+            
+            <!-- Stream connection To load in scroes after being set -->
+               <div hx-ext="sse" sse-connect="/stream">
+                   <div sse-swap="score" hx-target="#scorecontainer" hx-swap="afterbegin">
+                   </div>
+               </div>
+           
+            <div id="scorecontainer" class="flex-col backdrop--medium page-width transition">
+            </div>
+
+
+            <div id="chart1" class="flex backdrop--medium mt-4 mb-3" style="height: 500px">
+                <div class="w-1/2 rounded-l-lg backdrop--light flex-col justify-center items-center flex mt-4 m-2">
+                    <h2>BanchoTime</h2>
+                    <canvas id="BanchoTimeChart" height="440" width="450"></canvas>
+                </div>
+                <div class="w-1/2 rounded-r-lg backdrop--light flex-col justify-center items-center flex mt-4 m-2">
+                    <h2>TimeWasted</h2>
+                    <canvas id="TimeWastedChart" height="440" width="450"></canvas>
+                </div>
+            </div>
+
+            <div id="chart2" class="border-b rounded-lg backdrop--light mb-4 p-4">
+                <div class="flex-col justify-center items-center flex">
+                    <h1>Difficulties</h1>
+                </div>
+                <div style="height: 460px">
+                    <canvas id="averageschart"></canvas>
+                </div>
+
+            </div>
+
+            <div id="chart3" class="flex backdrop--medium" style="height: 280px">
+          <div class="w-1/2 rounded-l-lg backdrop--light flex-col justify-center items-center flex m-4">
+              <h2>BanchoTime</h2>
+              <canvas id="pieBanchoTimeChart" height="250" width="450"></canvas>
+          </div>
+          <div class="w-1/2 rounded-r-lg backdrop--light flex-col justify-center items-center flex m-4">
+              <h2>TimeWasted</h2>
+              <canvas id="pieTimeWastedChart" height="250" width="450"></canvas>
+          </div>
+      </div>
+
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script>
+        flatpickr("#fromDate");
+         flatpickr("#toDate", {
+             defaultDate: new Date().fp_incr(1),
+            dateFormat: "Y-m-d",
+        });
+        document.getElementById('toDate').valueAsDate = new Date();
+    </script>
+
+    <script src="configmenu.js"></script>
+
+    <script src="difficulities.js"></script>
+
+    <script src="timespend.js"></script>
+    <script src="timespendtotal.js"></script>
+
+    <script src="onload.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+﻿<div>
+	{% if List.size == 0 %}
+
+ <div class="flex justify-center mb-0">
+	<div class="flex backdrop--light h-16 rounded justify-between m-4 w-5/6 mb-1 mt-1">
+		<div class="flex-1"></div>
+	
+				<img src="not-found.gif" class="rounded-lg w-16 h-16" alt="?">
+				<p class="flex-1 text-white text-center ">No Scores found.</p>
+				<img src="not-found.gif" class=" rounded-lg  w-16 h-16" alt="?">
+
+			<div class="flex-1"></div>
+		</div>
+	</div>
+	{% else %}
+	{% for score in List %}
+	{% include 'score.liquid' %}
+	{% endfor %}
+	{% endif %}
+
+	{% if limit and offset and query%}
+	<div
+		hx-get="/api/beatmaps/search?query={{ query }}&limit={{ limit }}&offset={{ offset }}&form={{ from}}&to={{ to }}"
+		hx-swap="outerHTML"
+		hx-trigger="click"
+		class="flex justify-center">
+		 <div class=" p-5 backdrop--medium--light rounded-md hover:bg-pink-900 text-center cursor-pointer rounded-lg w-5/6">
+			Load More
+		</div>
+	</div>
+	{% elsif limit and offset %}
+	<div
+		hx-get="/api/beatmaps?limit={{ limit }}&offset={{ offset }}"
+		hx-swap="outerHTML"
+		hx-trigger="click"
+		hx-include=""
+		class="flex justify-center">
+		  <div class="backdrop--medium--light pt-5 rounded-md hover:bg-pink-900 flex justify-center cursor-pointer rounded-lg w-5/6">
+		   
+			   <img id="loading" src="loading.gif" class="htmx-indicator" style="height:40px"/>
+					Load More!
+				<img id="loading" src="loading.gif" class="htmx-indicator" style="height:40px"/>
+  
+		  </div>
+	</div>
+	{% endif %}
+</div>

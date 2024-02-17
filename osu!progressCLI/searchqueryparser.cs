@@ -4,9 +4,14 @@ using System.Text.RegularExpressions;
 public class QueryParser
 {
     public List<string> SearchTerms { get; } = new List<string>();
-    public Dictionary<string, List<string>> QueryParams { get; } = new Dictionary<string, List<string>>();
+    public Dictionary<string, List<string>> QueryParams { get; } =
+        new Dictionary<string, List<string>>();
     public List<string> ParametersWithoutOperators { get; } = new List<string>();
 
+    /// <summary>
+    /// trys to setup search terms to fit with database model
+    /// </summary>
+    /// <param name="queryString"></param>
     public void Parse(string queryString)
     {
         string[] parts = queryString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -15,7 +20,11 @@ public class QueryParser
 
         foreach (string part in parts)
         {
-            Match match = Regex.Match(part, @"^(?<name>[a-zA-Z]+)(?<operator>[<=>]=?)(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
+            Match match = Regex.Match(
+                part,
+                @"^(?<name>[a-zA-Z]+)(?<operator>[<=>]=?)(?<value>[0-9.]+)$",
+                RegexOptions.IgnoreCase
+            );
 
             if (match.Success)
             {
@@ -29,7 +38,11 @@ public class QueryParser
 
         foreach (string param in parameters)
         {
-            Match match = Regex.Match(param, @"^(?<name>[a-zA-Z]+)(?<operator>[<=>]=?)(?<value>[0-9.]+)$", RegexOptions.IgnoreCase);
+            Match match = Regex.Match(
+                param,
+                @"^(?<name>[a-zA-Z]+)(?<operator>[<=>]=?)(?<value>[0-9.]+)$",
+                RegexOptions.IgnoreCase
+            );
 
             if (match.Success)
             {
@@ -55,10 +68,9 @@ public class QueryParser
             }
         }
     }
+
     public static string Filter(string queryString)
     {
-        //string queryString = " Ichinose cs<=4 sadadfsasf cs>=2 cs<=4 hp>=6";
-
         QueryParser parser = new QueryParser();
         parser.Parse(queryString);
 
@@ -86,8 +98,32 @@ public class QueryParser
         }
 
         // Print the generated SQL query
-       // Console.WriteLine(commandBuilder.ToString());
+        // Console.WriteLine(commandBuilder.ToString());
         return commandBuilder.ToString();
     }
 
+    public static string Filter(string queryString, string filename)
+    {
+        QueryParser parser = new QueryParser();
+        parser.Parse(queryString);
+
+        StringBuilder commandBuilder = new StringBuilder();
+
+        if (filename is not null)
+        {
+            commandBuilder.Append($"AND Osufilename == \"{filename}\" ");
+        }
+
+        foreach (var kvp in parser.QueryParams)
+        {
+            foreach (string kv in kvp.Value)
+            {
+                commandBuilder.Append($"AND {kvp.Key} {kv} ");
+            }
+        }
+
+        // Print the generated SQL query
+        // Console.WriteLine(commandBuilder.ToString());
+        return commandBuilder.ToString();
+    }
 }

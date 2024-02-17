@@ -22,6 +22,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="Webserver\Fluid\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+
+	<ItemGroup>
 		<Content Include="Start.vbs">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
@@ -46,16 +53,28 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="public\css\importer.css" />
+	  <None Remove="public\css\score.css" />
 	  <None Remove="public\css\style.css" />
-	  <None Remove="public\html\scores.html" />
+	  <None Remove="public\html\import.html" />
+	  <None Remove="public\html\score.html" />
 	  <None Remove="public\html\tags.html" />
 	  <None Remove="public\js\configmenu.js" />
+	  <None Remove="public\js\difficulities.js" />
+	  <None Remove="public\js\importer.js" />
 	  <None Remove="public\js\jsconfig1.json" />
+	  <None Remove="public\js\onload.js" />
 	  <None Remove="public\js\savebutton.js" />
 	  <None Remove="public\js\scoreexample.js" />
 	  <None Remove="public\js\scoresite.ts" />
 	  <None Remove="public\js\sidebar.txt" />
 	  <None Remove="public\js\TextFile1.txt" />
+	  <None Remove="Webserver\Fluid\Importer.liquid" />
+	  <None Remove="Webserver\Fluid\score.liquid" />
+	  <None Remove="Webserver\Fluid\Scorepage.liquid" />
+	  <None Remove="Webserver\Fluid\Scores.liquid" />
+	  <None Remove="Webserver\Fluid\Settings.liquid" />
+	  <None Remove="Webserver\Fluid\stats.liquid" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -64,15 +83,20 @@
 	
 	
 	<ItemGroup>
+    <PackageReference Include="CsvHelper" Version="31.0.0" />
     <PackageReference Include="DeepCopy" Version="1.0.3" />
     <PackageReference Include="Fleck" Version="1.2.0" />
+    <PackageReference Include="Fluid.Core" Version="2.5.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="OsuMemoryDataProvider" Version="0.10.0" />
+    <PackageReference Include="OsuMemoryDataProvider" Version="0.10.3" />
+    <PackageReference Include="OsuParsers" Version="1.7.1" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
   </ItemGroup>
 	
 	
 	<ItemGroup>
-	  <Folder Include="public\img\" />
+	  <Folder Include="public\video\" />
 	</ItemGroup>
 </Project>

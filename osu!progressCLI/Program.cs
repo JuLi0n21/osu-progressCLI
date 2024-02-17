@@ -1,16 +1,18 @@
-﻿using osu_progressCLI;
-using osu_progressCLI.server;
+﻿using Newtonsoft.Json.Linq;
+using osu1progressbar.Game.Database;
 using osu1progressbar.Game.MemoryProvider;
+using osu_progressCLI;
+using osu_progressCLI.Datatypes;
+using osu_progressCLI.Webserver.Server;
 
 class Program
 {
-
     static async Task Main(string[] args)
     {
         Logger.SetConsoleLogLevel(Logger.Severity.Warning);
         if (args.Length > 0)
         {
-            for(int i = 0; i < args.Length; i++)
+            for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "-v")
                 {
@@ -18,27 +20,28 @@ class Program
                 }
             }
         }
-       
+
+        Task.Run(() => ScoreImporter.Instance.StartImporting());
+
         Console.WriteLine("Welcome to osu!progress");
         Console.WriteLine("If this is ur first time running read the README.txt");
-        Console.WriteLine("Keep this Terminal Open or the Progamm will stop if u want it run in the background follow the guide on the github!");
+        Console.WriteLine(
+            "Keep this Terminal Open or the Progamm will stop if u want it run in the background follow the guide on the github!"
+        );
         Logger.Log(Logger.Severity.Info, Logger.Framework.Misc, "Initialzing Components");
 
         OsuMemoryProvider memoryProvider = new OsuMemoryProvider("osu!");
-        Credentials crendtials = Credentials.Instance; 
-        ApiController apiController = ApiController.Instance;
 
         memoryProvider.Run();
         memoryProvider.ReadDelay = 1;
-        
-        Task listenTask = Task.Run(async () =>
-        {
-            while (true)
-            {
-                await Webserver.Instance().listen(); 
-            }
-        });
-        await listenTask;
+
+        JArray array = await ApiController.Instance.getTopScores();
+
+        DatabaseController databaseController = new DatabaseController();
+        List<Score> scores = databaseController.GetPotentcialtopplays(250);
+
+        //Console.WriteLine($"{job.ToString()}");
+        await Webserver.Instance().start();
 
         memoryProvider.Stop();
     }
