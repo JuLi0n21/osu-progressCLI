@@ -95,7 +95,12 @@
                         </p>
 
                         <p class="mostplayedscreen">💻 {{ week.Screen }}</p>
+
+                        {% if count < 100 %}
+                        <p class="count">📂 {{ count }}</p><a href="/importer" class="text--pink hover:text-pink-700">Import Scores!</a>
+                        {% else %}
                         <p class="count">📂 {{ count }}</p>
+                        {% endif %}
                         </div>
              
                     </div>
@@ -119,6 +124,7 @@
                     <div hx-get="/api/potentialfcs"
                         hx-trigger="click"
                         hx-target="#scorecontainer"
+                        hx-indicator="#loading"
                         class="flex text-center rounded-lg p-2 mb-4 mr-2 border self-center text--dark--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500">
                         Fcable
                     </div>
@@ -127,6 +133,7 @@
                             hx-include="this"
                             hx-trigger="click, load"
                             hx-target="#scorecontainer"
+                            hx-indicator="#loading"
                             class="flex cursor-pointer text-center rounded-lg p-2  mb-4 border  self-center text--dark--yellow backdrop--dark focus:border-pink-500 hover:border-pink-500">
                             Recent Plays
                             
@@ -135,11 +142,15 @@
                         </div>
                  </div>
 
+                     <div class="flex justify-center">
+                         <img id="loading" src="loading.gif" class="htmx-indicator" style="height:40px"/>
+                     </div>
+
                 <form hx-get="/api/beatmaps/search"
                       hx-trigger="input delay:500ms" 
                       hx-target="#scorecontainer" 
-                      hx-swap="innerHTML transition:true" 
                       hx-indicator="#loading"
+                      hx-swap="innerHTML transition:true"
                       class="mb-4 flex justify-center self-center align-center">
 
                     <div class="flex justify-center rounded-lg">
@@ -163,7 +174,7 @@
                    <div sse-swap="score" hx-target="#scorecontainer" hx-swap="afterbegin">
                    </div>
                </div>
-
+           
             <div id="scorecontainer" class="flex-col backdrop--medium page-width transition">
             </div>
 
