@@ -6,7 +6,7 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 <details>
   <summary>Homepage</summary>
 
-![Imgur](https://imgur.com/TOq4cZL)
+![Imgur](https://i.imgur.com/TOq4cZL.png)
 
 </details>
 
