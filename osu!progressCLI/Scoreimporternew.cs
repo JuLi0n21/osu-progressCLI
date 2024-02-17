@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity.Core.Mapping;
 using System.Data.Entity.Core.Objects;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -82,23 +83,25 @@ namespace osu_progressCLI
             if (files.Length > 0)
             {
                 Parallel.ForEach(files, file =>
-                {
-                    try
-                    {
-                        if (file.EndsWith(".csv"))
+                {   
                         {
-                            Importcsv(file);
-                        }
+                        try
+                        {
 
-                        if (file.Contains(".db"))
+                            if (file.EndsWith(".csv"))
+                            {
+                                Importcsv(file);
+                            } 
+                            else if (file.Contains(".db"))
+                            {
+                                ImportScoreDb(file);
+                            }
+                        }
+                        catch (Exception e)
                         {
-                            ImportScoreDb(file);
+                            Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, e.Message);
                         }
                     }
-                    catch (Exception e){ 
-                        Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, e.Message);
-                    }
-
                 });
             }
         }
@@ -129,18 +132,32 @@ namespace osu_progressCLI
             }
             tracker.amountoffscores = filterd.Count;
 
-            for (int i = tracker.index; i <= filterd.Count; i++)
+            using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
             {
-                if (reset)
-                    return;
+                connection.Open();
 
-                tracker.index = i;
-                await DatabaseController.ImportScore(filterd.ElementAt(i));
+                try
+                {
+                    for (int i = tracker.index; i <= filterd.Count; i++)
+                    {
+                        if (reset)
+                            return;
 
-                if (i % 10 == 0)
-                    await save(tracker);
+                        tracker.index = i;
+                        await DatabaseController.ImportScore(filterd.ElementAt(i), connection);
+
+                        if (i % 10 == 0)
+                            await save(tracker);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, e.Message);
+                }
+                finally { connection.Close(); }
             }
 
+            await save(tracker);
             cleanup(tracker);
         }
 
@@ -153,18 +170,32 @@ namespace osu_progressCLI
             ScoresDatabase Scoredb = OsuParsers.Decoders.DatabaseDecoder.DecodeScores($"{tracker.filename}");
             tracker.amountoffscores = Scoredb.Scores.Count;
 
-            for (int i = tracker.index; i <= Scoredb.Scores.Count; i++)
+            using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
             {
-                if (reset)
-                    return;
+                connection.Open();
 
-                tracker.index = i;
-                await DatabaseController.ImportScore(Scoredb.Scores.ElementAt(i).Item2.FirstOrDefault());
+                try
+                {
+                    for (int i = tracker.index; i <= Scoredb.Scores.Count; i++)
+                    {
+                        if (reset)
+                            return;
 
-                if (i % 10 == 0)
-                    await save(tracker);
+                        tracker.index = i;
+                        await DatabaseController.ImportScore(Scoredb.Scores.ElementAt(i).Item2.FirstOrDefault(), connection);
+
+                        if (i % 10 == 0)
+                            await save(tracker);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(Logger.Severity.Error, Logger.Framework.Scoreimporter, e.Message);
+                }
+                finally { connection.Close(); }
             }
 
+            await save(tracker);
             cleanup(tracker);
         }
 

@@ -32,7 +32,7 @@ namespace osu_progressCLI.Webserver.Server
                 Logger.Log(Logger.Severity.Info, Logger.Framework.Server, path);
 
                 var queryparams = HttpUtility.ParseQueryString(request.Url.Query);
-                Console.WriteLine(queryparams.ToString());
+                //Console.WriteLine(queryparams.ToString());
                 string requestData;
                 using (Stream bodystream = request.InputStream)
                 using (StreamReader reader = new StreamReader(bodystream))

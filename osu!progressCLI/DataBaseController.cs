@@ -361,7 +361,7 @@ namespace osu1progressbar.Game.Database
             }
         }
 
-        public static async Task<bool> ImportScore(OsuParsers.Database.Objects.Score score)
+        public static async Task<bool> ImportScore(OsuParsers.Database.Objects.Score score, SQLiteConnection connection)
         {
             if (score == null)
                 return false;
@@ -377,9 +377,7 @@ namespace osu1progressbar.Game.Database
                 $"Trying to Insert Score {beatmap.MD5Hash} {score.ScoreId}"
             );
 
-            using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
-            {
-                connection.Open();
+   
 
                 double bpm = -1;
                 if (beatmap.TimingPoints.Count > 0)
@@ -395,7 +393,6 @@ namespace osu1progressbar.Game.Database
                     bpm *= -1;
 
                 bpm = Math.Round(bpm, 2);
-
                 string background = Util.getBackground(beatmap.FolderName, beatmap.FileName);
 
                 using (SQLiteCommand command = new SQLiteCommand(connection))
@@ -442,7 +439,8 @@ namespace osu1progressbar.Game.Database
                                 aim,
                                 speed,
                                 accuracyatt,
-                                grade
+                                grade,
+                                Title
                                     ) VALUES (
                                         @Date,
                                         @BeatmapSetid,
@@ -483,7 +481,8 @@ namespace osu1progressbar.Game.Database
                                         @aim,
                                         @speed,
                                         @accuracyatt,
-                                        @grade
+                                        @grade,
+                                        @Title
                                             );
                     ";
 
@@ -586,8 +585,10 @@ namespace osu1progressbar.Game.Database
                         )
                     );
 
+                    command.Parameters.AddWithValue("@Title", beatmap.Title);
+
                     int rows = command.ExecuteNonQuery();
-                    connection.Close();
+                    
                     Logger.Log(
                         Logger.Severity.Debug,
                         Logger.Framework.Database,
@@ -595,10 +596,9 @@ namespace osu1progressbar.Game.Database
                     );
                     return true;
                 }
-            }
         }
 
-        public static async Task<bool> ImportScore(object importscore)
+        public static async Task<bool> ImportScore(object importscore, SQLiteConnection connection)
         {
             ImportScore score = (ImportScore)importscore;
             Logger.Log(
@@ -606,11 +606,8 @@ namespace osu1progressbar.Game.Database
                 Logger.Framework.Database,
                 $"Trying to Insert Score {score.file_md5} {score.pp}"
             );
-            using (var connection = new SQLiteConnection("Data Source=osu!progress.db;Version=3;"))
-            {
                 try
                 {
-                    connection.Open();
 
                     string foldername = "";
 
@@ -763,7 +760,7 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Hp", score.hp); //needs mod recalculation
                         command.Parameters.AddWithValue("@Od", score.od);
                         command.Parameters.AddWithValue("@Status", "Ranked");
-                        command.Parameters.AddWithValue("@SR", score.stars);
+                        command.Parameters.AddWithValue("@SR", Math.Round(score.stars,2));
                         command.Parameters.AddWithValue("@Bpm", score.bpm);
                         command.Parameters.AddWithValue("@Creator", score.creator);
                         command.Parameters.AddWithValue("@Artist", score.artist);
@@ -785,12 +782,15 @@ namespace osu1progressbar.Game.Database
                         command.Parameters.AddWithValue("@Version", score.diffname);
                         command.Parameters.AddWithValue("@Cover", background);
                         command.Parameters.AddWithValue("@Coverlist", background);
-                        command.Parameters.AddWithValue("@Preview", null);
+
+                        var beatmap = OsuDbsExposer.GetBeatmapbyHash(score.file_md5);
+
+                        command.Parameters.AddWithValue("@Preview", beatmap?.AudioFileName ?? null);
                         command.Parameters.AddWithValue("@Tags", score.tags);
                         command.Parameters.AddWithValue("@Time", score.drain);
-                        command.Parameters.AddWithValue("@pp", score.pp);
+                        command.Parameters.AddWithValue("@pp", Math.Round(score.pp, 2));
 
-                        command.Parameters.AddWithValue("@fcpp", fcpp.pp);
+                        command.Parameters.AddWithValue("@fcpp", Math.Round(fcpp.pp, 2));
                         command.Parameters.AddWithValue("@aim", 0);
                         command.Parameters.AddWithValue("@speed", 0);
                         command.Parameters.AddWithValue("@accuracyatt", 0);
@@ -815,11 +815,6 @@ namespace osu1progressbar.Game.Database
                     );
                     return false;
                 }
-                finally
-                {
-                    connection.Close();
-                }
-            }
         }
 
         public List<Score> GetPotentcialtopplays(double ppcutoffpoint)
