@@ -170,7 +170,7 @@ namespace osu1progressbar.Game.Logicstuff
                 )
                 {
                     Logger.Log(Logger.Severity.Info, Logger.Framework.Logic, "Multiplay detected");
-                    if (Data.Player.Score >= 1000)
+                    if (Data.Player.Score >= 10000)
                     {
                         Task.Run(() =>
                         {
@@ -209,7 +209,7 @@ namespace osu1progressbar.Game.Logicstuff
                     && Data.GeneralData.OsuStatus.ToString() != "Playing"
                 )
                 {
-                    if (Data.Player.Score >= 1000)
+                    if (Data.Player.Score >= 10000)
                     {
                         Task.Run(() =>
                         {
@@ -247,7 +247,7 @@ namespace osu1progressbar.Game.Logicstuff
                 if (
                     (Data.GeneralData.OsuStatus.ToString() == "Playing")
                     && (Audiotime > Data.GeneralData.AudioTime)
-                    && (Data.Player.Score >= 1000)
+                    && (Data.Player.Score >= 10000)
                     && (timeSinceStartedPlaying.ElapsedMilliseconds > 1000)
                 )
                 {
