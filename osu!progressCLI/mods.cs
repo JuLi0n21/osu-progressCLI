@@ -90,6 +90,11 @@
                 }
             }
 
+            if (modList.Contains("DoubleTime") && modList.Contains("Nightcore"))
+            {
+                modList.Remove("DoubleTime");
+            }
+
             string modsString = string.Join(", ", modList);
 
             return modsString;
@@ -123,6 +128,9 @@
 
             if (modList.Count > 0)
             {
+                if (modList.Contains("dt") && modList.Contains("nc")) {
+                    modList.Remove("dt");
+                }
                 string modsString = string.Join(" -m ", modList);
                 return "-m " + modsString;
             }
