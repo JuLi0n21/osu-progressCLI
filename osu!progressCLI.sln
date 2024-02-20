@@ -5,8 +5,6 @@ VisualStudioVersion = 17.7.34003.232
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu!progressCLI", "osu!progressCLI\osu!progressCLI.csproj", "{ABC5BEEE-9A3F-4FBC-A7EB-DF5BBF042DAB}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "osuprogressinstaller", "osuprogressinstaller\osuprogressinstaller.vdproj", "{5524DB92-1560-4129-8DA1-A399547BFF44}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,8 +15,6 @@ Global
 		{ABC5BEEE-9A3F-4FBC-A7EB-DF5BBF042DAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABC5BEEE-9A3F-4FBC-A7EB-DF5BBF042DAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABC5BEEE-9A3F-4FBC-A7EB-DF5BBF042DAB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5524DB92-1560-4129-8DA1-A399547BFF44}.Debug|Any CPU.ActiveCfg = Debug
-		{5524DB92-1560-4129-8DA1-A399547BFF44}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
