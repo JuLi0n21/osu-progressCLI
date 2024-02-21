@@ -345,16 +345,16 @@ namespace osu_progressCLI.Webserver.Server
                     response.OutputStream.Write(imageBytes, 0, imageBytes.Length);
                     response.OutputStream.Close();
                 }
-                else if (File.Exists($"{Credentials.Instance.GetConfig().songfolder}{decodedname}"))
+                else if (File.Exists(@$"{Credentials.Instance.GetConfig().songfolder}{decodedname}"))
                 {
                     string contentType = GetContentType(
                         Path.GetExtension(
-                            $"{Credentials.Instance.GetConfig().songfolder}{decodedname}"
+                            @$"{Credentials.Instance.GetConfig().songfolder}{decodedname}"
                         )
                     );
 
                     byte[] imageBytes = File.ReadAllBytes(
-                        $"{Credentials.Instance.GetConfig().songfolder}{decodedname}"
+                        @$"{Credentials.Instance.GetConfig().songfolder}{decodedname}"
                     );
                     response.ContentType = contentType;
                     response.ContentLength64 = imageBytes.Length;
