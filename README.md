@@ -36,14 +36,12 @@ A small Tool to Visualize localy Tracked scores for the osu! game.
 
 ## How to run
 
-1. Download the [Latest Release](https://github.com/juli0n21/osu-progresscli/releases/)
-2. Extract it
-3. Run the Programm and open the [Webpage](http://localhost:4200)
-4. Add youre Userid, Osu folder and song folder under the Pen icon hit save and Click the Login with Osu! Button.
-5. If ur profile stats are displayed ur done!
-
-6. If u wish to keep scores from older version, move the osu!progress.db to the new folder
-7. If u want to Import Scores from ur current game or from osu!alternative visit  [importer](http://localhost:4200/importer)
+1. Download Either the installer or Portable -> [Latest Release](https://github.com/juli0n21/osu-progresscli/releases/)
+2. Run the Programm and open the [Webpage](http://localhost:4200)
+3. Add youre Userid under the Pen icon hit save and Click the Login with Osu! Button.
+4. If ur profile stats are displayed ur done!
+  
+5. If u want to Import Scores from ur current game or from osu!alternative visit  [importer](http://localhost:4200/importer)
 
 ## Run on Startup 
 1. Create a shortcut to the **Start.vsb**
@@ -96,9 +94,9 @@ one request every 2 seconds is ok, burst should be ok but if it goes to high ask
 - [ ] Add possiblity to reload api data incase no internet (or beatmap changed)  (automatic or manual)
 - [x] localbeatmap parser (offline, not submitted maps support) (use osu-tools) (bpm still missing)
 - [ ] highconfigurable website (showing what graphs u want and what not)
-- [ ] page for a single score
+- [x] page for a single score
 - [ ] mod support
-- [ ] add local images in score displat website for mods and rankings (maybe rankedtype)
+- [x] add local images in score displat website for mods and rankings (maybe rankedtype)
 - [x] rename some Colums to enable "better" searching
 - [x] example for costume webpages
 - [ ] api documentaion / renaming
