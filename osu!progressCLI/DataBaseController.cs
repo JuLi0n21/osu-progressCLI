@@ -1522,8 +1522,11 @@ namespace osu1progressbar.Game.Database
             return result;
         }
 
-        public Score GetScore(int id)
+        public Score GetScore(int? id)
         {
+            if (id == null) 
+                return null; 
+
             Score score;
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))

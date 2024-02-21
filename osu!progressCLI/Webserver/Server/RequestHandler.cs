@@ -70,7 +70,10 @@ namespace osu_progressCLI.Webserver.Server
                     item.Key.Equals("Scorepage.liquid")
                 );
 
-                Score score = controller.GetScore(int.Parse(queryparams["id"]));
+                int scoreid;
+                int.TryParse(queryparams["id"], out scoreid);
+
+                Score score = controller.GetScore(scoreid);
 
                 if (score != null)
                 {
