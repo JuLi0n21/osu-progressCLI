@@ -128,7 +128,8 @@
 
             if (modList.Count > 0)
             {
-                if (modList.Contains("dt") && modList.Contains("nc")) {
+                if (modList.Contains("dt") && modList.Contains("nc"))
+                {
                     modList.Remove("dt");
                 }
                 string modsString = string.Join(" -m ", modList);

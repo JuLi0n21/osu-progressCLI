@@ -53,7 +53,14 @@ namespace osu_progressCLI.Webserver.Server
                 while (true)
                 {
                     var context = await listener.GetContextAsync();
-                    await HandleRequest(context);
+                    try
+                    {
+                        await HandleRequest(context);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(Logger.Severity.Error, Logger.Framework.Server, ex.Message);
+                    }
                 }
             });
             await listenTask;
@@ -61,98 +68,105 @@ namespace osu_progressCLI.Webserver.Server
 
         private async Task HandleRequest(HttpListenerContext context)
         {
-            HttpListenerRequest request = context.Request;
-            HttpListenerResponse response = context.Response;
-
-            string path = request.Url.AbsolutePath;
-            //Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, path);
-
-            if (
-                path.EndsWith(".jpg")
-                || path.EndsWith(".jpeg")
-                || path.EndsWith(".png")
-                || path.EndsWith(".gif")
-                || path.EndsWith(".bmp")
-                || path.EndsWith(".tiff")
-                || path.EndsWith(".ico")
-                || path.EndsWith(".webp")
-                || path.EndsWith(".svg")
-            )
+            try
             {
-                serveimage(request, response, path);
-            }
+                HttpListenerRequest request = context.Request;
+                HttpListenerResponse response = context.Response;
 
-            if (path.EndsWith(".mp4"))
-            {
-                Servevid(request, response, Webserver.DEFAULT_VIDEO + path, "video/mp4");
-                return;
-            }
+                string path = request.Url.AbsolutePath;
+                //Logger.Log(Logger.Severity.Debug, Logger.Framework.Server, path);
 
-            if (
-                path.EndsWith(".css")
-                || path.EndsWith(".html")
-                || path.EndsWith(".js")
-                || path.EndsWith(".osr")
-            )
-            {
-                if (path.EndsWith(".css"))
+                if (
+                    path.EndsWith(".jpg")
+                    || path.EndsWith(".jpeg")
+                    || path.EndsWith(".png")
+                    || path.EndsWith(".gif")
+                    || path.EndsWith(".bmp")
+                    || path.EndsWith(".tiff")
+                    || path.EndsWith(".ico")
+                    || path.EndsWith(".webp")
+                    || path.EndsWith(".svg")
+                )
                 {
-                    ServeStaticFile(response, Webserver.DEFAULT_CSS + path, "text/css");
+                    serveimage(request, response, path);
+                }
+
+                if (path.EndsWith(".mp4"))
+                {
+                    Servevid(request, response, Webserver.DEFAULT_VIDEO + path, "video/mp4");
                     return;
                 }
 
-                if (path.EndsWith(".html"))
+                if (
+                    path.EndsWith(".css")
+                    || path.EndsWith(".html")
+                    || path.EndsWith(".js")
+                    || path.EndsWith(".osr")
+                )
                 {
-                    ServeStaticFile(response, Webserver.DEFAULT_HTML + path, "text/html");
+                    if (path.EndsWith(".css"))
+                    {
+                        ServeStaticFile(response, Webserver.DEFAULT_CSS + path, "text/css");
+                        return;
+                    }
+
+                    if (path.EndsWith(".html"))
+                    {
+                        ServeStaticFile(response, Webserver.DEFAULT_HTML + path, "text/html");
+                        return;
+                    }
+
+                    if (path.EndsWith(".js"))
+                    {
+                        ServeStaticFile(response, Webserver.DEFAULT_JS + path, "text/js");
+                        return;
+                    }
+
+                    if (path.EndsWith(".osr"))
+                    {
+                        ServeStaticFile(
+                            response,
+                            $"{Credentials.Instance.GetConfig().osufolder}/Data/r/{path}",
+                            "application/osr"
+                        );
+                        return;
+                    }
+                }
+
+                if (path.EndsWith(".ogg") || path.EndsWith(".mp3") || path.EndsWith(".wav"))
+                {
+                    serveaudio(request, response, path);
+                }
+
+                if (path.Equals("/stream"))
+                {
+                    sse.Setup(request, response, parser);
                     return;
                 }
 
-                if (path.EndsWith(".js"))
+                if (path.StartsWith("/api/"))
                 {
-                    ServeStaticFile(response, Webserver.DEFAULT_JS + path, "text/js");
-                    return;
+                    api.Route(request, response, parser);
                 }
-
-                if (path.EndsWith(".osr"))
+                else if (path.StartsWith("/"))
                 {
-                    ServeStaticFile(
-                        response,
-                        $"{Credentials.Instance.GetConfig().osufolder}/Data/r/{path}",
-                        "application/osr"
+                    helper.route(request, response, parser);
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.OutputStream.Close();
+
+                    Logger.Log(
+                        Logger.Severity.Warning,
+                        Logger.Framework.Server,
+                        $"Not found: {path}. (Can be Ignored if everything works fine!)"
                     );
-                    return;
                 }
             }
-
-            if (path.EndsWith(".ogg") || path.EndsWith(".mp3") || path.EndsWith(".wav"))
+            catch (Exception e)
             {
-                serveaudio(request, response, path);
-            }
-
-            if (path.Equals("/stream"))
-            {
-                sse.Setup(request, response, parser);
-                return;
-            }
-
-            if (path.StartsWith("/api/"))
-            {
-                api.Route(request, response, parser);
-            }
-            else if (path.StartsWith("/"))
-            {
-                helper.route(request, response, parser);
-            }
-            else
-            {
-                response.StatusCode = 404;
-                response.OutputStream.Close();
-
-                Logger.Log(
-                    Logger.Severity.Warning,
-                    Logger.Framework.Server,
-                    $"Not found: {path}. (Can be Ignored if everything works fine!)"
-                );
+                Logger.Log(Logger.Severity.Error, Logger.Framework.Server, e.Message);
             }
         }
 
@@ -345,7 +359,9 @@ namespace osu_progressCLI.Webserver.Server
                     response.OutputStream.Write(imageBytes, 0, imageBytes.Length);
                     response.OutputStream.Close();
                 }
-                else if (File.Exists(@$"{Credentials.Instance.GetConfig().songfolder}{decodedname}"))
+                else if (
+                    File.Exists(@$"{Credentials.Instance.GetConfig().songfolder}{decodedname}")
+                )
                 {
                     string contentType = GetContentType(
                         Path.GetExtension(
