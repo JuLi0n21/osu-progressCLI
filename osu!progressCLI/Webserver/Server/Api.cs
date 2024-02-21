@@ -41,12 +41,6 @@ namespace osu_progressCLI.Webserver.Server
                 }
                 NameValueCollection PostData = HttpUtility.ParseQueryString(requestData);
 
-                foreach (string key in PostData.AllKeys)
-                {
-                    string value = PostData[key];
-                    Console.WriteLine($"Key: {key}, Value: {value}");
-                }
-
                 DateTime to = DateTime.Now;
                 DateTime from = to.Subtract(TimeSpan.FromDays(30000)); //around 100 years
 
