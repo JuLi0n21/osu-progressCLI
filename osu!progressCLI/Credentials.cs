@@ -16,8 +16,8 @@ namespace osu_progressCLI
 
         private JsonConfig config { get; set; }
 
-        string credentialsFilePath = "credentials.json";
-        public static string loginwithosuFilePath = "loginWithOsu!.json";
+        public static string credentialsFilePath = "../credentials.json";
+        public static string loginwithosuFilePath = "../loginWithOsu!.json";
 
         private Credentials()
         {

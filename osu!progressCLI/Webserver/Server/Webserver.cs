@@ -7,13 +7,13 @@ namespace osu_progressCLI.Webserver.Server
 {
     public class Webserver
     {
-        public static readonly string DEFAULT_PATH = "public/";
-        public static readonly string DEFAULT_CSS = "public/css/";
-        public static readonly string DEFAULT_HTML = "public/html/";
-        public static readonly string DEFAULT_IMAGES = "public/img/";
-        public static readonly string DEFAULT_JS = "public/js/";
-        public static readonly string DEFAULT_FLUID = "Webserver/Fluid/";
-        public static readonly string DEFAULT_VIDEO = "public/video/";
+        public static readonly string DEFAULT_PATH = "../public/";
+        public static readonly string DEFAULT_CSS = "../public/css/";
+        public static readonly string DEFAULT_HTML = "../public/html/";
+        public static readonly string DEFAULT_IMAGES = "../public/img/";
+        public static readonly string DEFAULT_JS = "../public/js/";
+        public static readonly string DEFAULT_FLUID = "../Webserver/Fluid/";
+        public static readonly string DEFAULT_VIDEO = "../public/video/";
         private static readonly FluidParser parser = new FluidParser();
 
         private static Webserver instance;

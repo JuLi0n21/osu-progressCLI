@@ -16,7 +16,7 @@ namespace osu1progressbar.Game.Database
     public class DatabaseController
     {
         private readonly string dbname = null;
-        private readonly string connectionString = "Data Source=osu!progress.db;Version=3;";
+        private readonly string connectionString = "Data Source=../osu!progress.db;Version=3;";
 
         //private readonly string connectionString = "Data Source=osu!TEST.db;Version=3;";
 
